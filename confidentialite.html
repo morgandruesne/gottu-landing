@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Politique de confidentialité — Gottu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #171411;
+  --paper: #FAF6EF;
+  --sage: #4CA671;
+  --sage-pale: #E3F2E9;
+  --sage-deep: #2D7A4E;
+  --honey: #E9A23B;
+  --honey-pale: #FFF3DB;
+  --blush: #EB6E56;
+  --clay: #C4A882;
+  --fog: #EDE8DF;
+  --text-mid: #6D6355;
+  --text-light: #A39888;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+  font-family:'Outfit',sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,.display{font-family:'Bricolage Grotesque',sans-serif}
+a{text-decoration:none;color:inherit}
+img{max-width:100%}
+
+/* ═══ GRAIN OVERLAY ═══ */
+body::after{
+  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;
+}
+
+/* ═══ NAV ═══ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:20px 40px;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(250,246,239,0.92);
+  backdrop-filter:blur(24px);
+  box-shadow:0 1px 0 var(--fog);
+}
+.nav-logo{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;font-size:26px;letter-spacing:-0.5px;
+}
+.nav-logo i{
+  display:inline-block;width:8px;height:8px;
+  background:var(--sage);border-radius:50%;
+  margin-left:1px;transform:translateY(-8px);
+}
+
+/* ═══ PAGE CONTENT ═══ */
+.page-wrap{
+  max-width:760px;
+  margin:0 auto;
+  padding:140px 40px 100px;
+}
+.page-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--sage-pale);color:var(--sage-deep);
+  padding:6px 14px;border-radius:100px;
+  font-size:12px;font-weight:700;text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:20px;
+}
+.page-tag::before{content:'';width:6px;height:6px;background:var(--sage);border-radius:50%}
+.page-title{
+  font-size:clamp(36px,5vw,56px);
+  font-weight:800;letter-spacing:-2px;
+  line-height:1.05;
+  margin-bottom:12px;
+}
+.page-updated{
+  font-size:13px;color:var(--text-light);
+  margin-bottom:56px;
+}
+
+.legal-section{
+  margin-bottom:48px;
+}
+.legal-section h2{
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:-0.3px;
+  margin-bottom:16px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--fog);
+}
+.legal-section p{
+  font-size:15px;
+  line-height:1.85;
+  color:var(--text-mid);
+  margin-bottom:12px;
+}
+.legal-section p:last-child{margin-bottom:0}
+.legal-section strong{
+  color:var(--ink);
+  font-weight:600;
+}
+.legal-section a{
+  color:var(--sage-deep);
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+.legal-section a:hover{color:var(--sage)}
+.legal-section ul{
+  list-style:none;
+  margin:8px 0 12px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.legal-section ul li{
+  font-size:15px;
+  line-height:1.7;
+  color:var(--text-mid);
+  padding-left:20px;
+  position:relative;
+}
+.legal-section ul li::before{
+  content:'';
+  position:absolute;left:0;top:10px;
+  width:6px;height:6px;
+  background:var(--sage);border-radius:50%;
+}
+
+/* ═══ FOOTER ═══ */
+.footer{
+  padding:32px 60px;
+  border-top:1px solid var(--fog);
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:16px;
+}
+.footer-left{display:flex;align-items:center;gap:20px}
+.footer-logo{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;font-size:18px;color:var(--text-light);
+}
+.footer-logo i{
+  display:inline-block;width:5px;height:5px;
+  background:var(--sage);border-radius:50%;
+  margin-left:1px;transform:translateY(-6px);
+}
+.footer-tagline{font-size:12px;color:var(--text-light);font-style:italic}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:12px;color:var(--text-light);transition:color 0.2s}
+.footer-links a:hover{color:var(--ink)}
+.footer-links a.active{color:var(--sage-deep);font-weight:600}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:900px){
+  .nav{padding:16px 24px}
+  .page-wrap{padding:110px 24px 80px}
+  .footer{padding:24px;flex-direction:column;text-align:center}
+  .footer-left{flex-direction:column;gap:4px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-logo">gottu<i></i></a>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-tag">Légal</div>
+  <h1 class="page-title">Politique de confidentialité</h1>
+  <p class="page-updated">Dernière mise à jour : avril 2026</p>
+
+  <div class="legal-section">
+    <h2>1. Qui sommes-nous ?</h2>
+    <p><strong>Gottu SAS</strong> édite le site <strong>gottu.coffee</strong> et commercialise un système de fidélité sans application via des cartes NFC pour les cafés indépendants. En tant que responsable de traitement, Gottu SAS s'engage à traiter vos données personnelles dans le respect du <strong>Règlement Général sur la Protection des Données (RGPD)</strong> et de la loi Informatique et Libertés.</p>
+    <p>Pour toute question relative à vos données : <a href="mailto:privacy@gottu.coffee">privacy@gottu.coffee</a></p>
+  </div>
+
+  <div class="legal-section">
+    <h2>2. Données collectées et finalités</h2>
+    <p><strong>Via le formulaire de contact du site :</strong></p>
+    <ul>
+      <li>Nom du café et quartier — pour qualifier votre demande d'installation</li>
+      <li>Numéro de téléphone — pour vous recontacter et planifier l'installation</li>
+    </ul>
+    <p><strong>Via les cartes NFC Gottu (en café) :</strong></p>
+    <ul>
+      <li>Un prénom (facultatif) — pour personnaliser l'accueil</li>
+      <li>Préférences de boissons — pour votre expérience de fidélité</li>
+      <li>Compteur de passages — pour gérer les récompenses</li>
+    </ul>
+    <p>Aucune donnée sensible (email, données bancaires, numéro de sécurité sociale) n'est collectée via les cartes NFC.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>3. Base légale des traitements</h2>
+    <ul>
+      <li><strong>Exécution d'un contrat</strong> — traitement des demandes d'installation et gestion du service de fidélité</li>
+      <li><strong>Intérêt légitime</strong> — amélioration du service, suivi relation client</li>
+      <li><strong>Consentement</strong> — lorsque vous enregistrez volontairement vos préférences sur une carte NFC</li>
+    </ul>
+  </div>
+
+  <div class="legal-section">
+    <h2>4. Durée de conservation</h2>
+    <ul>
+      <li><strong>Données formulaire de contact :</strong> 3 ans à compter du dernier contact</li>
+      <li><strong>Données carte NFC :</strong> effacées à la demande ou après 18 mois d'inactivité</li>
+      <li><strong>Données de facturation :</strong> 10 ans conformément aux obligations légales</li>
+    </ul>
+  </div>
+
+  <div class="legal-section">
+    <h2>5. Destinataires des données</h2>
+    <p>Vos données sont traitées par Gottu SAS et, pour les besoins techniques, par nos sous-traitants :</p>
+    <ul>
+      <li><strong>Vercel Inc.</strong> — hébergement du site (serveurs UE)</li>
+      <li><strong>Prestataires d'envoi d'emails</strong> — pour les communications liées à votre demande</li>
+    </ul>
+    <p>Nous ne revendons jamais vos données à des tiers à des fins commerciales.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>6. Transferts hors Union Européenne</h2>
+    <p>Certains sous-traitants peuvent être établis hors de l'UE. Dans ce cas, nous veillons à ce que ces transferts soient encadrés par des garanties appropriées (clauses contractuelles types de la Commission européenne ou décision d'adéquation).</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>7. Cookies</h2>
+    <p>Ce site n'utilise pas de cookies de tracking, publicitaires ou d'analyse comportementale. Seuls des cookies techniques strictement nécessaires au bon fonctionnement du site peuvent être déposés, sans nécessiter votre consentement.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>8. Vos droits</h2>
+    <p>Conformément au RGPD, vous disposez des droits suivants sur vos données :</p>
+    <ul>
+      <li><strong>Droit d'accès</strong> — savoir quelles données nous détenons sur vous</li>
+      <li><strong>Droit de rectification</strong> — corriger des données inexactes</li>
+      <li><strong>Droit à l'effacement</strong> — demander la suppression de vos données</li>
+      <li><strong>Droit à la portabilité</strong> — recevoir vos données dans un format structuré</li>
+      <li><strong>Droit d'opposition</strong> — vous opposer à certains traitements</li>
+      <li><strong>Droit à la limitation</strong> — limiter le traitement dans certains cas</li>
+    </ul>
+    <p>Pour exercer vos droits, contactez-nous à : <a href="mailto:privacy@gottu.coffee">privacy@gottu.coffee</a>. Nous vous répondrons dans un délai maximum d'un mois.</p>
+    <p>Vous disposez également du droit d'introduire une réclamation auprès de la <strong>Commission Nationale de l'Informatique et des Libertés (CNIL)</strong> : <a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a>.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>9. Sécurité</h2>
+    <p>Gottu SAS met en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données contre tout accès non autorisé, perte, altération ou divulgation : chiffrement des données en transit (HTTPS), accès restreint aux données, hébergement sécurisé.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>10. Modifications</h2>
+    <p>Cette politique de confidentialité peut être mise à jour à tout moment. La date de dernière mise à jour est indiquée en haut de cette page. En cas de modification substantielle, nous vous en informerons par tout moyen approprié.</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-left">
+    <span class="footer-logo">gottu<i></i></span>
+    <span class="footer-tagline">We got you.</span>
+  </div>
+  <div class="footer-links">
+    <a href="mentions-legales.html">Mentions légales</a>
+    <a href="confidentialite.html" class="active">Confidentialité</a>
+    <a href="mailto:hello@gottu.coffee">hello@gottu.coffee</a>
+    <a href="#">@gottu.coffee</a>
+  </div>
+</footer>
+
+</body>
+</html>

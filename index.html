@@ -67,13 +67,13 @@ body::after{
 .nav-links{display:flex;gap:32px;align-items:center}
 .nav-links a{font-size:14px;font-weight:500;color:var(--text-mid);transition:color 0.2s}
 .nav-links a:hover{color:var(--ink)}
-.nav-btn{
+.nav-links a.nav-btn{
   background:var(--ink);color:var(--paper);
   padding:10px 22px;border-radius:10px;
   font-weight:600;font-size:13px;letter-spacing:0.3px;
   transition:transform 0.25s cubic-bezier(.34,1.56,.64,1),box-shadow 0.25s;
 }
-.nav-btn:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 6px 24px rgba(0,0,0,0.15)}
+.nav-links a.nav-btn:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 6px 24px rgba(0,0,0,0.15)}
 
 /* ═══ HERO ═══ */
 .hero{
@@ -121,34 +121,63 @@ body::after{
 .hero-note{font-size:13px;color:var(--text-light);max-width:260px;line-height:1.5}
 
 /* HERO VISUAL */
-.hero-visual{position:relative;display:flex;justify-content:center;align-items:center}
-.card-stack{position:relative;width:360px;height:460px}
-.card-main{
-  position:absolute;top:20px;left:0;
-  width:340px;
-  background:#fff;border-radius:24px;
-  padding:32px 28px;
-  box-shadow:0 8px 60px rgba(23,20,17,0.08),0 1px 3px rgba(23,20,17,0.04);
-  border:1px solid rgba(0,0,0,0.04);
-  z-index:3;
-  transform:rotate(-1.5deg);
-}
-.card-behind{
-  position:absolute;top:0;left:30px;
-  width:340px;height:100%;
-  background:var(--fog);border-radius:24px;
-  border:1px solid rgba(0,0,0,0.03);
-  z-index:1;
-  transform:rotate(3deg);
-}
-.card-behind-2{
-  position:absolute;top:10px;left:15px;
-  width:340px;height:100%;
-  background:var(--honey-pale);border-radius:24px;
-  border:1px solid rgba(0,0,0,0.02);
+.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;padding:20px 0}
+.hv-scene{position:relative;width:360px;height:560px}
+/* Carte principale */
+.hv-main{
+  position:absolute;
+  top:80px;left:0;
+  width:295px;
+  background:#fff;
+  border-radius:24px;
+  padding:28px 24px;
+  box-shadow:0 20px 80px rgba(23,20,17,0.11),0 1px 3px rgba(23,20,17,0.04);
+  border:1px solid rgba(0,0,0,0.05);
+  transform:rotate(-2deg);
   z-index:2;
-  transform:rotate(1deg);
 }
+/* Chip stats (sombre) — haut droite */
+.hv-chip-1{
+  position:absolute;
+  top:0;right:0;
+  width:168px;
+  background:var(--ink);color:var(--paper);
+  border-radius:20px;
+  padding:18px 18px;
+  box-shadow:0 12px 40px rgba(23,20,17,0.22);
+  transform:rotate(2.5deg);
+  z-index:3;
+  animation:floatA 7s ease-in-out infinite;
+}
+/* Chip Thomas — bas droite */
+.hv-chip-2{
+  position:absolute;
+  bottom:0;right:0;
+  width:205px;
+  background:var(--sage-pale);
+  border-radius:20px;
+  padding:18px 18px;
+  box-shadow:0 8px 32px rgba(23,20,17,0.1);
+  border:1px solid rgba(0,0,0,0.04);
+  transform:rotate(-1.5deg);
+  z-index:3;
+  animation:floatB 8s ease-in-out infinite;
+}
+@keyframes floatA{0%,100%{transform:rotate(2.5deg) translateY(0)}50%{transform:rotate(2.5deg) translateY(-7px)}}
+@keyframes floatB{0%,100%{transform:rotate(-1.5deg) translateY(0)}50%{transform:rotate(-1.5deg) translateY(-8px)}}
+/* Chip stats internals */
+.hvc1-num{font-family:'Bricolage Grotesque',sans-serif;font-size:38px;font-weight:800;color:var(--paper);line-height:1;margin-bottom:2px}
+.hvc1-label{font-size:11px;color:rgba(250,246,239,0.45);font-weight:500;margin-bottom:14px}
+.hvc1-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.hvc1-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.hvc1-text{font-size:11px;color:rgba(250,246,239,0.55);line-height:1.3}
+/* Chip Thomas internals */
+.hvc2-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.hvc2-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--sage-pale),var(--honey-pale));display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:14px;color:var(--sage-deep);flex-shrink:0}
+.hvc2-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:15px}
+.hvc2-meta{font-size:11px;color:var(--text-light);margin-top:1px}
+.hvc2-tag{display:inline-flex;align-items:center;gap:5px;background:var(--sage-pale);color:var(--sage-deep);padding:6px 11px;border-radius:9px;font-size:11px;font-weight:500}
+.hvc2-dot{width:5px;height:5px;border-radius:50%;background:var(--sage);flex-shrink:0}
 .card-status{
   display:inline-flex;align-items:center;gap:6px;
   background:var(--sage-pale);color:var(--sage-deep);
@@ -185,6 +214,8 @@ body::after{
   animation:grow 1.8s 1s cubic-bezier(.22,1,.36,1) forwards;
 }
 @keyframes grow{to{width:70%}}
+@keyframes grow2{to{width:30%}}
+@keyframes grow3{to{width:55%}}
 .progress-meta{display:flex;justify-content:space-between;font-size:12px}
 .progress-meta span:first-child{color:var(--text-light)}
 .progress-meta span:last-child{font-weight:700;color:var(--honey)}
@@ -203,6 +234,24 @@ body::after{
 .drink-tag:nth-child(1) .drink-dot{background:var(--sage)}
 .drink-tag:nth-child(2) .drink-dot{background:var(--honey)}
 .drink-tag:nth-child(3) .drink-dot{background:var(--blush)}
+/* Drink photo cards */
+.drink-photos{display:flex;gap:8px;margin-top:2px}
+.drink-photo-card{
+  flex:1;border-radius:12px;overflow:hidden;
+  background:var(--fog);
+  transition:transform 0.25s cubic-bezier(.34,1.56,.64,1);
+  cursor:default;
+}
+.drink-photo-card:hover{transform:scale(1.04) translateY(-2px)}
+.drink-photo-card img{width:100%;height:76px;object-fit:cover;display:block}
+.drink-photo-label{
+  font-size:10px;font-weight:500;color:var(--text-mid);
+  padding:6px 8px;line-height:1.35;
+}
+/* Stats chip drink preview */
+.hvc1-drink{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(250,246,239,0.1)}
+.hvc1-drink img{width:32px;height:32px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.hvc1-drink-text{font-size:11px;color:rgba(250,246,239,0.55);line-height:1.3}
 
 /* ═══ MARQUEE ═══ */
 .marquee-wrap{
@@ -210,7 +259,7 @@ body::after{
   border-top:1px solid var(--fog);border-bottom:1px solid var(--fog);
 }
 .marquee{
-  display:flex;gap:48px;
+  display:flex;
   animation:scroll 20s linear infinite;
   width:max-content;
 }
@@ -218,6 +267,7 @@ body::after{
 .marquee span{
   font-size:14px;color:var(--text-light);white-space:nowrap;
   font-weight:500;letter-spacing:0.5px;
+  margin-right:48px;
 }
 .marquee span b{color:var(--text-mid);font-weight:600}
 
@@ -234,7 +284,7 @@ body::after{
   content:'';position:absolute;top:-120px;right:-80px;
   width:400px;height:400px;
   background:radial-gradient(circle,rgba(232,162,59,0.1),transparent 65%);
-  border-radius:50%;
+  border-radius:50%;pointer-events:none;
 }
 .problem h2{font-size:clamp(34px,4.2vw,52px);font-weight:800;line-height:1.08;letter-spacing:-1.5px}
 .problem h2 span{color:var(--blush)}
@@ -418,7 +468,7 @@ body::after{
   content:'';position:absolute;bottom:-150px;left:50%;transform:translateX(-50%);
   width:500px;height:500px;
   background:radial-gradient(circle,rgba(76,166,113,0.1),transparent 60%);
-  border-radius:50%;
+  border-radius:50%;pointer-events:none;
 }
 .final h2{
   font-size:clamp(34px,4.2vw,52px);font-weight:800;
@@ -507,9 +557,11 @@ body::after{
   .footer-left{flex-direction:column;gap:4px}
 }
 @media(max-width:420px){
-  .card-stack{width:300px;height:420px}
-  .card-main{width:280px;padding:24px 20px}
-  .card-behind,.card-behind-2{width:280px}
+  .hv-scene{width:300px;height:480px}
+  .hv-main{width:240px;padding:22px 18px;top:70px}
+  .hv-chip-1{width:140px;padding:14px}
+  .hv-chip-2{width:170px;padding:14px}
+  .hvc1-num{font-size:30px}
 }
 </style>
 </head>
@@ -539,10 +591,28 @@ body::after{
     <p class="hero-note" style="margin-top:16px">Sans engagement. Sans carte bancaire.<br>On vient installer chez vous.</p>
   </div>
   <div class="hero-visual">
-    <div class="card-stack">
-      <div class="card-behind"></div>
-      <div class="card-behind-2"></div>
-      <div class="card-main">
+    <div class="hv-scene">
+
+      <!-- Chip stats — haut droite -->
+      <div class="hv-chip-1">
+        <div class="hvc1-num">22</div>
+        <div class="hvc1-label">passages aujourd'hui</div>
+        <div class="hvc1-row">
+          <span class="hvc1-dot" style="background:var(--sage)"></span>
+          <span class="hvc1-text">Heure de pointe : 8h30</span>
+        </div>
+        <div class="hvc1-row">
+          <span class="hvc1-dot" style="background:var(--honey)"></span>
+          <span class="hvc1-text">Top boisson : Latte avoine</span>
+        </div>
+        <div class="hvc1-drink">
+          <img src="img/953c358d43f35f52d5e3adf7448bb245.jpg" alt="Latte avoine">
+          <span class="hvc1-drink-text">Latte avoine · la boisson du jour</span>
+        </div>
+      </div>
+
+      <!-- Carte principale : Léa -->
+      <div class="hv-main">
         <div class="card-status"><span class="pulse"></span>Badge détecté</div>
         <div class="card-person">
           <div class="card-avatar">L</div>
@@ -558,13 +628,34 @@ body::after{
         </div>
         <div class="card-section">
           <div class="card-section-label">Commandes favorites</div>
-          <div>
-            <span class="drink-tag"><span class="drink-dot"></span>Latte &middot; Avoine &middot; Vanille</span>
-            <span class="drink-tag"><span class="drink-dot"></span>Matcha latte &middot; M</span>
-            <span class="drink-tag"><span class="drink-dot"></span>Flat white &middot; S</span>
+          <div class="drink-photos">
+            <div class="drink-photo-card">
+              <img src="img/953c358d43f35f52d5e3adf7448bb245.jpg" alt="Latte avoine vanille">
+              <div class="drink-photo-label">Latte · Avoine · Vanille</div>
+            </div>
+            <div class="drink-photo-card">
+              <img src="img/9a897189061a44ccbc211f88205d161c.jpg" alt="Matcha latte">
+              <div class="drink-photo-label">Matcha latte · M</div>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Chip Thomas — bas droite -->
+      <div class="hv-chip-2">
+        <div class="hvc2-head">
+          <div class="hvc2-avatar">T</div>
+          <div>
+            <div class="hvc2-name">Thomas</div>
+            <div class="hvc2-meta">31 visites &middot; il y a 2j</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <img src="img/e163d2ee9cf456cfa7e7bfc99b37889d.jpg" alt="" style="width:38px;height:38px;border-radius:10px;object-fit:cover;flex-shrink:0">
+          <span class="hvc2-tag" style="flex:1"><span class="hvc2-dot"></span>Americano &middot; S &middot; Sans sucre</span>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -580,6 +671,16 @@ body::after{
     <span>&middot;</span>
     <span>Specialty coffee <b>friendly</b></span>
     <span>&middot;</span>
+    <span>Sans <b>application</b> à télécharger</span>
+    <span>&middot;</span>
+    <span>Installation en <b>moins de 10 min</b></span>
+    <span>&middot;</span>
+    <span>Compatible <b>tous smartphones</b></span>
+    <span>&middot;</span>
+    <span>Zéro <b>carte papier</b></span>
+    <span>&middot;</span>
+    <span>Données <b>100% à vous</b></span>
+    <span>&middot;</span>
     <span>Testé par des cafés du <b>11e arrondissement</b></span>
     <span>&middot;</span>
     <span>Approuvé dans le <b>Marais</b></span>
@@ -587,6 +688,16 @@ body::after{
     <span>Adopté à <b>Oberkampf</b></span>
     <span>&middot;</span>
     <span>Specialty coffee <b>friendly</b></span>
+    <span>&middot;</span>
+    <span>Sans <b>application</b> à télécharger</span>
+    <span>&middot;</span>
+    <span>Installation en <b>moins de 10 min</b></span>
+    <span>&middot;</span>
+    <span>Compatible <b>tous smartphones</b></span>
+    <span>&middot;</span>
+    <span>Zéro <b>carte papier</b></span>
+    <span>&middot;</span>
+    <span>Données <b>100% à vous</b></span>
     <span>&middot;</span>
   </div>
 </div>
@@ -730,14 +841,17 @@ body::after{
   <div class="final-box">
     <h2>Prêt à connaître vos clients ?</h2>
     <p class="sub">2 mois gratuits, sans engagement. On vient installer chez vous, on forme votre équipe, et on vous laisse juger.</p>
-    <div class="form-grid">
-      <input class="form-input" type="text" placeholder="Nom du café" required>
-      <input class="form-input" type="text" placeholder="Quartier" required>
-    </div>
-    <div class="form-grid full">
-      <input class="form-input" type="tel" placeholder="Téléphone / WhatsApp" required>
-    </div>
-    <button class="form-btn" style="margin-top:12px">Réserver mon installation gratuite &rarr;</button>
+    <form action="https://api.web3forms.com/submit" method="POST">
+      <input type="hidden" name="access_key" value="6f834764-0c17-4213-8dff-d7d097f11dae">
+      <div class="form-grid">
+        <input class="form-input" type="text" name="cafe" placeholder="Nom du café" required>
+        <input class="form-input" type="text" name="quartier" placeholder="Quartier" required>
+      </div>
+      <div class="form-grid full">
+        <input class="form-input" type="tel" name="telephone" placeholder="Téléphone / WhatsApp" required>
+      </div>
+      <button type="submit" class="form-btn" style="margin-top:12px">Réserver mon installation gratuite &rarr;</button>
+    </form>
   </div>
 </section>
 
@@ -747,8 +861,8 @@ body::after{
     <span class="footer-tagline">We got you.</span>
   </div>
   <div class="footer-links">
-    <a href="#">Mentions légales</a>
-    <a href="#">Confidentialité</a>
+    <a href="mentions-legales.html">Mentions légales</a>
+    <a href="confidentialite.html">Confidentialité</a>
     <a href="mailto:hello@gottu.com">hello@gottu.com</a>
     <a href="#">@gottu.coffee</a>
   </div>
