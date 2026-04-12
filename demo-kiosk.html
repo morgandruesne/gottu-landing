@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gottu — Démo Barista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#171411;--paper:#FAF6EF;--sage:#4CA671;--sage-pale:#E3F2E9;
+  --sage-deep:#2D7A4E;--honey:#E9A23B;--honey-pale:#FFF3DB;
+  --blush:#EB6E56;--blush-pale:#FDE8E4;--fog:#EDE8DF;
+  --mid:#6D6355;--light:#A39888;--white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden}
+body{
+  font-family:'Outfit',sans-serif;
+  background:#E8E2D8;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  -webkit-font-smoothing:antialiased;
+  gap:20px;
+}
+h1,h2,h3{font-family:'Bricolage Grotesque',sans-serif}
+
+/* ═══ STAGE LABEL ═══ */
+.stage-label{
+  font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;
+  color:#9B9389;
+}
+
+/* ═══ PHONE FRAME ═══ */
+.phone{
+  width:375px;flex-shrink:0;
+  background:var(--ink);
+  border-radius:44px;
+  padding:14px;
+  box-shadow:
+    0 24px 80px rgba(23,20,17,0.28),
+    0 4px 16px rgba(23,20,17,0.12),
+    inset 0 0 0 2px rgba(255,255,255,0.06);
+  position:relative;
+}
+.phone-screen{
+  background:var(--paper);
+  border-radius:32px;
+  overflow:hidden;
+  position:relative;
+  height:700px;
+  display:flex;flex-direction:column;
+}
+.phone-notch{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:150px;height:28px;
+  background:var(--ink);
+  border-radius:0 0 20px 20px;
+  z-index:100;
+  pointer-events:none;
+}
+
+/* ═══ STATUS BAR ═══ */
+.status-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:36px 24px 8px;font-size:12px;font-weight:600;
+  color:var(--mid);flex-shrink:0;
+}
+
+/* ═══ APP NAV BAR (top) ═══ */
+.app-nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:2px 20px 10px;flex-shrink:0;
+}
+.app-logo{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;font-size:20px;color:var(--ink);
+}
+.app-logo i{
+  display:inline-block;width:5px;height:5px;
+  background:var(--sage);border-radius:50%;
+  margin-left:1px;transform:translateY(-5px);
+}
+.app-staff{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--mid);font-weight:500;
+}
+.app-staff-dot{width:7px;height:7px;border-radius:50%;background:var(--sage)}
+
+/* ═══ BOTTOM NAV ═══ */
+.bottom-nav{
+  display:flex;justify-content:space-around;align-items:center;
+  padding:12px 16px 20px;
+  border-top:1px solid var(--fog);
+  flex-shrink:0;background:var(--paper);
+}
+.bottom-nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  font-size:10px;font-weight:600;color:var(--light);
+}
+.bottom-nav-item.active{color:var(--sage)}
+.bottom-nav-item svg{width:20px;height:20px}
+
+/* ═══ SCREENS ═══ */
+.screen{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  transition:opacity 0.4s ease,transform 0.4s ease;
+}
+.screen.hidden{opacity:0;pointer-events:none;transform:scale(0.98)}
+
+/* ═══════════════════════════════════
+   SCREEN 1 — WAITING
+═══════════════════════════════════ */
+#s-idle{}
+.waiting-body{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:20px 32px 32px;text-align:center;
+}
+.nfc-ring{
+  width:120px;height:120px;border-radius:50%;
+  border:3px solid var(--fog);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;margin-bottom:28px;
+  cursor:pointer;
+}
+.nfc-ring::before{
+  content:'';position:absolute;inset:-14px;
+  border-radius:50%;border:2px dashed var(--fog);
+  animation:spin 12s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.nfc-ring::after{
+  content:'';position:absolute;inset:-28px;
+  border-radius:50%;border:1.5px solid rgba(237,232,223,0.5);
+  animation:spin 20s linear infinite reverse;
+}
+.nfc-icon{font-size:40px;transition:transform 0.3s}
+.nfc-ring:hover .nfc-icon{transform:scale(1.1)}
+.waiting-title{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;font-size:22px;color:var(--ink);
+  margin-bottom:10px;letter-spacing:-0.5px;
+}
+.waiting-sub{font-size:14px;color:var(--light);line-height:1.6;max-width:240px;margin-bottom:32px}
+.search-bar{
+  width:100%;
+  display:flex;align-items:center;gap:10px;
+  background:var(--white);border:1.5px solid var(--fog);
+  border-radius:14px;padding:13px 16px;cursor:pointer;
+  transition:border-color 0.2s;
+}
+.search-bar:hover{border-color:var(--light)}
+.search-bar svg{width:16px;height:16px;color:var(--light);flex-shrink:0}
+.search-bar span{font-size:13px;color:var(--light)}
+.tap-hint{
+  font-size:10px;color:rgba(76,166,113,0.6);font-weight:500;
+  margin-top:20px;letter-spacing:0.5px;
+  animation:hintBlink 2.2s ease-in-out infinite alternate;
+}
+@keyframes hintBlink{from{opacity:0.4}to{opacity:1}}
+
+/* ═══════════════════════════════════
+   SCAN OVERLAY
+═══════════════════════════════════ */
+.scan-overlay{
+  position:absolute;inset:0;border-radius:32px;
+  background:var(--ink);z-index:200;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.scan-overlay.active{opacity:1;pointer-events:all}
+.scan-nfc-box{
+  width:80px;height:80px;border-radius:24px;
+  background:rgba(250,246,239,0.06);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.scan-nfc-box::after{
+  content:'';position:absolute;inset:-3px;border-radius:27px;
+  border:2px solid var(--sage);
+  animation:scanGlow 1.2s ease-in-out infinite alternate;
+}
+@keyframes scanGlow{
+  from{opacity:0.3;box-shadow:0 0 0 0 rgba(76,166,113,0)}
+  to{opacity:1;box-shadow:0 0 0 10px rgba(76,166,113,0.08)}
+}
+.scan-text{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:17px;font-weight:700;color:var(--paper);
+}
+.scan-dots{display:flex;gap:8px}
+.scan-dots span{
+  width:7px;height:7px;border-radius:50%;background:var(--sage);
+  animation:dotB 1.1s ease-in-out infinite;
+}
+.scan-dots span:nth-child(2){animation-delay:.18s}
+.scan-dots span:nth-child(3){animation-delay:.36s}
+@keyframes dotB{0%,80%,100%{transform:scale(1);opacity:0.4}40%{transform:scale(1.5);opacity:1}}
+
+/* ═══════════════════════════════════
+   SCREEN 2 — CLIENT PROFILE
+═══════════════════════════════════ */
+#s-profile{}
+.profile-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.profile-scroll::-webkit-scrollbar{display:none}
+
+.profile-header{padding:4px 0 0;flex-shrink:0}
+.badge-detected{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--sage-pale);color:var(--sage-deep);
+  padding:4px 12px;border-radius:100px;
+  font-size:11px;font-weight:600;
+  margin:0 0 14px 20px;
+}
+.badge-pulse{width:6px;height:6px;background:var(--sage);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.profile-top{
+  display:flex;align-items:center;gap:16px;
+  padding:0 20px;margin-bottom:16px;
+}
+.avatar{
+  width:60px;height:60px;border-radius:20px;
+  background:linear-gradient(135deg,var(--honey-pale),var(--sage-pale));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;font-size:24px;color:var(--sage-deep);
+  flex-shrink:0;
+}
+.profile-name{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;font-size:24px;letter-spacing:-0.5px;
+}
+.profile-meta{font-size:12px;color:var(--light);margin-top:2px}
+.profile-actions{display:flex;gap:6px;margin-top:8px}
+.profile-action-btn{
+  padding:5px 12px;border-radius:8px;
+  font-size:11px;font-weight:600;
+  border:1.5px solid var(--fog);background:var(--white);
+  color:var(--mid);cursor:pointer;
+  font-family:'Outfit',sans-serif;
+  transition:all 0.2s;
+}
+.profile-action-btn:hover{border-color:var(--sage);color:var(--sage-deep)}
+.profile-action-btn.active-tab{border-color:var(--sage);background:var(--sage-pale);color:var(--sage-deep)}
+
+/* Info strip */
+.info-strip{
+  display:flex;gap:0;margin:0 20px 14px;
+  background:var(--white);border-radius:16px;
+  border:1px solid rgba(0,0,0,0.04);
+  overflow:hidden;
+  box-shadow:0 2px 8px rgba(23,20,17,0.04);
+}
+.info-cell{
+  flex:1;padding:14px 12px;text-align:center;
+  border-right:1px solid var(--fog);
+}
+.info-cell:last-child{border-right:none}
+.info-num{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;font-size:20px;letter-spacing:-0.5px;
+}
+.info-label{font-size:10px;color:var(--light);margin-top:3px;font-weight:500}
+.info-cell.highlight .info-num{color:var(--honey)}
+
+/* Loyalty */
+.loyalty-section{
+  margin:0 20px 14px;padding:16px 18px;
+  background:var(--white);border-radius:16px;
+  border:1px solid rgba(0,0,0,0.04);
+  box-shadow:0 2px 8px rgba(23,20,17,0.04);
+}
+.loyalty-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.loyalty-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--light);font-weight:600}
+.loyalty-reward{
+  font-size:11px;font-weight:600;color:var(--sage-deep);
+  background:var(--sage-pale);padding:3px 10px;border-radius:100px;
+}
+.dots-row{display:flex;gap:6px;margin-bottom:8px;justify-content:center}
+.dot{
+  width:30px;height:30px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;font-family:'Bricolage Grotesque',sans-serif;
+}
+.dot.filled{background:var(--sage);color:#fff}
+.dot.next{background:var(--white);color:var(--honey);border:2px dashed var(--honey)}
+.dot.empty{background:var(--fog);color:var(--light)}
+.loyalty-footer{text-align:center;font-size:12px;color:var(--light)}
+.loyalty-footer b{color:var(--honey);font-weight:700}
+
+/* Favorites */
+.fav-section{margin:0 20px 12px}
+.fav-label{
+  font-size:11px;text-transform:uppercase;letter-spacing:1.2px;
+  color:var(--light);font-weight:600;margin-bottom:10px;padding-left:2px;
+}
+.fav-card{
+  background:var(--white);border-radius:16px;
+  border:1.5px solid rgba(0,0,0,0.04);
+  padding:14px 16px;margin-bottom:8px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 2px 8px rgba(23,20,17,0.04);
+  transition:transform 0.2s,border-color 0.2s;
+}
+.fav-card.selected{border-color:var(--sage);background:var(--sage-pale)}
+.fav-emoji{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;background:var(--sage-pale);
+}
+.fav-card:nth-child(3) .fav-emoji{background:var(--honey-pale)}
+.fav-card:nth-child(4) .fav-emoji{background:var(--blush-pale)}
+.fav-detail{flex:1;min-width:0}
+.fav-name{font-weight:600;font-size:14px;letter-spacing:-0.2px}
+.fav-desc{font-size:11px;color:var(--light);margin-top:1px}
+.fav-freq{
+  font-size:10px;color:var(--light);font-weight:500;
+  background:var(--fog);padding:3px 8px;border-radius:6px;
+  flex-shrink:0;white-space:nowrap;
+}
+.fav-card.selected .fav-freq{background:rgba(76,166,113,0.15);color:var(--sage-deep)}
+
+/* Note */
+.notes-section{margin:0 20px 16px}
+.note-card{
+  background:var(--honey-pale);border-radius:14px;
+  padding:14px 16px;border-left:3px solid var(--honey);
+}
+.note-title{
+  font-size:10px;text-transform:uppercase;letter-spacing:1.2px;
+  color:#9B7520;font-weight:700;margin-bottom:6px;
+}
+.note-text{font-size:13px;color:#7A6218;line-height:1.6;font-style:italic}
+
+/* Validate */
+.validate-bar{padding:4px 20px 24px;flex-shrink:0;background:var(--paper)}
+.validate-btn{
+  width:100%;padding:16px;border-radius:16px;border:none;
+  background:var(--sage);color:#fff;
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:700;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform 0.25s cubic-bezier(.34,1.56,.64,1),box-shadow 0.25s;
+}
+.validate-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(76,166,113,0.3)}
+.validate-btn:active{transform:scale(0.98)}
+.validate-btn svg{width:18px;height:18px}
+
+/* ═══════════════════════════════════
+   SCREEN 3 — EDIT PROFILE
+═══════════════════════════════════ */
+#s-edit{}
+.edit-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:24px}
+.edit-scroll::-webkit-scrollbar{display:none}
+
+.edit-header{
+  padding:4px 20px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--fog);flex-shrink:0;
+}
+.back-btn{
+  display:flex;align-items:center;gap:6px;
+  font-size:14px;font-weight:600;color:var(--sage-deep);
+  cursor:pointer;background:none;border:none;
+  font-family:'Outfit',sans-serif;
+}
+.back-btn svg{width:16px;height:16px}
+.edit-title{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;font-size:18px;letter-spacing:-0.3px;
+}
+.save-btn{
+  font-size:13px;font-weight:700;color:var(--sage-deep);
+  background:var(--sage-pale);border:none;
+  padding:6px 14px;border-radius:10px;cursor:pointer;
+  font-family:'Outfit',sans-serif;
+  transition:background 0.2s;
+}
+.save-btn:hover{background:#C7E9D3}
+
+.edit-avatar-section{
+  display:flex;flex-direction:column;align-items:center;
+  padding:20px 20px 20px;
+}
+.edit-avatar{
+  width:72px;height:72px;border-radius:22px;
+  background:linear-gradient(135deg,var(--honey-pale),var(--sage-pale));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;font-size:28px;color:var(--sage-deep);
+  margin-bottom:8px;
+}
+.edit-change{font-size:12px;color:var(--sage);font-weight:600;cursor:pointer}
+
+.form-section{padding:0 20px;margin-bottom:20px}
+.form-label{
+  font-size:11px;text-transform:uppercase;letter-spacing:1.2px;
+  color:var(--light);font-weight:600;margin-bottom:8px;
+}
+.form-input{
+  width:100%;padding:13px 16px;border-radius:12px;
+  border:1.5px solid var(--fog);background:var(--white);
+  font-family:'Outfit',sans-serif;font-size:14px;
+  color:var(--ink);outline:none;
+  transition:border-color 0.2s;
+}
+.form-input:focus{border-color:var(--sage)}
+.form-row{display:flex;gap:10px}
+.form-row .form-field{flex:1}
+.form-textarea{
+  width:100%;padding:13px 16px;border-radius:12px;
+  border:1.5px solid var(--fog);background:var(--white);
+  font-family:'Outfit',sans-serif;font-size:14px;
+  color:var(--ink);outline:none;resize:none;height:80px;line-height:1.5;
+  transition:border-color 0.2s;
+}
+.form-textarea:focus{border-color:var(--sage)}
+
+.edit-drinks{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.edit-drink{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:12px;
+  background:var(--white);border:1.5px solid var(--fog);
+}
+.edit-drink-text{flex:1;font-size:13px;font-weight:500}
+.edit-drink-remove{
+  width:26px;height:26px;border-radius:8px;
+  background:var(--blush-pale);border:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:background 0.2s;
+}
+.edit-drink-remove:hover{background:#F5C5BE}
+.edit-drink-remove svg{width:10px;height:10px;color:var(--blush)}
+.add-drink-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px;border-radius:12px;border:2px dashed var(--fog);
+  font-size:13px;color:var(--light);font-weight:600;
+  cursor:pointer;background:none;width:100%;
+  font-family:'Outfit',sans-serif;
+  transition:border-color 0.2s,color 0.2s;
+}
+.add-drink-btn:hover{border-color:var(--sage);color:var(--sage)}
+.add-drink-btn svg{width:14px;height:14px}
+
+.loyalty-config{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;border-radius:14px;
+  background:var(--white);border:1.5px solid var(--fog);
+}
+.loyalty-config-label{flex:1;font-size:13px;font-weight:500;color:var(--mid)}
+.config-btn{
+  width:32px;height:32px;border-radius:10px;
+  background:var(--fog);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:700;font-size:18px;color:var(--mid);
+  transition:background 0.2s;line-height:1;
+}
+.config-btn:hover{background:var(--sage-pale);color:var(--sage-deep)}
+.config-num{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;font-size:20px;min-width:28px;text-align:center;
+}
+
+.delete-zone{
+  margin:8px 20px 0;padding:14px;
+  border-radius:14px;border:1.5px solid var(--blush-pale);
+  text-align:center;
+}
+.delete-btn{
+  background:none;border:none;
+  font-size:13px;color:var(--blush);font-weight:600;
+  cursor:pointer;font-family:'Outfit',sans-serif;
+}
+
+/* ═══ ENTRY ANIMATIONS ═══ */
+.anim-in > *{
+  opacity:0;transform:translateY(14px);
+  animation:entryUp 0.45s cubic-bezier(.22,1,.36,1) forwards;
+}
+.anim-in > *:nth-child(1){animation-delay:.05s}
+.anim-in > *:nth-child(2){animation-delay:.1s}
+.anim-in > *:nth-child(3){animation-delay:.15s}
+.anim-in > *:nth-child(4){animation-delay:.2s}
+.anim-in > *:nth-child(5){animation-delay:.25s}
+.anim-in > *:nth-child(6){animation-delay:.3s}
+.anim-in > *:nth-child(7){animation-delay:.35s}
+.anim-in > *:nth-child(8){animation-delay:.4s}
+@keyframes entryUp{to{opacity:1;transform:translateY(0)}}
+
+/* ═══ TOAST ═══ */
+.toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:var(--paper);
+  padding:11px 22px;border-radius:100px;
+  font-size:13px;font-weight:500;
+  z-index:9000;
+  opacity:0;transition:all 0.35s cubic-bezier(.22,1,.36,1);
+  display:flex;align-items:center;gap:8px;
+  pointer-events:none;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-dot{width:7px;height:7px;border-radius:50%;background:var(--sage);flex-shrink:0}
+
+/* ═══ COUNTDOWN ═══ */
+.countdown-bar{
+  height:2px;background:var(--fog);position:absolute;bottom:0;left:0;right:0;
+  overflow:hidden;
+}
+.countdown-fill{
+  height:100%;background:linear-gradient(90deg,var(--sage),var(--honey));
+  width:100%;transform-origin:left;
+  transition:transform linear;
+}
+
+/* ═══ MOBILE — pas de faux cadre ═══ */
+@media(max-width:500px){
+  body{background:var(--paper);gap:0}
+  .stage-label{display:none}
+  .phone{
+    width:100%;background:transparent;
+    border-radius:0;padding:0;box-shadow:none;
+  }
+  .phone-screen{
+    border-radius:0;
+    height:100vh;height:100svh;
+  }
+  .phone-notch{display:none}
+  .status-bar{
+    padding-top:max(env(safe-area-inset-top,20px),20px);
+  }
+  .edit-header{
+    padding-top:max(env(safe-area-inset-top,12px),12px);
+  }
+  .validate-bar{
+    padding-bottom:max(env(safe-area-inset-bottom,24px),24px);
+  }
+  .bottom-nav{
+    padding-bottom:max(env(safe-area-inset-bottom,20px),20px);
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="stage-label">Flux NFC : attente → profil client → modification</div>
+
+<div class="phone">
+  <div class="phone-screen">
+    <div class="phone-notch"></div>
+
+    <!-- SCAN OVERLAY -->
+    <div class="scan-overlay" id="scan-overlay">
+      <div class="scan-nfc-box">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <path d="M7 20C7 12.82 12.82 7 20 7" stroke="rgba(250,246,239,0.2)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M11 20C11 15.03 15.03 11 20 11" stroke="rgba(250,246,239,0.4)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M15 20C15 17.24 17.24 15 20 15" stroke="rgba(250,246,239,0.65)" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="20" cy="20" r="3.5" fill="#4CA671"/>
+          <path d="M33 20C33 27.18 27.18 33 20 33" stroke="rgba(250,246,239,0.2)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M29 20C29 24.97 24.97 29 20 29" stroke="rgba(250,246,239,0.4)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M25 20C25 22.76 22.76 25 20 25" stroke="rgba(250,246,239,0.65)" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="scan-text">Lecture du badge…</div>
+      <div class="scan-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- ═══ SCREEN 1 — WAITING ═══ -->
+    <div class="screen" id="s-idle">
+      <div class="status-bar">
+        <span>9:41</span><span>••• Wi-Fi</span>
+      </div>
+      <div class="app-nav">
+        <span class="app-logo">gottu<i></i></span>
+        <span class="app-staff"><span class="app-staff-dot"></span>Jules — Barista</span>
+      </div>
+
+      <div class="waiting-body">
+        <div class="nfc-ring" id="tap-zone">
+          <span class="nfc-icon">💳</span>
+        </div>
+        <div class="waiting-title">En attente d'un badge</div>
+        <div class="waiting-sub">Passez la carte du client devant le lecteur NFC</div>
+        <div class="search-bar" id="search-trigger">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="8.5" cy="8.5" r="6"/>
+            <path d="M13 13l4 4"/>
+          </svg>
+          <span>Chercher par prénom...</span>
+        </div>
+        <div class="tap-hint">Toucher la carte pour simuler</div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="bottom-nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="2"/>
+            <rect x="14" y="3" width="7" height="7" rx="2"/>
+            <rect x="3" y="14" width="7" height="7" rx="2"/>
+            <rect x="14" y="14" width="7" height="7" rx="2"/>
+          </svg>
+          Service
+        </div>
+        <div class="bottom-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+          Clients
+        </div>
+        <div class="bottom-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20V10M18 20V4M6 20v-4"/>
+          </svg>
+          Stats
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SCREEN 2 — CLIENT PROFILE ═══ -->
+    <div class="screen hidden" id="s-profile">
+      <div class="status-bar" style="padding-bottom:4px">
+        <span>9:41</span><span>••• Wi-Fi</span>
+      </div>
+      <div class="app-nav" style="padding-bottom:6px">
+        <span class="app-logo">gottu<i></i></span>
+        <span class="app-staff"><span class="app-staff-dot"></span>Jules</span>
+      </div>
+
+      <div class="profile-scroll">
+        <div class="anim-in" id="profile-anim">
+
+          <div class="profile-header">
+            <div class="badge-detected"><span class="badge-pulse"></span>Badge détecté</div>
+            <div class="profile-top">
+              <div class="avatar">L</div>
+              <div>
+                <div class="profile-name">Léa Martin</div>
+                <div class="profile-meta">Cliente depuis mars 2026</div>
+                <div class="profile-actions">
+                  <button class="profile-action-btn active-tab" id="btn-modifier">Modifier</button>
+                  <button class="profile-action-btn" id="btn-notes">Notes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-strip">
+            <div class="info-cell">
+              <div class="info-num">47</div>
+              <div class="info-label">Visites</div>
+            </div>
+            <div class="info-cell highlight">
+              <div class="info-num">7/10</div>
+              <div class="info-label">Fidélité</div>
+            </div>
+            <div class="info-cell">
+              <div class="info-num">4.8€</div>
+              <div class="info-label">Panier moy.</div>
+            </div>
+          </div>
+
+          <div class="loyalty-section">
+            <div class="loyalty-head">
+              <span class="loyalty-title">Fidélité</span>
+              <span class="loyalty-reward">1 boisson offerte</span>
+            </div>
+            <div class="dots-row">
+              <span class="dot filled">1</span>
+              <span class="dot filled">2</span>
+              <span class="dot filled">3</span>
+              <span class="dot filled">4</span>
+              <span class="dot filled">5</span>
+              <span class="dot filled">6</span>
+              <span class="dot filled">7</span>
+              <span class="dot next">8</span>
+              <span class="dot empty">9</span>
+              <span class="dot empty">10</span>
+            </div>
+            <div class="loyalty-footer">Encore <b>3 visites</b> pour la récompense</div>
+          </div>
+
+          <div class="fav-section">
+            <div class="fav-label">Commandes favorites</div>
+            <div class="fav-card selected">
+              <div class="fav-emoji">☕</div>
+              <div class="fav-detail">
+                <div class="fav-name">Latte · Avoine · Vanille · Extra shot</div>
+                <div class="fav-desc">Sa commande habituelle</div>
+              </div>
+              <span class="fav-freq">78%</span>
+            </div>
+            <div class="fav-card">
+              <div class="fav-emoji">🍵</div>
+              <div class="fav-detail">
+                <div class="fav-name">Matcha latte · Avoine · M</div>
+                <div class="fav-desc">Le lundi surtout</div>
+              </div>
+              <span class="fav-freq">15%</span>
+            </div>
+            <div class="fav-card">
+              <div class="fav-emoji">🥐</div>
+              <div class="fav-detail">
+                <div class="fav-name">Croissant beurre</div>
+                <div class="fav-desc">Viennoiserie préférée</div>
+              </div>
+              <span class="fav-freq">62%</span>
+            </div>
+          </div>
+
+          <div class="notes-section">
+            <div class="note-card">
+              <div class="note-title">Note du barista</div>
+              <div class="note-text">"Allergique aux fruits à coque. Toujours demander avant de proposer les cookies. Anniversaire le 15 mai."</div>
+            </div>
+          </div>
+
+        </div><!-- /anim-in -->
+      </div><!-- /scroll -->
+
+      <div class="validate-bar">
+        <div class="countdown-bar"><div class="countdown-fill" id="countdown-fill"></div></div>
+        <button class="validate-btn" id="validate-btn">
+          Valider la commande
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <path d="M4 10l5 5L16 5"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="bottom-nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" rx="2"/>
+            <rect x="14" y="3" width="7" height="7" rx="2"/>
+            <rect x="3" y="14" width="7" height="7" rx="2"/>
+            <rect x="14" y="14" width="7" height="7" rx="2"/>
+          </svg>
+          Service
+        </div>
+        <div class="bottom-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+          </svg>
+          Clients
+        </div>
+        <div class="bottom-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20V10M18 20V4M6 20v-4"/>
+          </svg>
+          Stats
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SCREEN 3 — EDIT PROFILE ═══ -->
+    <div class="screen hidden" id="s-edit">
+      <div class="status-bar" style="padding-bottom:4px">
+        <span>9:41</span><span>••• Wi-Fi</span>
+      </div>
+
+      <div class="edit-header">
+        <button class="back-btn" id="back-btn">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M14 4l-8 6 8 6"/>
+          </svg>
+          Retour
+        </button>
+        <span class="edit-title">Modifier le profil</span>
+        <button class="save-btn" id="save-btn">Sauver</button>
+      </div>
+
+      <div class="edit-scroll">
+        <div class="edit-avatar-section">
+          <div class="edit-avatar">L</div>
+          <span class="edit-change">Changer l'initiale</span>
+        </div>
+
+        <div class="form-section">
+          <div class="form-label">Informations</div>
+          <div class="form-row">
+            <div class="form-field">
+              <input class="form-input" type="text" value="Léa" placeholder="Prénom">
+            </div>
+            <div class="form-field">
+              <input class="form-input" type="date" value="2000-05-15">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-label">Commandes favorites (3 max)</div>
+          <div class="edit-drinks" id="edit-drinks">
+            <div class="edit-drink">
+              <span style="font-size:16px">☕</span>
+              <span class="edit-drink-text">Latte · Avoine · Vanille · Extra shot</span>
+              <button class="edit-drink-remove">
+                <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M2 2l6 6M8 2l-6 6"/>
+                </svg>
+              </button>
+            </div>
+            <div class="edit-drink">
+              <span style="font-size:16px">🍵</span>
+              <span class="edit-drink-text">Matcha latte · Avoine · M</span>
+              <button class="edit-drink-remove">
+                <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M2 2l6 6M8 2l-6 6"/>
+                </svg>
+              </button>
+            </div>
+            <div class="edit-drink">
+              <span style="font-size:16px">🥐</span>
+              <span class="edit-drink-text">Croissant beurre</span>
+              <button class="edit-drink-remove">
+                <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M2 2l6 6M8 2l-6 6"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <button class="add-drink-btn">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M7 1v12M1 7h12"/>
+            </svg>
+            Ajouter une commande favorite
+          </button>
+        </div>
+
+        <div class="form-section">
+          <div class="form-label">Programme fidélité</div>
+          <div class="loyalty-config">
+            <span class="loyalty-config-label">Récompense tous les</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="config-btn" id="minus-btn">−</button>
+              <span class="config-num" id="loyalty-num">10</span>
+              <button class="config-btn" id="plus-btn">+</button>
+            </div>
+            <span style="font-size:13px;color:var(--mid);font-weight:500">visites</span>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-label">Notes barista</div>
+          <textarea class="form-textarea">Allergique aux fruits à coque. Toujours demander avant de proposer les cookies. Anniversaire le 15 mai.</textarea>
+        </div>
+
+        <div class="delete-zone">
+          <button class="delete-btn">Supprimer ce profil</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /phone-screen -->
+</div><!-- /phone -->
+
+<div class="stage-label" id="step-label">Toucher la carte pour commencer</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-dot"></span>
+  <span id="toast-msg">Commande validée</span>
+</div>
+
+<script>
+/* ── refs ── */
+const sIdle     = document.getElementById('s-idle');
+const sProfile  = document.getElementById('s-profile');
+const sEdit     = document.getElementById('s-edit');
+const scanOverlay = document.getElementById('scan-overlay');
+const tapZone   = document.getElementById('tap-zone');
+const searchTrigger = document.getElementById('search-trigger');
+const validateBtn = document.getElementById('validate-btn');
+const btnModifier = document.getElementById('btn-modifier');
+const btnNotes  = document.getElementById('btn-notes');
+const backBtn   = document.getElementById('back-btn');
+const saveBtn   = document.getElementById('save-btn');
+const minusBtn  = document.getElementById('minus-btn');
+const plusBtn   = document.getElementById('plus-btn');
+const loyaltyNum = document.getElementById('loyalty-num');
+const stepLabel = document.getElementById('step-label');
+const toast     = document.getElementById('toast');
+const toastMsg  = document.getElementById('toast-msg');
+const countdownFill = document.getElementById('countdown-fill');
+const profileAnim = document.getElementById('profile-anim');
+
+let loyaltyVal = 10;
+let autoTimer = null;
+const AUTO_DELAY = 18; // seconds
+
+/* ── screen switcher ── */
+function showScreen(name) {
+  [sIdle, sProfile, sEdit].forEach(s => s.classList.add('hidden'));
+  const target = {idle: sIdle, profile: sProfile, edit: sEdit}[name];
+  target.classList.remove('hidden');
+  // re-trigger animations
+  if(name === 'profile'){
+    profileAnim.classList.remove('anim-in');
+    void profileAnim.offsetWidth;
+    profileAnim.classList.add('anim-in');
+  }
+}
+
+/* ── countdown ── */
+function startCountdown(secs) {
+  clearTimeout(autoTimer);
+  countdownFill.style.transition = 'none';
+  countdownFill.style.transform = 'scaleX(1)';
+  void countdownFill.offsetWidth;
+  countdownFill.style.transition = `transform ${secs}s linear`;
+  countdownFill.style.transform = 'scaleX(0)';
+  autoTimer = setTimeout(returnToIdle, secs * 1000);
+}
+
+function stopCountdown() {
+  clearTimeout(autoTimer);
+  countdownFill.style.transition = 'none';
+  countdownFill.style.transform = 'scaleX(1)';
+}
+
+function returnToIdle() {
+  stopCountdown();
+  showScreen('idle');
+  stepLabel.textContent = 'Toucher la carte pour recommencer';
+}
+
+/* ── NFC tap ── */
+function triggerScan() {
+  scanOverlay.classList.add('active');
+  stepLabel.textContent = 'Lecture du badge…';
+  setTimeout(() => {
+    scanOverlay.classList.remove('active');
+    showScreen('profile');
+    stepLabel.textContent = 'Profil chargé — valider ou modifier';
+    startCountdown(AUTO_DELAY);
+  }, 1700);
+}
+
+tapZone.addEventListener('click', triggerScan);
+searchTrigger.addEventListener('click', triggerScan);
+
+/* ── profile actions ── */
+validateBtn.addEventListener('click', () => {
+  stopCountdown();
+  showToast('Commande validée ✓');
+  setTimeout(returnToIdle, 1800);
+});
+
+btnModifier.addEventListener('click', () => {
+  stopCountdown();
+  showScreen('edit');
+  stepLabel.textContent = 'Modification du profil';
+});
+
+btnNotes.addEventListener('click', () => {
+  // stay on profile, just toggle active state visually
+  btnNotes.classList.add('active-tab');
+  btnModifier.classList.remove('active-tab');
+  setTimeout(() => {
+    btnModifier.classList.add('active-tab');
+    btnNotes.classList.remove('active-tab');
+  }, 800);
+});
+
+/* ── edit actions ── */
+backBtn.addEventListener('click', () => {
+  showScreen('profile');
+  stepLabel.textContent = 'Profil chargé — valider ou modifier';
+  startCountdown(AUTO_DELAY);
+});
+
+saveBtn.addEventListener('click', () => {
+  showToast('Profil enregistré avec succès');
+  setTimeout(() => {
+    showScreen('profile');
+    stepLabel.textContent = 'Profil chargé — valider ou modifier';
+    startCountdown(AUTO_DELAY);
+  }, 700);
+});
+
+/* ── loyalty stepper ── */
+minusBtn.addEventListener('click', () => {
+  if(loyaltyVal > 1){ loyaltyVal--; loyaltyNum.textContent = loyaltyVal; }
+});
+plusBtn.addEventListener('click', () => {
+  if(loyaltyVal < 30){ loyaltyVal++; loyaltyNum.textContent = loyaltyVal; }
+});
+
+/* ── remove drink ── */
+document.getElementById('edit-drinks').addEventListener('click', e => {
+  const btn = e.target.closest('.edit-drink-remove');
+  if(btn) btn.closest('.edit-drink').remove();
+});
+
+/* ── toast ── */
+function showToast(msg) {
+  toastMsg.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>

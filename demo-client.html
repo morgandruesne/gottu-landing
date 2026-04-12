@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gottu — Démo Client</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#171411;--paper:#FAF6EF;--sage:#4CA671;--sage-pale:#E3F2E9;
+  --sage-deep:#2D7A4E;--honey:#E9A23B;--honey-pale:#FFF3DB;
+  --blush:#EB6E56;--blush-pale:#FDE8E4;--fog:#EDE8DF;
+  --mid:#6D6355;--light:#A39888;--white:#FFFFFF;
+  --lavender:#EDE5F5;--lavender-deep:#7B5EA7;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden}
+body{
+  font-family:'Outfit',sans-serif;
+  background:#E8E2D8;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  -webkit-font-smoothing:antialiased;
+  gap:20px;
+}
+h1,h2,h3{font-family:'Bricolage Grotesque',sans-serif}
+
+/* ═══ STAGE LABEL ═══ */
+.stage-label{
+  font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;
+  color:#9B9389;
+}
+
+/* ═══ PHONE FRAME ═══ */
+.phone{
+  width:375px;flex-shrink:0;
+  background:var(--ink);
+  border-radius:44px;
+  padding:14px;
+  box-shadow:
+    0 24px 80px rgba(23,20,17,0.28),
+    0 4px 16px rgba(23,20,17,0.12),
+    inset 0 0 0 2px rgba(255,255,255,0.06);
+  position:relative;
+}
+.phone-screen{
+  background:var(--paper);
+  border-radius:32px;
+  overflow:hidden;
+  position:relative;
+  height:700px;
+  display:flex;flex-direction:column;
+}
+.phone-notch{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:150px;height:28px;
+  background:var(--ink);
+  border-radius:0 0 20px 20px;
+  z-index:100;pointer-events:none;
+}
+
+/* ═══ STATUS BAR ═══ */
+.status-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:36px 24px 8px;font-size:12px;font-weight:600;
+  color:var(--mid);flex-shrink:0;
+}
+
+/* ═══ SCREENS ═══ */
+.screen{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  transition:opacity 0.4s ease,transform 0.4s ease;
+}
+.screen.hidden{opacity:0;pointer-events:none;transform:scale(0.98)}
+
+/* ═══════════════════════════════════
+   SCREEN 0 — IDLE
+═══════════════════════════════════ */
+.idle-body{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:32px;text-align:center;
+  background:linear-gradient(180deg,var(--paper) 0%,var(--sage-pale) 100%);
+}
+.idle-logo{
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+  font-size:30px;color:var(--ink);margin-bottom:48px;
+}
+.idle-logo i{display:inline-block;width:6px;height:6px;background:var(--sage);border-radius:50%;margin-left:1px;transform:translateY(-6px)}
+.nfc-ring{
+  width:130px;height:130px;border-radius:50%;
+  border:3px solid rgba(76,166,113,0.2);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;margin-bottom:28px;cursor:pointer;
+  background:var(--white);
+  box-shadow:0 4px 32px rgba(76,166,113,0.12);
+  animation:breathe 3s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{box-shadow:0 4px 32px rgba(76,166,113,0.12)}50%{box-shadow:0 8px 48px rgba(76,166,113,0.22)}}
+.nfc-ring::before{
+  content:'';position:absolute;inset:-18px;border-radius:50%;
+  border:2px solid rgba(76,166,113,0.15);
+  animation:ripple 3s ease-out infinite;
+}
+@keyframes ripple{0%{transform:scale(1);opacity:0.7}100%{transform:scale(1.4);opacity:0}}
+.nfc-ring::after{
+  content:'';position:absolute;inset:-34px;border-radius:50%;
+  border:1.5px solid rgba(76,166,113,0.08);
+  animation:ripple 3s 0.5s ease-out infinite;
+}
+.nfc-icon{font-size:44px;transition:transform 0.3s}
+.nfc-ring:hover .nfc-icon{transform:scale(1.1)}
+.idle-title{
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px;
+  color:var(--ink);margin-bottom:10px;letter-spacing:-0.5px;
+}
+.idle-sub{font-size:14px;color:var(--mid);line-height:1.6;max-width:240px}
+.tap-hint{
+  font-size:10px;color:rgba(76,166,113,0.7);font-weight:500;
+  margin-top:24px;letter-spacing:0.5px;
+  animation:hintBlink 2.2s ease-in-out infinite alternate;
+}
+@keyframes hintBlink{from{opacity:0.4}to{opacity:1}}
+
+/* ═══════════════════════════════════
+   SCAN OVERLAY
+═══════════════════════════════════ */
+.scan-overlay{
+  position:absolute;inset:0;border-radius:32px;
+  background:var(--ink);z-index:200;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.scan-overlay.active{opacity:1;pointer-events:all}
+.scan-nfc-box{
+  width:80px;height:80px;border-radius:24px;
+  background:rgba(250,246,239,0.06);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.scan-nfc-box::after{
+  content:'';position:absolute;inset:-3px;border-radius:27px;
+  border:2px solid var(--sage);
+  animation:scanGlow 1.2s ease-in-out infinite alternate;
+}
+@keyframes scanGlow{
+  from{opacity:0.3;box-shadow:0 0 0 0 rgba(76,166,113,0)}
+  to{opacity:1;box-shadow:0 0 0 10px rgba(76,166,113,0.08)}
+}
+.scan-text{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-size:17px;font-weight:700;color:var(--paper);
+}
+.scan-dots{display:flex;gap:8px}
+.scan-dots span{
+  width:7px;height:7px;border-radius:50%;background:var(--sage);
+  animation:dotB 1.1s ease-in-out infinite;
+}
+.scan-dots span:nth-child(2){animation-delay:.18s}
+.scan-dots span:nth-child(3){animation-delay:.36s}
+@keyframes dotB{0%,80%,100%{transform:scale(1);opacity:0.4}40%{transform:scale(1.5);opacity:1}}
+
+/* ═══════════════════════════════════
+   SCREEN 1 — SPLASH
+═══════════════════════════════════ */
+.splash{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:40px 32px;text-align:center;
+  background:linear-gradient(180deg,var(--paper) 0%,var(--sage-pale) 100%);
+  position:relative;overflow:hidden;
+}
+.splash::before{
+  content:'';position:absolute;bottom:-80px;left:50%;transform:translateX(-50%);
+  width:360px;height:360px;
+  background:radial-gradient(circle,rgba(76,166,113,0.12),transparent 65%);
+  border-radius:50%;
+}
+.splash-logo{
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+  font-size:30px;color:var(--ink);margin-bottom:44px;position:relative;
+}
+.splash-logo i{display:inline-block;width:6px;height:6px;background:var(--sage);border-radius:50%;margin-left:1px;transform:translateY(-6px)}
+.splash-ring{
+  width:130px;height:130px;border-radius:50%;
+  background:var(--white);
+  box-shadow:0 4px 32px rgba(76,166,113,0.15);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;margin-bottom:32px;
+}
+.splash-check{
+  width:56px;height:56px;
+  background:var(--sage);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  animation:popIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+.splash-check svg{width:28px;height:28px;color:white}
+.splash-ripple{
+  position:absolute;inset:-18px;border-radius:50%;
+  border:2px solid rgba(76,166,113,0.2);
+  animation:ripplePulse 2s ease-out infinite;
+}
+@keyframes ripplePulse{0%{transform:scale(1);opacity:0.7}100%{transform:scale(1.4);opacity:0}}
+.splash-title{
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+  font-size:26px;letter-spacing:-0.8px;margin-bottom:8px;color:var(--ink);
+  animation:fadeUp 0.5s 0.2s both;
+}
+.splash-sub{
+  font-size:15px;color:var(--mid);line-height:1.6;max-width:240px;
+  animation:fadeUp 0.5s 0.35s both;
+}
+.splash-sub b{color:var(--ink)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.splash-loading{
+  margin-top:28px;display:flex;gap:6px;
+  animation:fadeUp 0.5s 0.5s both;
+}
+.splash-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--sage);
+  animation:bounce 1.4s ease-in-out infinite;
+}
+.splash-dot:nth-child(2){animation-delay:0.2s}
+.splash-dot:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}}
+
+/* ═══════════════════════════════════
+   SCREEN 2 — CLIENT PROFILE
+═══════════════════════════════════ */
+.profile-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.profile-scroll::-webkit-scrollbar{display:none}
+
+.client-header{
+  padding:44px 0 0;text-align:center;position:relative;flex-shrink:0;
+}
+.client-header::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:180px;
+  background:linear-gradient(180deg,var(--sage-pale),var(--paper));
+  z-index:0;
+}
+.client-header>*{position:relative;z-index:1}
+.client-cafe-name{
+  font-size:11px;text-transform:uppercase;letter-spacing:1.5px;
+  color:var(--sage-deep);font-weight:700;margin:4px 0 14px;
+}
+.client-avatar{
+  width:72px;height:72px;border-radius:22px;
+  background:var(--white);
+  box-shadow:0 4px 20px rgba(0,0,0,0.06);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+  font-size:28px;color:var(--sage-deep);
+  margin:0 auto 12px;
+  border:3px solid var(--paper);
+}
+.client-name{
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+  font-size:26px;letter-spacing:-0.8px;
+}
+.client-since{font-size:12px;color:var(--light);margin-top:4px;margin-bottom:20px}
+
+/* Loyalty card */
+.loyalty-card{
+  margin:0 20px 16px;padding:18px 20px;
+  background:var(--ink);border-radius:20px;
+  color:var(--paper);position:relative;overflow:hidden;
+}
+.loyalty-card::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:140px;height:140px;
+  background:radial-gradient(circle,rgba(233,162,59,0.2),transparent 65%);
+  border-radius:50%;
+}
+.loyalty-card-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:14px;position:relative;
+}
+.loyalty-card-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(250,246,239,0.5);font-weight:600}
+.loyalty-card-reward{font-size:11px;font-weight:600;color:var(--honey);background:rgba(233,162,59,0.15);padding:4px 10px;border-radius:100px}
+.loyalty-dots{display:flex;gap:5px;justify-content:center;margin-bottom:10px;position:relative;flex-wrap:wrap}
+.ldot{
+  width:26px;height:26px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;cursor:pointer;
+  transition:transform 0.15s;
+}
+.ldot:hover{transform:scale(1.1)}
+.ldot.done{background:var(--sage);color:#fff}
+.ldot.empty{background:rgba(250,246,239,0.1);color:rgba(250,246,239,0.3)}
+.ldot.current{background:rgba(233,162,59,0.2);color:var(--honey);border:1.5px dashed var(--honey)}
+.loyalty-card-footer{text-align:center;font-size:12px;color:rgba(250,246,239,0.5);position:relative}
+.loyalty-card-footer b{color:var(--honey)}
+
+/* Client sections */
+.client-section{margin:0 20px 14px}
+.section-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px;padding:0 2px;
+}
+.section-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--light);font-weight:600}
+.section-edit{font-size:12px;color:var(--sage);font-weight:600;cursor:pointer}
+.section-edit:hover{color:var(--sage-deep)}
+
+/* Pick cards */
+.pick-card{
+  background:var(--white);border-radius:16px;
+  border:1.5px solid rgba(0,0,0,0.04);
+  padding:13px 16px;margin-bottom:8px;
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;
+  transition:border-color 0.2s,background 0.2s;
+}
+.pick-card:hover{border-color:var(--fog)}
+.pick-card.active{border-color:var(--sage);background:var(--sage-pale)}
+.pick-emoji{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.pick-card:nth-child(1) .pick-emoji{background:var(--sage-pale)}
+.pick-card.active:nth-child(1) .pick-emoji{background:rgba(76,166,113,0.15)}
+.pick-card:nth-child(2) .pick-emoji{background:var(--honey-pale)}
+.pick-card:nth-child(3) .pick-emoji{background:var(--blush-pale)}
+.pick-card:nth-child(4) .pick-emoji{background:var(--lavender)}
+.pick-info{flex:1;min-width:0}
+.pick-name{font-weight:600;font-size:14px;letter-spacing:-0.2px}
+.pick-detail{font-size:11px;color:var(--light);margin-top:1px}
+.pick-check{
+  width:22px;height:22px;border-radius:7px;
+  border:1.5px solid var(--fog);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all 0.2s;
+}
+.pick-card.active .pick-check{background:var(--sage);border-color:var(--sage)}
+.pick-card.active .pick-check svg{display:block!important}
+.pick-check svg{display:none;width:12px;height:12px;color:#fff}
+.add-pick{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:13px;border-radius:14px;border:1.5px dashed var(--fog);
+  font-size:13px;color:var(--light);font-weight:600;
+  cursor:pointer;background:none;width:100%;
+  font-family:'Outfit',sans-serif;
+  transition:border-color 0.2s,color 0.2s;
+  margin-top:4px;
+}
+.add-pick:hover{border-color:var(--sage);color:var(--sage)}
+
+/* Info card */
+.info-card{
+  background:var(--white);border-radius:16px;
+  border:1px solid rgba(0,0,0,0.04);
+  padding:14px;
+}
+.info-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:9px 0;
+}
+.info-row+.info-row{border-top:1px solid var(--fog)}
+.info-row-label{font-size:13px;color:var(--mid);font-weight:500}
+.info-row-value{font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:6px}
+.info-tag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px}
+.info-tag.green{background:var(--sage-pale);color:var(--sage-deep)}
+
+/* Notes */
+.note-card-client{
+  background:var(--honey-pale);border-radius:14px;
+  padding:14px 16px;border-left:3px solid var(--honey);
+}
+.note-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:#9B7520;font-weight:600;margin-bottom:6px}
+.note-body{font-size:13px;color:#7A6218;line-height:1.6;font-style:italic}
+.note-input-client{
+  width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(155,117,32,0.2);
+  background:rgba(255,255,255,0.6);font-family:'Outfit',sans-serif;
+  font-size:13px;color:#7A6218;resize:none;height:56px;outline:none;
+  margin-top:8px;line-height:1.4;
+}
+.note-input-client::placeholder{color:rgba(122,98,24,0.4)}
+.note-input-client:focus{border-color:var(--honey)}
+
+/* Rating */
+.rating-card{
+  background:var(--white);border-radius:16px;border:1px solid rgba(0,0,0,0.04);
+  padding:14px 16px;display:flex;align-items:center;justify-content:space-between;
+}
+.rating-row{display:flex;gap:4px;align-items:center}
+.star{
+  width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;
+  transition:transform 0.15s,background 0.15s;
+}
+.star:hover{transform:scale(1.2)}
+.star.filled{background:var(--honey-pale)}
+.star.empty{background:var(--fog);opacity:0.5}
+.rating-label{font-size:12px;color:var(--light)}
+
+/* Powered by */
+.powered{text-align:center;padding:16px 20px 28px}
+.powered-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;color:var(--light);
+  text-decoration:none;
+  padding:6px 14px;border-radius:100px;
+  background:var(--fog);
+  transition:color 0.2s;
+}
+.powered-link:hover{color:var(--mid)}
+.powered-logo{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:13px;color:var(--mid)}
+.powered-logo i{display:inline-block;width:4px;height:4px;background:var(--sage);border-radius:50%;margin-left:1px;transform:translateY(-4px)}
+
+/* ═══════════════════════════════════
+   SCREEN 3 — DRINK PICKER
+═══════════════════════════════════ */
+.picker-header{
+  padding:44px 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.picker-back{
+  display:flex;align-items:center;gap:4px;
+  font-size:14px;font-weight:600;color:var(--sage-deep);
+  cursor:pointer;background:none;border:none;font-family:'Outfit',sans-serif;
+}
+.picker-back svg{width:16px;height:16px}
+.picker-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;letter-spacing:-0.3px}
+.picker-done{
+  font-size:13px;font-weight:700;color:var(--white);
+  background:var(--sage);border:none;
+  padding:6px 14px;border-radius:10px;cursor:pointer;
+  font-family:'Outfit',sans-serif;
+  transition:opacity 0.2s;
+}
+.picker-done:hover{opacity:0.88}
+
+.cat-tabs{
+  display:flex;gap:6px;padding:4px 20px 14px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;flex-shrink:0;
+}
+.cat-tabs::-webkit-scrollbar{display:none}
+.cat-tab{
+  padding:7px 14px;border-radius:100px;
+  font-size:13px;font-weight:600;white-space:nowrap;
+  border:1px solid var(--fog);background:var(--white);
+  color:var(--mid);cursor:pointer;transition:all 0.2s;flex-shrink:0;
+}
+.cat-tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.cat-tab:hover:not(.active){border-color:var(--sage)}
+
+.picker-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.picker-scroll::-webkit-scrollbar{display:none}
+
+.drink-grid{padding:0 20px 16px}
+.drink-grid-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--light);font-weight:600;margin-bottom:10px;padding-top:4px}
+.drink-option{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;border-radius:14px;
+  background:var(--white);border:1.5px solid rgba(0,0,0,0.04);
+  margin-bottom:7px;cursor:pointer;
+  transition:border-color 0.2s,background 0.2s;
+}
+.drink-option:hover{border-color:var(--sage)}
+.drink-option.selected{border-color:var(--sage);background:var(--sage-pale)}
+.drink-option-icon{
+  width:36px;height:36px;border-radius:10px;background:var(--fog);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+.drink-option.selected .drink-option-icon{background:var(--white)}
+.drink-option-name{flex:1;font-size:14px;font-weight:500}
+.drink-option-check{
+  width:20px;height:20px;border-radius:6px;
+  border:1.5px solid var(--fog);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;
+}
+.drink-option.selected .drink-option-check{background:var(--sage);border-color:var(--sage)}
+.drink-option.selected .drink-option-check svg{display:block!important}
+.drink-option-check svg{display:none;width:10px;height:10px;color:#fff}
+
+.options-section{padding:0 20px 12px}
+.option-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.option-chip{
+  padding:8px 14px;border-radius:10px;
+  font-size:12px;font-weight:600;
+  border:1px solid var(--fog);background:var(--white);
+  color:var(--mid);cursor:pointer;transition:all 0.2s;
+}
+.option-chip.selected{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.option-chip:hover:not(.selected){border-color:var(--sage)}
+
+.preview-bar{
+  margin:4px 20px 8px;padding:14px 16px;
+  background:var(--sage-pale);border-radius:14px;
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.preview-label{font-size:11px;color:var(--sage-deep);font-weight:600;text-transform:uppercase;letter-spacing:0.8px;flex-shrink:0}
+.preview-text{font-size:13px;font-weight:600;color:var(--sage-deep)}
+
+.confirm-bar{padding:12px 20px 28px;flex-shrink:0}
+.confirm-btn{
+  width:100%;padding:16px;border-radius:16px;border:none;
+  background:var(--sage);color:#fff;
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:700;font-size:16px;cursor:pointer;
+  transition:transform 0.25s cubic-bezier(.34,1.56,.64,1),box-shadow 0.25s;
+}
+.confirm-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(76,166,113,0.3)}
+.confirm-btn:active{transform:scale(0.98)}
+
+/* ═══ ANIM IN ═══ */
+.anim-in>*{
+  opacity:0;transform:translateY(14px);
+  animation:entryUp 0.45s cubic-bezier(.22,1,.36,1) forwards;
+}
+.anim-in>*:nth-child(1){animation-delay:.04s}
+.anim-in>*:nth-child(2){animation-delay:.09s}
+.anim-in>*:nth-child(3){animation-delay:.14s}
+.anim-in>*:nth-child(4){animation-delay:.19s}
+.anim-in>*:nth-child(5){animation-delay:.24s}
+.anim-in>*:nth-child(6){animation-delay:.29s}
+.anim-in>*:nth-child(7){animation-delay:.34s}
+.anim-in>*:nth-child(8){animation-delay:.39s}
+@keyframes entryUp{to{opacity:1;transform:translateY(0)}}
+
+/* ═══ TOAST ═══ */
+.toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:var(--paper);
+  padding:11px 22px;border-radius:100px;
+  font-size:13px;font-weight:500;
+  z-index:9000;
+  opacity:0;transition:all 0.35s cubic-bezier(.22,1,.36,1);
+  display:flex;align-items:center;gap:8px;
+  pointer-events:none;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-dot{width:7px;height:7px;border-radius:50%;background:var(--sage);flex-shrink:0}
+
+/* ═══ COUNTDOWN ═══ */
+.countdown-bar{
+  height:2px;background:var(--fog);position:absolute;bottom:0;left:0;right:0;
+  overflow:hidden;
+}
+.countdown-fill{
+  height:100%;background:linear-gradient(90deg,var(--sage),var(--honey));
+  width:100%;transform-origin:left;
+  transition:transform linear;
+}
+
+/* ═══ MOBILE — pas de faux cadre ═══ */
+@media(max-width:500px){
+  body{background:var(--paper);gap:0}
+  .stage-label{display:none}
+  .phone{
+    width:100%;background:transparent;
+    border-radius:0;padding:0;box-shadow:none;
+  }
+  .phone-screen{
+    border-radius:0;
+    height:100vh;height:100svh;
+  }
+  .phone-notch{display:none}
+  .status-bar{
+    padding-top:max(env(safe-area-inset-top,20px),20px);
+  }
+  .client-header{
+    padding-top:max(env(safe-area-inset-top,20px),20px);
+  }
+  .picker-header{
+    padding-top:max(env(safe-area-inset-top,20px),20px);
+  }
+  .confirm-bar{
+    padding-bottom:max(env(safe-area-inset-bottom,24px),24px);
+  }
+  .powered{
+    padding-bottom:max(env(safe-area-inset-bottom,28px),28px);
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="stage-label">Badge NFC → splash → profil client → sélection boisson</div>
+
+<div class="phone">
+  <div class="phone-screen">
+    <div class="phone-notch"></div>
+
+    <!-- SCAN OVERLAY -->
+    <div class="scan-overlay" id="scan-overlay">
+      <div class="scan-nfc-box">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <path d="M7 20C7 12.82 12.82 7 20 7" stroke="rgba(250,246,239,0.2)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M11 20C11 15.03 15.03 11 20 11" stroke="rgba(250,246,239,0.4)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M15 20C15 17.24 17.24 15 20 15" stroke="rgba(250,246,239,0.65)" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="20" cy="20" r="3.5" fill="#4CA671"/>
+          <path d="M33 20C33 27.18 27.18 33 20 33" stroke="rgba(250,246,239,0.2)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M29 20C29 24.97 24.97 29 20 29" stroke="rgba(250,246,239,0.4)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M25 20C25 22.76 22.76 25 20 25" stroke="rgba(250,246,239,0.65)" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="scan-text">Lecture du badge…</div>
+      <div class="scan-dots"><span></span><span></span><span></span></div>
+    </div>
+
+    <!-- ═══ SCREEN 0 — IDLE ═══ -->
+    <div class="screen" id="s-idle">
+      <div class="status-bar"><span>9:41</span><span>••• Wi-Fi</span></div>
+      <div class="idle-body">
+        <div class="idle-logo">gottu<i></i></div>
+        <div class="nfc-ring" id="tap-zone">
+          <span class="nfc-icon">💳</span>
+        </div>
+        <div class="idle-title">Passez votre carte</div>
+        <div class="idle-sub">Approchez votre badge NFC pour accéder à votre profil chez <b>Café Oberkampf</b></div>
+        <div class="tap-hint">Toucher la carte pour simuler →</div>
+      </div>
+    </div>
+
+    <!-- ═══ SCREEN 1 — SPLASH ═══ -->
+    <div class="screen hidden" id="s-splash">
+      <div class="status-bar"><span>9:41</span><span>••• Wi-Fi</span></div>
+      <div class="splash">
+        <div class="splash-logo">gottu<i></i></div>
+        <div class="splash-ring">
+          <div class="splash-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M4 12l6 6L20 6"/></svg>
+          </div>
+          <div class="splash-ripple"></div>
+        </div>
+        <div class="splash-title">Carte reconnue !</div>
+        <div class="splash-sub">On charge ton profil chez<br><b>Café Oberkampf</b></div>
+        <div class="splash-loading">
+          <span class="splash-dot"></span>
+          <span class="splash-dot"></span>
+          <span class="splash-dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SCREEN 2 — CLIENT PROFILE ═══ -->
+    <div class="screen hidden" id="s-profile">
+      <div class="client-header">
+        <div class="status-bar" style="padding-bottom:4px"><span>9:41</span><span></span></div>
+        <div class="client-cafe-name">Café Oberkampf</div>
+        <div class="client-avatar">L</div>
+        <div class="client-name">Salut Léa !</div>
+        <div class="client-since">Fidèle depuis mars 2026 · 47 visites</div>
+      </div>
+
+      <div class="profile-scroll" id="profile-scroll">
+        <div class="anim-in" id="profile-anim">
+
+          <!-- Loyalty card -->
+          <div class="loyalty-card">
+            <div class="loyalty-card-header">
+              <span class="loyalty-card-title">Ta fidélité</span>
+              <span class="loyalty-card-reward">1 boisson offerte</span>
+            </div>
+            <div class="loyalty-dots" id="loyalty-dots">
+              <span class="ldot done" data-i="1">✓</span>
+              <span class="ldot done" data-i="2">✓</span>
+              <span class="ldot done" data-i="3">✓</span>
+              <span class="ldot done" data-i="4">✓</span>
+              <span class="ldot done" data-i="5">✓</span>
+              <span class="ldot done" data-i="6">✓</span>
+              <span class="ldot done" data-i="7">✓</span>
+              <span class="ldot current" data-i="8">8</span>
+              <span class="ldot empty" data-i="9">9</span>
+              <span class="ldot empty" data-i="10">10</span>
+            </div>
+            <div class="loyalty-card-footer" id="loyalty-footer">Plus que <b>3 visites</b> pour ton café offert</div>
+          </div>
+
+          <!-- Favorite drinks -->
+          <div class="client-section">
+            <div class="section-header">
+              <span class="section-title">Tes boissons préférées</span>
+              <span class="section-edit" id="edit-drinks-btn">+ Ajouter</span>
+            </div>
+            <div class="pick-card active" id="drink-1">
+              <div class="pick-emoji">☕</div>
+              <div class="pick-info">
+                <div class="pick-name">Latte · Avoine · Vanille</div>
+                <div class="pick-detail">Extra shot · Taille M</div>
+              </div>
+              <div class="pick-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M2 6l3 3 5-5"/></svg></div>
+            </div>
+            <div class="pick-card" id="drink-2">
+              <div class="pick-emoji">🍵</div>
+              <div class="pick-info">
+                <div class="pick-name">Matcha latte · Avoine</div>
+                <div class="pick-detail">Taille M · Sans sirop</div>
+              </div>
+              <div class="pick-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M2 6l3 3 5-5"/></svg></div>
+            </div>
+          </div>
+
+          <!-- Favorite pastries -->
+          <div class="client-section">
+            <div class="section-header">
+              <span class="section-title">Tes viennoiseries préférées</span>
+              <span class="section-edit" id="edit-pastry-btn">+ Ajouter</span>
+            </div>
+            <div class="pick-card active" id="pastry-1">
+              <div class="pick-emoji">🥐</div>
+              <div class="pick-info">
+                <div class="pick-name">Croissant beurre</div>
+                <div class="pick-detail">Classique, toujours</div>
+              </div>
+              <div class="pick-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M2 6l3 3 5-5"/></svg></div>
+            </div>
+          </div>
+
+          <!-- Personal info -->
+          <div class="client-section">
+            <div class="section-header">
+              <span class="section-title">Tes infos</span>
+            </div>
+            <div class="info-card">
+              <div class="info-row">
+                <span class="info-row-label">Prénom</span>
+                <span class="info-row-value">Léa</span>
+              </div>
+              <div class="info-row">
+                <span class="info-row-label">Anniversaire</span>
+                <span class="info-row-value">15 mai <span class="info-tag green">Dans 33 jours</span></span>
+              </div>
+              <div class="info-row">
+                <span class="info-row-label">Membre depuis</span>
+                <span class="info-row-value">Mars 2026</span>
+              </div>
+              <div class="info-row">
+                <span class="info-row-label">Total visites</span>
+                <span class="info-row-value" style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800" id="visit-count">47</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Note for barista -->
+          <div class="client-section">
+            <div class="section-header">
+              <span class="section-title">Note pour le barista</span>
+            </div>
+            <div class="note-card-client">
+              <div class="note-label">Infos importantes</div>
+              <div class="note-body">Allergique aux fruits à coque. Pas de noisette svp !</div>
+              <textarea class="note-input-client" placeholder="Ajouter une info..."></textarea>
+            </div>
+          </div>
+
+          <!-- Rating -->
+          <div class="client-section">
+            <div class="section-header">
+              <span class="section-title">Ton avis sur ce café</span>
+            </div>
+            <div class="rating-card">
+              <div class="rating-row" id="star-row">
+                <span class="star filled" data-v="1">★</span>
+                <span class="star filled" data-v="2">★</span>
+                <span class="star filled" data-v="3">★</span>
+                <span class="star filled" data-v="4">★</span>
+                <span class="star empty" data-v="5">★</span>
+              </div>
+              <span class="rating-label" id="rating-label">4/5 · Super ambiance</span>
+            </div>
+          </div>
+
+          <div class="powered">
+            <a href="#" class="powered-link">Propulsé par <span class="powered-logo">gottu<i></i></span></a>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="countdown-bar"><div class="countdown-fill" id="countdown-fill"></div></div>
+    </div>
+
+    <!-- ═══ SCREEN 3 — DRINK PICKER ═══ -->
+    <div class="screen hidden" id="s-picker">
+      <div class="picker-header">
+        <button class="picker-back" id="picker-back">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 4l-8 6 8 6"/></svg>
+          Retour
+        </button>
+        <span class="picker-title" id="picker-title">Ajouter une boisson</span>
+        <button class="picker-done" id="picker-done-btn">OK</button>
+      </div>
+
+      <div class="cat-tabs" id="cat-tabs">
+        <span class="cat-tab active" data-cat="cafe">☕ Café</span>
+        <span class="cat-tab" data-cat="the">🍵 Thé</span>
+        <span class="cat-tab" data-cat="matcha">🌿 Matcha</span>
+        <span class="cat-tab" data-cat="jus">🥤 Jus</span>
+        <span class="cat-tab" data-cat="autre">✨ Autre</span>
+      </div>
+
+      <div class="picker-scroll">
+        <div class="drink-grid" id="drink-grid">
+          <!-- filled by JS -->
+        </div>
+
+        <div class="options-section" id="drink-options-section">
+          <div class="drink-grid-title">Lait</div>
+          <div class="option-chips" id="chips-lait">
+            <span class="option-chip" data-group="lait">Entier</span>
+            <span class="option-chip selected" data-group="lait">Avoine</span>
+            <span class="option-chip" data-group="lait">Soja</span>
+            <span class="option-chip" data-group="lait">Amande</span>
+            <span class="option-chip" data-group="lait">Coco</span>
+          </div>
+          <div class="drink-grid-title">Sirop</div>
+          <div class="option-chips" id="chips-sirop">
+            <span class="option-chip selected" data-group="sirop">Vanille</span>
+            <span class="option-chip" data-group="sirop">Caramel</span>
+            <span class="option-chip" data-group="sirop">Noisette</span>
+            <span class="option-chip" data-group="sirop">Aucun</span>
+          </div>
+          <div class="drink-grid-title">Supplément</div>
+          <div class="option-chips" id="chips-supp">
+            <span class="option-chip selected" data-group="supp">Extra shot</span>
+            <span class="option-chip" data-group="supp">Décaf</span>
+            <span class="option-chip" data-group="supp">Chantilly</span>
+          </div>
+          <div class="drink-grid-title">Taille</div>
+          <div class="option-chips" id="chips-taille">
+            <span class="option-chip" data-group="taille" data-single>S</span>
+            <span class="option-chip selected" data-group="taille" data-single>M</span>
+            <span class="option-chip" data-group="taille" data-single>L</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-bar">
+        <span class="preview-label">Ta boisson :</span>
+        <span class="preview-text" id="preview-text">Latte · Avoine · Vanille · Extra shot · M</span>
+      </div>
+
+      <div class="confirm-bar">
+        <button class="confirm-btn" id="confirm-btn">Ajouter aux favoris</button>
+      </div>
+    </div>
+
+    <!-- ═══ SCREEN 4 — PASTRY PICKER ═══ -->
+    <div class="screen hidden" id="s-pastry">
+      <div class="picker-header">
+        <button class="picker-back" id="pastry-back">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 4l-8 6 8 6"/></svg>
+          Retour
+        </button>
+        <span class="picker-title">Viennoiserie favorite</span>
+        <button class="picker-done" id="pastry-done-btn">OK</button>
+      </div>
+
+      <div class="cat-tabs">
+        <span class="cat-tab active">🥐 Viennoiseries</span>
+        <span class="cat-tab">🍰 Gâteaux</span>
+        <span class="cat-tab">🍪 Biscuits</span>
+      </div>
+
+      <div class="picker-scroll">
+        <div class="drink-grid">
+          <div class="drink-grid-title">Choisir une viennoiserie</div>
+          <div class="drink-option selected" id="pastry-opt-1">
+            <div class="drink-option-icon">🥐</div>
+            <span class="drink-option-name">Croissant beurre</span>
+            <div class="drink-option-check"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1.5 5L4 7.5L8.5 2.5"/></svg></div>
+          </div>
+          <div class="drink-option" id="pastry-opt-2">
+            <div class="drink-option-icon">🧇</div>
+            <span class="drink-option-name">Pain au chocolat</span>
+            <div class="drink-option-check"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1.5 5L4 7.5L8.5 2.5"/></svg></div>
+          </div>
+          <div class="drink-option" id="pastry-opt-3">
+            <div class="drink-option-icon">🍞</div>
+            <span class="drink-option-name">Pain aux raisins</span>
+            <div class="drink-option-check"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1.5 5L4 7.5L8.5 2.5"/></svg></div>
+          </div>
+          <div class="drink-option" id="pastry-opt-4">
+            <div class="drink-option-icon">🌀</div>
+            <span class="drink-option-name">Kouign-amann</span>
+            <div class="drink-option-check"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1.5 5L4 7.5L8.5 2.5"/></svg></div>
+          </div>
+          <div class="drink-option" id="pastry-opt-5">
+            <div class="drink-option-icon">🍫</div>
+            <span class="drink-option-name">Cookie chocolat noir</span>
+            <div class="drink-option-check"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1.5 5L4 7.5L8.5 2.5"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="preview-bar">
+        <span class="preview-label">Ta viennoiserie :</span>
+        <span class="preview-text" id="pastry-preview-text">Croissant beurre</span>
+      </div>
+
+      <div class="confirm-bar">
+        <button class="confirm-btn" id="pastry-confirm-btn">Enregistrer ce choix</button>
+      </div>
+    </div>
+
+  </div><!-- /phone-screen -->
+</div><!-- /phone -->
+
+<div class="stage-label" id="step-label">Toucher la carte pour commencer</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-dot"></span>
+  <span id="toast-msg">Boisson ajoutée aux favoris</span>
+</div>
+
+<script>
+/* ── data ── */
+const DRINKS = {
+  cafe:   [{i:'☕',n:'Latte'},{i:'☕',n:'Cappuccino'},{i:'☕',n:'Flat white'},{i:'☕',n:'Americano'},{i:'☕',n:'Cortado'},{i:'☕',n:'Espresso'}],
+  the:    [{i:'🍵',n:'Thé noir Earl Grey'},{i:'🍵',n:'Thé vert Sencha'},{i:'🍵',n:'Thé Rooibos'},{i:'🍵',n:'Thé à la menthe'}],
+  matcha: [{i:'🌿',n:'Matcha latte'},{i:'🌿',n:'Matcha nature'},{i:'🌿',n:'Matcha frappé'}],
+  jus:    [{i:'🍊',n:'Jus d\'orange frais'},{i:'🥕',n:'Jus carotte-gingembre'},{i:'🍋',n:'Citronnade maison'}],
+  autre:  [{i:'🍫',n:'Chocolat chaud'},{i:'🥛',n:'Lait d\'or'},{i:'💧',n:'Eau pétillante'}],
+};
+
+const RATINGS = ['','😕','Bof…','Bien !','Super ambiance','Incroyable !'];
+
+/* ── refs ── */
+const sIdle      = document.getElementById('s-idle');
+const sSplash    = document.getElementById('s-splash');
+const sProfile   = document.getElementById('s-profile');
+const sPicker    = document.getElementById('s-picker');
+const sPastry    = document.getElementById('s-pastry');
+const scanOverlay= document.getElementById('scan-overlay');
+const tapZone    = document.getElementById('tap-zone');
+const stepLabel  = document.getElementById('step-label');
+const toast      = document.getElementById('toast');
+const toastMsg   = document.getElementById('toast-msg');
+const countdownFill = document.getElementById('countdown-fill');
+const profileAnim = document.getElementById('profile-anim');
+const profileScroll = document.getElementById('profile-scroll');
+
+const screens = {idle:sIdle, splash:sSplash, profile:sProfile, picker:sPicker, pastry:sPastry};
+let autoTimer = null;
+const AUTO_DELAY = 22;
+let currentRating = 4;
+
+/* ── screen switcher ── */
+function showScreen(name) {
+  Object.values(screens).forEach(s => s.classList.add('hidden'));
+  screens[name].classList.remove('hidden');
+  if(name === 'profile'){
+    profileScroll.scrollTop = 0;
+    profileAnim.classList.remove('anim-in');
+    void profileAnim.offsetWidth;
+    profileAnim.classList.add('anim-in');
+  }
+}
+
+/* ── countdown ── */
+function startCountdown(secs) {
+  clearTimeout(autoTimer);
+  countdownFill.style.transition = 'none';
+  countdownFill.style.transform = 'scaleX(1)';
+  void countdownFill.offsetWidth;
+  countdownFill.style.transition = `transform ${secs}s linear`;
+  countdownFill.style.transform = 'scaleX(0)';
+  autoTimer = setTimeout(returnToIdle, secs * 1000);
+}
+function stopCountdown() {
+  clearTimeout(autoTimer);
+  countdownFill.style.transition = 'none';
+  countdownFill.style.transform = 'scaleX(1)';
+}
+function returnToIdle() {
+  stopCountdown();
+  showScreen('idle');
+  stepLabel.textContent = 'Toucher la carte pour recommencer';
+}
+
+/* ── NFC tap ── */
+function triggerScan() {
+  scanOverlay.classList.add('active');
+  stepLabel.textContent = 'Lecture du badge…';
+  setTimeout(() => {
+    scanOverlay.classList.remove('active');
+    showScreen('splash');
+    stepLabel.textContent = 'Carte reconnue — chargement du profil…';
+    setTimeout(() => {
+      showScreen('profile');
+      stepLabel.textContent = 'Profil chargé — interagis avec ton espace';
+      startCountdown(AUTO_DELAY);
+    }, 2200);
+  }, 1600);
+}
+tapZone.addEventListener('click', triggerScan);
+
+/* ── loyalty dots interaction ── */
+let loyaltyCount = 7;
+document.getElementById('loyalty-dots').addEventListener('click', e => {
+  const dot = e.target.closest('.ldot');
+  if(!dot) return;
+  const idx = parseInt(dot.dataset.i);
+  const dots = document.querySelectorAll('.ldot');
+  loyaltyCount = idx;
+  dots.forEach(d => {
+    const di = parseInt(d.dataset.i);
+    d.className = 'ldot';
+    if(di < idx){ d.classList.add('done'); d.textContent='✓'; }
+    else if(di === idx){ d.classList.add('current'); d.textContent=di; }
+    else { d.classList.add('empty'); d.textContent=di; }
+  });
+  const remaining = 10 - idx;
+  const footer = document.getElementById('loyalty-footer');
+  if(remaining <= 0){
+    footer.innerHTML = '<b>🎉 Félicitations !</b> Tu as ta boisson offerte !';
+    showToast('🎉 Boisson offerte débloquée !');
+  } else {
+    footer.innerHTML = `Plus que <b>${remaining} visite${remaining>1?'s':''}</b> pour ton café offert`;
+  }
+});
+
+/* ── pick cards toggle ── */
+function setupPickCard(id) {
+  document.getElementById(id).addEventListener('click', function(){
+    this.classList.toggle('active');
+  });
+}
+setupPickCard('drink-1');
+setupPickCard('drink-2');
+setupPickCard('pastry-1');
+
+/* ── star rating ── */
+document.getElementById('star-row').addEventListener('click', e => {
+  const star = e.target.closest('.star');
+  if(!star) return;
+  currentRating = parseInt(star.dataset.v);
+  document.querySelectorAll('#star-row .star').forEach(s => {
+    const v = parseInt(s.dataset.v);
+    s.className = v <= currentRating ? 'star filled' : 'star empty';
+  });
+  document.getElementById('rating-label').textContent = `${currentRating}/5 · ${RATINGS[currentRating]}`;
+  showToast('Avis enregistré, merci !');
+});
+
+/* ── DRINK PICKER ── */
+let pickerMode = 'drink'; // 'drink' | 'pastry' implicit via separate screen
+let selectedDrink = 'Latte';
+let selectedCat = 'cafe';
+
+function buildDrinkGrid(cat) {
+  const grid = document.getElementById('drink-grid');
+  const items = DRINKS[cat] || [];
+  grid.innerHTML = `<div class="drink-grid-title">Choisir ta boisson</div>` +
+    items.map((d,i)=>`
+      <div class="drink-option${i===0?' selected':''}" data-name="${d.n}" data-icon="${d.i}">
+        <div class="drink-option-icon">${d.i}</div>
+        <span class="drink-option-name">${d.n}</span>
+        <div class="drink-option-check"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1.5 5L4 7.5L8.5 2.5"/></svg></div>
+      </div>`).join('');
+  selectedDrink = items[0]?.n || '';
+  updatePreview();
+}
+
+function updatePreview() {
+  const lait  = document.querySelector('#chips-lait .option-chip.selected')?.textContent || '';
+  const sirop = document.querySelector('#chips-sirop .option-chip.selected')?.textContent || '';
+  const supp  = document.querySelector('#chips-supp .option-chip.selected')?.textContent || '';
+  const taille= document.querySelector('#chips-taille .option-chip.selected')?.textContent || '';
+  const parts = [selectedDrink, lait, sirop, supp, taille].filter(p=>p&&p!=='Aucun');
+  document.getElementById('preview-text').textContent = parts.join(' · ');
+}
+
+// Cat tabs
+document.getElementById('cat-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.cat-tab');
+  if(!tab) return;
+  document.querySelectorAll('#cat-tabs .cat-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  selectedCat = tab.dataset.cat;
+  buildDrinkGrid(selectedCat);
+});
+
+// Drink options
+document.getElementById('drink-grid').addEventListener('click', e => {
+  const opt = e.target.closest('.drink-option');
+  if(!opt) return;
+  document.querySelectorAll('#drink-grid .drink-option').forEach(o=>o.classList.remove('selected'));
+  opt.classList.add('selected');
+  selectedDrink = opt.dataset.name;
+  updatePreview();
+});
+
+// Option chips (multi-select per group, single-select for taille)
+document.getElementById('drink-options-section').addEventListener('click', e => {
+  const chip = e.target.closest('.option-chip');
+  if(!chip) return;
+  const isSingle = chip.hasAttribute('data-single');
+  if(isSingle){
+    chip.closest('.option-chips').querySelectorAll('.option-chip').forEach(c=>c.classList.remove('selected'));
+    chip.classList.add('selected');
+  } else {
+    chip.classList.toggle('selected');
+  }
+  updatePreview();
+});
+
+// Open picker for drinks
+document.getElementById('edit-drinks-btn').addEventListener('click', () => {
+  stopCountdown();
+  buildDrinkGrid('cafe');
+  showScreen('picker');
+  stepLabel.textContent = 'Choisis ta boisson favorite';
+});
+
+// Picker back
+document.getElementById('picker-back').addEventListener('click', () => {
+  showScreen('profile');
+  stepLabel.textContent = 'Profil chargé — interagis avec ton espace';
+  startCountdown(AUTO_DELAY);
+});
+
+// Picker confirm
+document.getElementById('picker-done-btn').addEventListener('click', addDrinkAndBack);
+document.getElementById('confirm-btn').addEventListener('click', addDrinkAndBack);
+
+function addDrinkAndBack() {
+  const preview = document.getElementById('preview-text').textContent;
+  showToast(`"${preview}" ajouté aux favoris`);
+  showScreen('profile');
+  stepLabel.textContent = 'Profil chargé — interagis avec ton espace';
+  startCountdown(AUTO_DELAY);
+}
+
+/* ── PASTRY PICKER ── */
+let selectedPastry = 'Croissant beurre';
+
+document.getElementById('edit-pastry-btn').addEventListener('click', () => {
+  stopCountdown();
+  showScreen('pastry');
+  stepLabel.textContent = 'Choisis ta viennoiserie favorite';
+});
+
+// Pastry options
+['pastry-opt-1','pastry-opt-2','pastry-opt-3','pastry-opt-4','pastry-opt-5'].forEach(id => {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('click', function(){
+    document.querySelectorAll('#s-pastry .drink-option').forEach(o=>o.classList.remove('selected'));
+    this.classList.add('selected');
+    selectedPastry = this.querySelector('.drink-option-name').textContent;
+    document.getElementById('pastry-preview-text').textContent = selectedPastry;
+  });
+});
+
+document.getElementById('pastry-back').addEventListener('click', () => {
+  showScreen('profile');
+  stepLabel.textContent = 'Profil chargé — interagis avec ton espace';
+  startCountdown(AUTO_DELAY);
+});
+document.getElementById('pastry-done-btn').addEventListener('click', addPastryAndBack);
+document.getElementById('pastry-confirm-btn').addEventListener('click', addPastryAndBack);
+
+function addPastryAndBack() {
+  showToast(`"${selectedPastry}" enregistré !`);
+  showScreen('profile');
+  stepLabel.textContent = 'Profil chargé — interagis avec ton espace';
+  startCountdown(AUTO_DELAY);
+}
+
+/* ── toast ── */
+function showToast(msg) {
+  toastMsg.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+/* ── init ── */
+buildDrinkGrid('cafe');
+</script>
+</body>
+</html>
