@@ -3,828 +3,783 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gottu — We got you</title>
+<title>Gottu — Le café de Paris, à explorer comme un jeu</title>
+<meta name="description" content="Gottu te guide de café en café à travers des parcours curatés. Valide chaque visite, colore ta carte, collectionne. L'ami connaisseur qui te fait découvrir les meilleurs cafés de Paris.">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --ink: #171411;
-  --paper: #FAF6EF;
-  --sage: #4CA671;
-  --sage-pale: #E3F2E9;
-  --sage-deep: #2D7A4E;
-  --honey: #E9A23B;
-  --honey-pale: #FFF3DB;
-  --blush: #EB6E56;
-  --clay: #C4A882;
-  --fog: #EDE8DF;
-  --text-mid: #6D6355;
-  --text-light: #A39888;
+:root{
+  /* Primary: white + black. Secondary (brand): cream #FFE5C0, coffee #A05F00, charcoal #3D3D3D */
+  --paper:#f7f2ea;
+  --ink:#0e0b0a;
+  --ink-soft:#17120f;
+  --orange:#a05f00;
+  --orange-deep:#8a5200;
+  --orange-deeper:#6f4200;
+  --sage:#3d3d3d;
+  --sage-deep:#2e2e2e;
+  --purple:#3d3d3d;
+  --purple-deep:#2e2e2e;
+  --peach:#ffe5c0;
+  --mint:#ffe8c9;
+  --yellow:#ffe5c0;
+  --lavender:#f0e4d3;
+  --text-mid:#6b5d54;
+  --text-soft:#5a4e46;
+  --text-light:#a29079;
+  --line:#ece1d2;
+  --line-soft:#efe6d8;
+  --accent-dark:#ffe5c0;
 }
-*{margin:0;padding:0;box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth;overflow-x:hidden}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{
-  font-family:'Outfit',sans-serif;
+  margin:0;
+  font-family:'Helvetica Neue',Helvetica,Arial,system-ui,sans-serif;
   background:var(--paper);
   color:var(--ink);
-  -webkit-font-smoothing:antialiased;
+  line-height:1.55;
   overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
 }
-h1,h2,h3,.display{font-family:'Bricolage Grotesque',sans-serif}
 a{text-decoration:none;color:inherit}
 img{max-width:100%}
+h1,h2,h3{margin:0}
+.serif{font-family:'Fredoka','Helvetica Neue',Arial,sans-serif;font-weight:600;letter-spacing:-.005em;line-height:1.04}
+.wrap{max-width:1160px;margin:0 auto;padding:0 28px}
+.over{text-transform:uppercase;letter-spacing:.15em;font-size:11px;font-weight:600;color:var(--text-light)}
+.italic{font-style:italic}
 
-/* ═══ GRAIN OVERLAY ═══ */
-body::after{
-  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:9999;
-}
+/* logo */
+.logo{display:inline-flex;align-items:center}
+.logo img{display:block;width:auto}
+.logo-lockup{height:30px}
 
-/* ═══ NAV ═══ */
-.nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:20px 40px;
-  display:flex;justify-content:space-between;align-items:center;
-  transition:all 0.4s;
-}
-.nav.stuck{
-  background:rgba(250,246,239,0.92);
-  backdrop-filter:blur(24px);
-  padding:14px 40px;
-  box-shadow:0 1px 0 var(--fog);
-}
-.nav-logo{
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-weight:800;font-size:26px;letter-spacing:-0.5px;
-}
-.nav-logo i{
-  display:inline-block;width:8px;height:8px;
-  background:var(--sage);border-radius:50%;
-  margin-left:1px;transform:translateY(-8px);
-}
-.nav-links{display:flex;gap:32px;align-items:center}
-.nav-links a{font-size:14px;font-weight:500;color:var(--text-mid);transition:color 0.2s}
-.nav-links a:hover{color:var(--ink)}
-.nav-links a.nav-btn{
-  background:var(--ink);color:var(--paper);
-  padding:10px 22px;border-radius:10px;
-  font-weight:600;font-size:13px;letter-spacing:0.3px;
-  transition:transform 0.25s cubic-bezier(.34,1.56,.64,1),box-shadow 0.25s;
-}
-.nav-links a.nav-btn:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 6px 24px rgba(0,0,0,0.15)}
+/* interactions */
+.press{transition:transform .18s cubic-bezier(.34,1.4,.64,1),background .2s,box-shadow .2s,color .2s;cursor:pointer}
+.press:active{transform:scale(.97)}
+.lift{transition:transform .3s cubic-bezier(.34,1.3,.64,1),box-shadow .3s}
+.lift:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(46,38,34,.09)}
+.ulink{position:relative;transition:color .2s}
+.ulink::after{content:"";position:absolute;left:0;bottom:-3px;height:1.5px;width:0;background:var(--orange);transition:width .25s ease}
+.ulink:hover::after{width:100%}
+.spark{position:absolute;font-weight:700;animation:twinkle 3s ease-in-out infinite;pointer-events:none}
 
-/* ═══ HERO ═══ */
-.hero{
-  min-height:100vh;
-  display:grid;grid-template-columns:1.1fr 0.9fr;
-  padding:140px 60px 80px;gap:40px;
-  align-items:center;
-  position:relative;
-}
-.hero-text h1{
-  font-size:clamp(42px,5.8vw,72px);
-  font-weight:800;line-height:1.0;
-  letter-spacing:-2.5px;
-  margin-bottom:28px;
-}
-.hero-text h1 .highlight{
-  position:relative;display:inline;
-}
-.hero-text h1 .highlight::after{
-  content:'';position:absolute;bottom:4px;left:-4px;right:-4px;
-  height:14px;background:var(--honey);opacity:0.35;
-  border-radius:4px;z-index:-1;
-  transform:rotate(-0.8deg);
-}
-.hero-p{
-  font-size:19px;line-height:1.75;color:var(--text-mid);
-  max-width:460px;margin-bottom:40px;font-weight:400;
-}
-.hero-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
-.btn-main{
-  display:inline-flex;align-items:center;gap:10px;
-  background:var(--sage);color:#fff;
-  padding:16px 32px;border-radius:14px;
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-weight:700;font-size:16px;
-  transition:transform 0.25s cubic-bezier(.34,1.56,.64,1),box-shadow 0.25s;
-  border:none;cursor:pointer;
-}
-.btn-main:hover{
-  transform:translateY(-3px) scale(1.02);
-  box-shadow:0 10px 36px rgba(76,166,113,0.3);
-}
-.btn-main svg{width:18px;height:18px;transition:transform 0.3s}
-.btn-main:hover svg{transform:translateX(4px)}
-.hero-note{font-size:13px;color:var(--text-light);max-width:260px;line-height:1.5}
+@keyframes pop{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-7px) rotate(2deg)}}
+@keyframes twinkle{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.25);opacity:.45}}
+@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.marqt{animation:marq 30s linear infinite}
+@media (prefers-reduced-motion:reduce){.marqt,.spark,.floaty{animation:none!important}}
 
-/* HERO VISUAL */
-.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;padding:20px 0}
-.hv-scene{position:relative;width:360px;height:560px}
-/* Carte principale */
-.hv-main{
-  position:absolute;
-  top:80px;left:0;
-  width:295px;
-  background:#fff;
-  border-radius:24px;
-  padding:28px 24px;
-  box-shadow:0 20px 80px rgba(23,20,17,0.11),0 1px 3px rgba(23,20,17,0.04);
-  border:1px solid rgba(0,0,0,0.05);
-  transform:rotate(-2deg);
-  z-index:2;
-}
-/* Chip stats (sombre) — haut droite */
-.hv-chip-1{
-  position:absolute;
-  top:0;right:0;
-  width:168px;
-  background:var(--ink);color:var(--paper);
-  border-radius:20px;
-  padding:18px 18px;
-  box-shadow:0 12px 40px rgba(23,20,17,0.22);
-  transform:rotate(2.5deg);
-  z-index:3;
-  animation:floatA 7s ease-in-out infinite;
-}
-/* Chip Thomas — bas droite */
-.hv-chip-2{
-  position:absolute;
-  bottom:0;right:0;
-  width:205px;
-  background:var(--sage-pale);
-  border-radius:20px;
-  padding:18px 18px;
-  box-shadow:0 8px 32px rgba(23,20,17,0.1);
-  border:1px solid rgba(0,0,0,0.04);
-  transform:rotate(-1.5deg);
-  z-index:3;
-  animation:floatB 8s ease-in-out infinite;
-}
-@keyframes floatA{0%,100%{transform:rotate(2.5deg) translateY(0)}50%{transform:rotate(2.5deg) translateY(-7px)}}
-@keyframes floatB{0%,100%{transform:rotate(-1.5deg) translateY(0)}50%{transform:rotate(-1.5deg) translateY(-8px)}}
-/* Chip stats internals */
-.hvc1-num{font-family:'Bricolage Grotesque',sans-serif;font-size:38px;font-weight:800;color:var(--paper);line-height:1;margin-bottom:2px}
-.hvc1-label{font-size:11px;color:rgba(250,246,239,0.45);font-weight:500;margin-bottom:14px}
-.hvc1-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.hvc1-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.hvc1-text{font-size:11px;color:rgba(250,246,239,0.55);line-height:1.3}
-/* Chip Thomas internals */
-.hvc2-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.hvc2-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--sage-pale),var(--honey-pale));display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:14px;color:var(--sage-deep);flex-shrink:0}
-.hvc2-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:15px}
-.hvc2-meta{font-size:11px;color:var(--text-light);margin-top:1px}
-.hvc2-tag{display:inline-flex;align-items:center;gap:5px;background:var(--sage-pale);color:var(--sage-deep);padding:6px 11px;border-radius:9px;font-size:11px;font-weight:500}
-.hvc2-dot{width:5px;height:5px;border-radius:50%;background:var(--sage);flex-shrink:0}
-.card-status{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--sage-pale);color:var(--sage-deep);
-  padding:5px 12px;border-radius:100px;
-  font-size:12px;font-weight:600;margin-bottom:20px;
-}
-.card-status .pulse{
-  width:7px;height:7px;background:var(--sage);border-radius:50%;
-  animation:pulse 2s infinite;
-}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-.card-person{display:flex;align-items:center;gap:14px;margin-bottom:24px}
-.card-avatar{
-  width:52px;height:52px;border-radius:16px;
-  background:linear-gradient(135deg,var(--honey-pale),var(--sage-pale));
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-weight:800;font-size:20px;color:var(--sage-deep);
-}
-.card-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:20px}
-.card-meta{font-size:12px;color:var(--text-light);margin-top:2px}
-.card-section{margin-bottom:18px}
-.card-section-label{
-  font-size:10px;text-transform:uppercase;letter-spacing:1.5px;
-  color:var(--text-light);font-weight:600;margin-bottom:10px;
-}
-.progress-track{
-  height:8px;background:var(--fog);border-radius:100px;overflow:hidden;
-  margin-bottom:6px;
-}
-.progress-fill{
-  height:100%;width:0%;border-radius:100px;
-  background:linear-gradient(90deg,var(--sage),var(--honey));
-  animation:grow 1.8s 1s cubic-bezier(.22,1,.36,1) forwards;
-}
-@keyframes grow{to{width:70%}}
-@keyframes grow2{to{width:30%}}
-@keyframes grow3{to{width:55%}}
-.progress-meta{display:flex;justify-content:space-between;font-size:12px}
-.progress-meta span:first-child{color:var(--text-light)}
-.progress-meta span:last-child{font-weight:700;color:var(--honey)}
-.drink-tag{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:8px 14px;border-radius:10px;
-  font-size:13px;font-weight:500;
-  margin:0 6px 8px 0;
-  transition:transform 0.2s;cursor:default;
-}
-.drink-tag:hover{transform:scale(1.04)}
-.drink-tag:nth-child(1){background:var(--sage-pale);color:var(--sage-deep)}
-.drink-tag:nth-child(2){background:var(--honey-pale);color:#9B7520}
-.drink-tag:nth-child(3){background:#FDE8E4;color:#B8463A}
-.drink-dot{width:6px;height:6px;border-radius:50%}
-.drink-tag:nth-child(1) .drink-dot{background:var(--sage)}
-.drink-tag:nth-child(2) .drink-dot{background:var(--honey)}
-.drink-tag:nth-child(3) .drink-dot{background:var(--blush)}
-/* Drink photo cards */
-.drink-photos{display:flex;gap:8px;margin-top:2px}
-.drink-photo-card{
-  flex:1;border-radius:12px;overflow:hidden;
-  background:var(--fog);
-  transition:transform 0.25s cubic-bezier(.34,1.56,.64,1);
-  cursor:default;
-}
-.drink-photo-card:hover{transform:scale(1.04) translateY(-2px)}
-.drink-photo-card img{width:100%;height:76px;object-fit:cover;display:block}
-.drink-photo-label{
-  font-size:10px;font-weight:500;color:var(--text-mid);
-  padding:6px 8px;line-height:1.35;
-}
-/* Stats chip drink preview */
-.hvc1-drink{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(250,246,239,0.1)}
-.hvc1-drink img{width:32px;height:32px;border-radius:8px;object-fit:cover;flex-shrink:0}
-.hvc1-drink-text{font-size:11px;color:rgba(250,246,239,0.55);line-height:1.3}
+/* nav */
+.nav{position:sticky;top:0;z-index:60;background:rgba(244,243,241,.82);backdrop-filter:saturate(150%) blur(12px);border-bottom:1px solid transparent;transition:border-color .3s}
+.nav.stuck{border-bottom-color:var(--line)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:74px}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{font-weight:500;font-size:14.5px;color:var(--text-soft)}
+.nav-cta{background:var(--ink);color:var(--paper);font-size:14px;font-weight:600;padding:11px 19px;border-radius:13px}
 
+/* hero */
+.hero{position:relative;overflow:hidden}
+.blob{position:absolute;pointer-events:none}
+.blob-a{top:-160px;right:-120px;width:460px;height:460px;border-radius:48% 52% 60% 40%/50% 45% 55% 50%;background:radial-gradient(circle,rgba(160,95,0,.12),transparent 70%)}
+.blob-b{bottom:-40px;left:-120px;width:360px;height:360px;border-radius:52% 48% 40% 60%/55% 50% 50% 45%;background:radial-gradient(circle,rgba(255,229,192,.5),transparent 70%)}
+.hero-inner{padding:56px 28px 76px;position:relative}
+.hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(2.9rem,6.2vw,5rem);color:var(--ink)}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.6em;color:var(--orange-deep);margin-bottom:20px}
+.hero-eyebrow .star{color:var(--orange);font-size:15px}
+.hero-p{font-size:clamp(1.05rem,1.5vw,1.22rem);color:var(--text-mid);max-width:45ch;margin:24px 0 30px;line-height:1.6}
+.signup{display:flex;gap:10px;flex-wrap:wrap;max-width:480px}
+.signup input{flex:1;min-width:200px;font-family:inherit;font-size:15.5px;padding:0 18px;height:54px;border:1px solid #e0d6c8;border-radius:15px;background:#fff;color:var(--ink);outline:none;box-shadow:0 3px 12px rgba(46,38,34,.04)}
+.signup input:focus{border-color:var(--orange)}
+.signup button{border:0;background:var(--orange);color:#fff;font-family:inherit;font-size:15px;font-weight:600;padding:0 24px;height:54px;border-radius:15px;box-shadow:0 8px 22px rgba(160,95,0,.28)}
+.signup-note{font-size:13px;color:var(--text-light);margin-top:13px;display:flex;align-items:center;gap:.45em}
+.signup-done{display:none;align-items:center;gap:.7em;font-weight:600;color:var(--ink);background:var(--mint);border-radius:15px;padding:.85em 1.3em}
+.signup-done .tick{width:24px;height:24px;border-radius:999px;background:var(--sage);display:flex;align-items:center;justify-content:center;flex:none;color:#fff}
+.form-state.done .signup{display:none}
+.form-state.done .signup-note{display:none}
+.form-state.done .signup-done{display:inline-flex}
 
-/* ═══ PROBLEM ═══ */
-.problem{padding:120px 60px}
-.problem-box{
-  background:var(--ink);border-radius:28px;
-  padding:80px 72px;color:var(--paper);
-  display:grid;grid-template-columns:1fr 1fr;gap:60px;
-  align-items:center;
-  position:relative;overflow:hidden;
-}
-.problem-box::after{
-  content:'';position:absolute;top:-120px;right:-80px;
-  width:400px;height:400px;
-  background:radial-gradient(circle,rgba(232,162,59,0.1),transparent 65%);
-  border-radius:50%;pointer-events:none;
-}
-.problem h2{font-size:clamp(34px,4.2vw,52px);font-weight:800;line-height:1.08;letter-spacing:-1.5px}
-.problem h2 span{color:var(--blush)}
-.problem-right p{font-size:17px;line-height:1.85;color:rgba(250,246,239,0.65)}
-.problem-right strong{color:var(--paper);font-weight:600}
+/* phone mockup */
+.heroart{position:relative;display:flex;justify-content:center}
+.hero-mascot{position:absolute;left:4px;bottom:18px;width:76px;z-index:4;filter:drop-shadow(0 10px 20px rgba(14,11,10,.2));pointer-events:none}
+.phone{position:relative;z-index:1;width:322px;background:linear-gradient(150deg,#3a3a3a,#0e0b0a 40%,#0e0b0a 62%,#2c2c2c);border-radius:50px;padding:13px;box-shadow:0 40px 80px -26px rgba(46,38,34,.7),0 6px 16px rgba(0,0,0,.35),inset 0 0 0 1.5px rgba(255,255,255,.07);animation:phonefloat 7s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.phone{animation:none}}
+@keyframes phonefloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.phone::after{content:"";position:absolute;inset:6px;border-radius:43px;box-shadow:inset 0 0 0 2px rgba(0,0,0,.6);pointer-events:none;z-index:9}
+.phone-screen{background:var(--paper);border-radius:38px;overflow:hidden;position:relative}
+.phone .btn{position:absolute;background:linear-gradient(90deg,#15110f,#3c332e);border-radius:3px;z-index:0}
+.phone .btn-power{right:-3px;top:152px;width:3px;height:62px}
+.phone .btn-vu{left:-3px;top:118px;width:3px;height:32px}
+.phone .btn-vd{left:-3px;top:160px;width:3px;height:32px}
+.island{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:94px;height:27px;background:#000;border-radius:16px;z-index:8}
+.island::after{content:"";position:absolute;right:10px;top:50%;transform:translateY(-50%);width:7px;height:7px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#33485c,#05080c);box-shadow:inset 0 0 1px rgba(120,170,210,.7)}
+.statusbar{display:flex;align-items:center;justify-content:space-between;padding:14px 26px 0;font-size:12px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.statusbar .sb-icons{display:flex;align-items:center;gap:6px}
+.statusbar svg{display:block}
+.gloss{position:absolute;inset:0;border-radius:38px;background:linear-gradient(122deg,rgba(255,255,255,.16),rgba(255,255,255,0) 30%);pointer-events:none;z-index:7}
+.phone-head{padding:12px 20px 11px;display:flex;align-items:center;justify-content:space-between}
+.phone-head .serif{font-size:21px;color:var(--ink)}
+.phone-head .sub{display:block;font-size:10.5px;font-weight:600;color:var(--text-light);letter-spacing:.02em;margin-top:2px}
+.pill{font-size:11px;font-weight:700;color:var(--orange-deep);background:var(--peach);padding:5px 11px;border-radius:999px}
+.map{position:relative;height:360px;margin:0 16px;border-radius:22px;overflow:hidden;background:linear-gradient(135deg,#efe8dd,#e6dccb);box-shadow:inset 0 0 0 1px rgba(160,95,0,.06)}
+.map .road{position:absolute;background:#faf6ee;border-radius:2px}
+.map .park{position:absolute;background:#e8e0cf;border-radius:11px;opacity:.95}
+.map .river{position:absolute;left:-30px;top:44%;width:400px;height:38px;background:linear-gradient(#e3dccf,#d8cfbd);transform:rotate(-10deg);border-radius:24px;opacity:.9}
+.route{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible}
+.route path{fill:none;stroke:var(--orange);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;opacity:.6;transition:stroke-dashoffset 2.2s cubic-bezier(.4,.0,.2,1)}
+.pin{position:absolute;width:24px;height:24px;border-radius:50% 50% 50% 0;display:grid;place-items:center;transition:all .45s cubic-bezier(.2,.9,.3,1.4);transform:rotate(-45deg) scale(.62);background:#fff;box-shadow:0 2px 5px rgba(46,38,34,.12);opacity:.55;z-index:2}
+.pin.on{background:var(--orange);box-shadow:0 5px 12px rgba(160,95,0,.4);opacity:1;transform:rotate(-45deg) scale(1)}
+.pin svg{width:10px;height:10px;transform:rotate(45deg);opacity:0;transition:opacity .3s}
+.pin.on svg{opacity:1}
+.pin.cur::before{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--orange);opacity:.45;z-index:-1;animation:ping 1.7s cubic-bezier(.2,.6,.4,1) infinite}
+@keyframes ping{0%{transform:scale(1);opacity:.45}80%,100%{transform:scale(2.7);opacity:0}}
+@media (prefers-reduced-motion:reduce){.pin.cur::before{animation:none;opacity:0}}
+.phone-card{margin:14px 16px 18px;background:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 4px 14px rgba(46,38,34,.04)}
+.phone-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.phone-card-top .label{font-weight:600;font-size:13.5px;color:var(--ink)}
+.phone-card-top .count{font-weight:700;font-size:13.5px;color:var(--orange);font-variant-numeric:tabular-nums}
+.track{height:8px;background:#efe6d8;border-radius:9px;overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--orange);border-radius:9px;transition:width .9s cubic-bezier(.3,.9,.3,1)}
+.badge-float{position:absolute;z-index:3;right:24px;top:118px;background:#fff;border-radius:16px;padding:11px 14px;box-shadow:0 12px 30px rgba(46,38,34,.2);display:flex;align-items:center;gap:10px;opacity:0;transform:scale(.4) translateY(10px)}
+.badge-float.show{opacity:1;animation:pop .55s cubic-bezier(.34,1.4,.64,1) both}
+.badge-float .ic{width:40px;height:40px;border-radius:13px;background:var(--purple);display:grid;place-items:center;flex:none;color:#fff}
+.badge-float small{display:block;font-size:9px;color:var(--text-light)}
+.badge-float b{font-size:13px;font-weight:700;color:var(--ink)}
 
-/* ═══ STEPS ═══ */
-.steps-section{padding:120px 60px}
-.section-tag{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--sage-pale);color:var(--sage-deep);
-  padding:6px 14px;border-radius:100px;
-  font-size:12px;font-weight:700;text-transform:uppercase;
-  letter-spacing:1px;margin-bottom:16px;
-}
-.section-tag::before{content:'';width:6px;height:6px;background:var(--sage);border-radius:50%}
-.steps-section h2{
-  font-size:clamp(34px,4.2vw,52px);
-  font-weight:800;letter-spacing:-1.5px;
-  margin-bottom:64px;line-height:1.1;
-}
-.steps-section h2 span{color:var(--honey)}
-.steps-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
-  counter-reset:step;
-}
-.step-card{
-  background:#fff;border-radius:22px;padding:36px 30px;
-  border:1px solid rgba(0,0,0,0.04);
-  position:relative;
-  transition:transform 0.35s cubic-bezier(.34,1.56,.64,1),box-shadow 0.35s;
-  counter-increment:step;
-}
-.step-card:hover{
-  transform:translateY(-8px);
-  box-shadow:0 20px 60px rgba(23,20,17,0.07);
-}
-.step-number{
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-size:48px;font-weight:800;
-  line-height:1;margin-bottom:16px;
-}
-.step-card:nth-child(1) .step-number{color:var(--sage)}
-.step-card:nth-child(2) .step-number{color:var(--honey)}
-.step-card:nth-child(3) .step-number{color:var(--blush)}
-.step-card h3{font-size:19px;font-weight:700;margin-bottom:10px;letter-spacing:-0.3px}
-.step-card p{font-size:14px;line-height:1.75;color:var(--text-mid)}
+/* marquee */
+.marquee{background:var(--ink);overflow:hidden}
+.marquee-track{display:flex;white-space:nowrap;width:max-content;padding:15px 0}
+.marquee-track .grp{display:inline-flex;align-items:center}
+.marquee-track .w{font-style:italic;font-size:1.5rem;color:var(--paper);padding:0 26px}
+.marquee-track .s{font-weight:700;color:var(--accent-dark);flex:none}
 
-/* ═══ BENEFITS ═══ */
-.benefits{padding:120px 60px}
-.benefits h2{
-  font-size:clamp(34px,4.2vw,52px);
-  font-weight:800;letter-spacing:-1.5px;margin-bottom:64px;
-  max-width:600px;line-height:1.1;
-}
-.bento{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  grid-template-rows:auto auto;
-  gap:20px;
-}
-.bento-item{
-  background:#fff;border-radius:22px;
-  padding:40px 34px;
-  border:1px solid rgba(0,0,0,0.04);
-  transition:transform 0.3s;
-  position:relative;overflow:hidden;
-}
-.bento-item:hover{transform:translateY(-4px)}
-.bento-item:nth-child(1){grid-column:1/2}
-.bento-item:nth-child(2){grid-column:2/3}
-.bento-item:nth-child(3){grid-column:1/2}
-.bento-item:nth-child(4){grid-column:2/3}
-.bento-accent{
-  position:absolute;top:-30px;right:-30px;
-  width:120px;height:120px;border-radius:50%;opacity:0.08;
-}
-.bento-item:nth-child(1) .bento-accent{background:var(--sage)}
-.bento-item:nth-child(2) .bento-accent{background:var(--honey)}
-.bento-item:nth-child(3) .bento-accent{background:var(--blush)}
-.bento-item:nth-child(4) .bento-accent{background:var(--clay)}
-.bento-icon{
-  width:44px;height:44px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;margin-bottom:20px;
-}
-.bento-item:nth-child(1) .bento-icon{background:var(--sage-pale)}
-.bento-item:nth-child(2) .bento-icon{background:var(--honey-pale)}
-.bento-item:nth-child(3) .bento-icon{background:#EEF4FC}
-.bento-item:nth-child(4) .bento-icon{background:#FDE8E4}
-.bento-item h3{font-size:18px;font-weight:700;margin-bottom:10px;letter-spacing:-0.2px}
-.bento-item p{font-size:14px;line-height:1.75;color:var(--text-mid)}
+/* stats strip */
+.stats{background:#fff;border-bottom:1px solid var(--line)}
+.stats-inner{padding:30px 28px;display:flex;flex-wrap:wrap;gap:26px;justify-content:space-between;align-items:center}
+.stats-row{display:flex;gap:40px;flex-wrap:wrap}
+.stat b{font-size:2rem;display:block;line-height:1;color:var(--ink)}
+.stat span{font-size:13px;color:var(--text-light)}
 
-/* ═══ PRICING ═══ */
-.pricing{padding:120px 60px}
-.pricing-wrap{
-  display:grid;grid-template-columns:1fr 1.2fr;gap:60px;
-  align-items:start;
-}
-.pricing-left h2{
-  font-size:clamp(34px,4.2vw,52px);font-weight:800;
-  letter-spacing:-1.5px;line-height:1.1;margin-bottom:16px;
-}
-.pricing-left h2 span{color:var(--sage)}
-.pricing-left>p{font-size:16px;color:var(--text-mid);line-height:1.7}
-.pricing-card{
-  background:#fff;border-radius:24px;
-  padding:44px 40px;
-  border:2px solid var(--sage);
-  position:relative;
-}
-.price-tag{
-  position:absolute;top:-14px;right:32px;
-  background:var(--sage);color:#fff;
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-weight:700;font-size:12px;
-  padding:5px 16px;border-radius:100px;
-  letter-spacing:0.5px;
-}
-.price-row{display:flex;align-items:baseline;gap:6px;margin-bottom:4px}
-.price-num{
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-size:56px;font-weight:800;letter-spacing:-3px;
-}
-.price-unit{font-size:18px;color:var(--text-light);font-weight:500}
-.price-sub{font-size:13px;color:var(--text-light);margin-bottom:28px}
-.feat-list{list-style:none;margin-bottom:32px}
-.feat-list li{
-  padding:13px 0;
-  border-bottom:1px solid var(--fog);
-  font-size:14px;line-height:1.6;
-  display:flex;gap:12px;align-items:flex-start;
-}
-.feat-list li:last-child{border-bottom:none}
-.feat-check{
-  width:20px;height:20px;border-radius:6px;flex-shrink:0;
-  background:var(--sage-pale);
-  display:flex;align-items:center;justify-content:center;
-  margin-top:2px;
-}
-.feat-check svg{width:10px;height:10px}
-.feat-list strong{font-weight:600}
-.price-footer{font-size:12px;color:var(--text-light);text-align:center;margin-top:16px}
+/* sections */
+.section{padding:100px 0;position:relative;overflow:hidden}
+.section.dark{background:var(--ink);color:var(--paper)}
+.section.white{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.section-head{max-width:680px;margin-bottom:50px}
+.section h2{font-size:clamp(2rem,4.4vw,3.3rem);color:var(--ink);margin-bottom:16px}
+.section.dark h2{color:var(--paper)}
+.section .lead{color:var(--text-mid);font-size:1.12rem;line-height:1.65}
+.section.dark .lead{color:rgba(246,241,234,.6)}
+.tag{color:var(--orange-deep);margin-bottom:16px}
+.section.dark .tag{color:var(--accent-dark)}
+.section.dark .spark{color:var(--accent-dark)!important}
+.parcours-art .spark{color:var(--accent-dark)!important}
 
-/* ═══ FAQ ═══ */
-.faq{padding:120px 60px}
-.faq h2{
-  font-size:clamp(34px,4.2vw,52px);font-weight:800;
-  letter-spacing:-1.5px;margin-bottom:48px;text-align:center;
-}
-.faq-list{max-width:660px;margin:0 auto}
-.faq-item{border-bottom:1px solid var(--fog)}
-.faq-q{
-  width:100%;background:none;border:none;
-  padding:22px 0;font-size:16px;font-weight:700;
-  font-family:'Bricolage Grotesque',sans-serif;
-  color:var(--ink);cursor:pointer;
-  display:flex;justify-content:space-between;align-items:center;
-  text-align:left;gap:16px;
-}
-.faq-icon{
-  width:28px;height:28px;border-radius:8px;
-  background:var(--fog);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;transition:transform 0.35s,background 0.35s;
-}
-.faq-item.open .faq-icon{transform:rotate(45deg);background:var(--sage-pale)}
-.faq-icon svg{width:12px;height:12px}
-.faq-a{max-height:0;overflow:hidden;transition:max-height 0.45s cubic-bezier(.22,1,.36,1)}
-.faq-item.open .faq-a{max-height:250px}
-.faq-a p{font-size:14px;line-height:1.8;color:var(--text-mid);padding-bottom:22px}
+/* concept cards */
+.cards-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:#fff;border-radius:24px;padding:28px;box-shadow:0 6px 22px rgba(46,38,34,.05)}
+.card-ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;margin-bottom:20px;color:var(--ink)}
+.card h3{font-size:1.5rem;margin-bottom:9px;color:var(--ink)}
+.card p{font-size:15px;color:var(--text-mid);margin:0;line-height:1.6}
 
-/* ═══ FINAL CTA ═══ */
-.final{padding:80px 60px 120px}
-.final-box{
-  background:var(--ink);border-radius:28px;
-  padding:80px;text-align:center;color:var(--paper);
-  position:relative;overflow:hidden;
-}
-.final-box::before{
-  content:'';position:absolute;bottom:-150px;left:50%;transform:translateX(-50%);
-  width:500px;height:500px;
-  background:radial-gradient(circle,rgba(76,166,113,0.1),transparent 60%);
-  border-radius:50%;pointer-events:none;
-}
-.final h2{
-  font-size:clamp(34px,4.2vw,52px);font-weight:800;
-  letter-spacing:-1.5px;margin-bottom:14px;position:relative;
-}
-.final .sub{
-  font-size:17px;color:rgba(250,246,239,0.55);
-  max-width:440px;margin:0 auto 44px;line-height:1.7;
-}
-.form-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:12px;
-  max-width:480px;margin:0 auto 12px;
-}
-.form-grid.full{grid-template-columns:1fr}
-.form-input{
-  padding:14px 18px;border-radius:12px;
-  border:1px solid rgba(250,246,239,0.12);
-  background:rgba(250,246,239,0.06);
-  color:var(--paper);font-family:'Outfit',sans-serif;
-  font-size:14px;outline:none;
-  transition:border-color 0.25s;
-}
-.form-input::placeholder{color:rgba(250,246,239,0.3)}
-.form-input:focus{border-color:var(--sage)}
-.form-btn{
-  width:100%;max-width:480px;margin:0 auto;
-  display:block;
-  background:var(--sage);color:#fff;
-  padding:16px;border-radius:12px;border:none;
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-weight:700;font-size:16px;cursor:pointer;
-  transition:transform 0.25s cubic-bezier(.34,1.56,.64,1),box-shadow 0.25s;
-}
-.form-btn:hover{
-  transform:translateY(-3px);
-  box-shadow:0 10px 40px rgba(76,166,113,0.25);
-}
+/* how */
+.how-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:46px}
+.how-head .lead{max-width:32ch;font-size:1.05rem}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.step{background:var(--paper);border-radius:22px;padding:24px}
+.step-num{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;margin-bottom:18px}
+.step-num span{font-family:'Newsreader',serif;font-size:20px}
+.step h3{font-weight:700;font-size:1.05rem;margin-bottom:7px;color:var(--ink)}
+.step p{font-size:14px;color:var(--text-mid);margin:0;line-height:1.55}
 
-/* ═══ FOOTER ═══ */
-.footer{
-  padding:32px 60px;
-  border-top:1px solid var(--fog);
-  display:flex;justify-content:space-between;align-items:center;
-  flex-wrap:wrap;gap:16px;
-}
-.footer-left{display:flex;align-items:center;gap:20px}
-.footer-logo{
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-weight:800;font-size:18px;color:var(--text-light);
-}
-.footer-logo i{
-  display:inline-block;width:5px;height:5px;
-  background:var(--sage);border-radius:50%;
-  margin-left:1px;transform:translateY(-6px);
-}
-.footer-tagline{font-size:12px;color:var(--text-light);font-style:italic}
-.footer-links{display:flex;gap:20px}
-.footer-links a{font-size:12px;color:var(--text-light);transition:color 0.2s}
-.footer-links a:hover{color:var(--ink)}
+/* collection */
+.collect{display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center}
+.collect-list{display:grid;gap:14px}
+.collect-item{display:flex;gap:16px;align-items:flex-start;padding:20px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(246,241,234,.1)}
+.collect-item .ic{flex:none;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;color:var(--ink)}
+.collect-item h3{font-weight:700;font-size:1.1rem;margin-bottom:4px;color:var(--paper)}
+.collect-item p{font-size:14px;color:rgba(246,241,234,.6);margin:0;line-height:1.55}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
+.chip{font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px;border:1px solid rgba(246,241,234,.18);color:rgba(246,241,234,.6)}
+.chip.active{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.collect-card{background:var(--ink-soft);border-radius:24px;padding:26px;box-shadow:0 24px 50px -16px rgba(0,0,0,.67);border:1px solid rgba(246,241,234,.08);transform:rotate(-3deg);position:relative;overflow:hidden}
+.collect-card .blob-c{position:absolute;bottom:-50px;right:-30px;width:150px;height:150px;border-radius:48% 52% 60% 40%/50% 45% 55% 50%;background:rgba(255,229,192,.09)}
+.collect-card .cc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;position:relative}
+.collect-card .cc-logo{font-family:'Newsreader',serif;font-style:italic;font-size:20px;color:var(--paper)}
+.collect-card .cc-pill{font-size:11px;font-weight:700;color:var(--ink);background:var(--paper);padding:5px 11px;border-radius:999px}
+.collect-card .cc-body{display:flex;justify-content:space-between;align-items:flex-end;position:relative}
+.collect-card .cc-num{font-family:'Newsreader',serif;font-size:2.9rem;color:var(--paper);line-height:1;margin:6px 0 16px}
+.collect-card .cc-num small{font-size:1.1rem;color:var(--accent-dark)}
+.collect-card .over{color:rgba(246,241,234,.4)}
+.qr{width:52px;height:52px;border-radius:12px;background:repeating-linear-gradient(0deg,#f6f1ea 0 4px,transparent 4px 8px),repeating-linear-gradient(90deg,#f6f1ea 0 4px,transparent 4px 8px);background-color:#000;opacity:.85;margin-left:auto}
 
-/* ═══ SCROLL REVEAL ═══ */
-.sr{opacity:0;transform:translateY(40px);transition:all 0.8s cubic-bezier(.22,1,.36,1)}
-.sr.v{opacity:1;transform:none}
-.sr-d1{transition-delay:0.1s}
-.sr-d2{transition-delay:0.2s}
-.sr-d3{transition-delay:0.3s}
+/* parcours */
+.parcours-card{background:#fff;border-radius:30px;overflow:hidden;display:grid;grid-template-columns:1.05fr .95fr;box-shadow:0 18px 50px rgba(46,38,34,.08)}
+.parcours-left{padding:52px}
+.parcours-left h2{font-size:clamp(2rem,3.6vw,2.9rem)}
+.parcours-left p{color:var(--text-mid);margin:0 0 26px;font-size:1.05rem;line-height:1.65}
+.mini-stats{display:flex;gap:30px;flex-wrap:wrap}
+.mini-stats b{font-size:1.9rem;display:block;line-height:1;color:var(--ink)}
+.mini-stats span{font-size:13px;color:var(--text-light)}
+.parcours-art{background:var(--ink);position:relative;min-height:320px;overflow:hidden;display:grid;place-items:center}
+.parcours-art .ring{position:absolute;border:1.5px dashed rgba(246,241,234,.18);border-radius:50%}
+.parcours-art .big{color:var(--paper);text-align:center;line-height:1;z-index:2;font-size:3rem;font-style:italic;font-family:'Newsreader',serif}
+.parcours-art .big span{display:block;font-size:.82rem;font-style:normal;letter-spacing:.2em;color:var(--accent-dark);margin-top:12px;font-weight:600}
 
-/* ═══ RESPONSIVE ═══ */
-@media(max-width:900px){
-  .hero{grid-template-columns:1fr;padding:120px 24px 60px;text-align:center}
-  .hero-p{margin-left:auto;margin-right:auto}
-  .hero-actions{justify-content:center}
-  .hero-note{margin:0 auto}
-  .card-stack{margin:0 auto}
-  .problem-box{grid-template-columns:1fr;padding:48px 32px;gap:32px}
-  .steps-grid{grid-template-columns:1fr}
-  .bento{grid-template-columns:1fr}
-  .bento-item{grid-column:auto!important}
-  .pricing-wrap{grid-template-columns:1fr;gap:32px}
-  .pricing,.benefits,.steps-section,.problem,.faq,.final{padding:80px 24px}
-  .final-box{padding:48px 24px}
-  .form-grid{grid-template-columns:1fr}
-  .nav{padding:16px 24px}
+/* waitlist band */
+.band{background:linear-gradient(135deg,var(--peach),var(--yellow));border-radius:32px;padding:68px 56px;text-align:center;position:relative;overflow:hidden}
+.band .blob1{position:absolute;bottom:-70px;right:-50px;width:230px;height:230px;border-radius:48% 52% 60% 40%/50% 45% 55% 50%;background:rgba(255,255,255,.33)}
+.band .blob2{position:absolute;top:-60px;left:-40px;width:180px;height:180px;border-radius:52% 48% 40% 60%/55% 50% 50% 45%;background:rgba(255,255,255,.25)}
+.band-inner{position:relative}
+.band h2{font-size:clamp(2rem,4.6vw,3.4rem);margin-bottom:14px;color:var(--ink)}
+.band p{max-width:48ch;margin:0 auto 28px;color:var(--text-mid);font-size:1.08rem;line-height:1.6}
+.band .signup{margin:0 auto;justify-content:center}
+.band .signup input{border:1px solid rgba(0,0,0,.08);background:rgba(255,255,255,.94)}
+.band .signup button{background:var(--ink);color:var(--paper);box-shadow:none}
+.band .signup-note{color:var(--text-mid);justify-content:center}
+.band .signup-done{background:rgba(255,255,255,.94)}
+.band .bigstar{height:64px;margin-bottom:14px}
+
+/* b2b */
+.b2b{display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;background:#fff;border-radius:26px;padding:36px 42px;box-shadow:0 6px 22px rgba(46,38,34,.05)}
+.b2b h3{font-size:1.7rem;margin-bottom:8px;color:var(--ink)}
+.b2b p{color:var(--text-mid);max-width:54ch;font-size:15px;margin:0;line-height:1.6}
+.b2b-btn{border:1px solid var(--ink);background:transparent;color:var(--ink);font-size:15px;font-weight:600;padding:15px 24px;border-radius:15px;white-space:nowrap}
+
+/* faq */
+.faq-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:start}
+.faq details{border-top:1px solid var(--line-soft);padding:4px 0}
+.faq details:last-child{border-bottom:1px solid var(--line-soft)}
+.faq summary{list-style:none;cursor:pointer;padding:20px 0;font-weight:600;font-size:1.08rem;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .plus{flex:none;width:28px;height:28px;border-radius:999px;background:var(--paper);display:grid;place-items:center;font-size:1.1rem;color:var(--orange-deep);transition:transform .3s}
+.faq details[open] summary .plus{transform:rotate(45deg)}
+.faq details p{padding:0 0 22px;color:var(--text-mid);max-width:62ch;margin:0;line-height:1.65}
+
+/* footer */
+.footer{background:var(--ink);color:var(--paper);padding:60px 0 38px;position:relative;overflow:hidden}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap;margin-bottom:42px}
+.footer-tagline{color:rgba(246,241,234,.53);margin:14px 0 0;font-size:1.15rem;font-style:italic}
+.footer-cols{display:flex;gap:46px;flex-wrap:wrap}
+.footer-col .over{color:rgba(246,241,234,.33);margin-bottom:14px}
+.footer-col a{display:block;color:rgba(246,241,234,.8);font-size:14.5px;margin-bottom:10px}
+.footer-bottom{border-top:1px solid rgba(246,241,234,.1);padding-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:13px;color:rgba(246,241,234,.4)}
+.footer-bottom a{color:inherit}
+
+/* tablet */
+@media (max-width:1024px){
+  .hero-grid{gap:36px}
+  .section{padding:84px 0}
+  .collect,.faq-grid{gap:40px}
+}
+@media (max-width:920px){
+  .hero-grid,.collect,.parcours-card,.faq-grid{grid-template-columns:1fr;gap:40px}
+  .heroart{justify-content:center}
+  .cards-3{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr 1fr}
   .nav-links{display:none}
-  .footer{padding:24px;flex-direction:column;text-align:center}
-  .footer-left{flex-direction:column;gap:4px}
+  .parcours-left{padding:40px 32px}
+  .hero-inner{padding:44px 28px 60px}
+  .collect-card{transform:rotate(-2deg)}
 }
-@media(max-width:420px){
-  .hv-scene{width:300px;height:480px}
-  .hv-main{width:240px;padding:22px 18px;top:70px}
-  .hv-chip-1{width:140px;padding:14px}
-  .hv-chip-2{width:170px;padding:14px}
-  .hvc1-num{font-size:30px}
+/* mobile */
+@media (max-width:600px){
+  .wrap{padding:0 20px}
+  .section{padding:64px 0}
+  .section-head{margin-bottom:36px}
+  .nav-inner{height:64px}
+  .hero-inner{padding:32px 20px 48px}
+  .hero-eyebrow{margin-bottom:14px}
+  .hero h1{font-size:clamp(2.3rem,9vw,3rem)}
+  .hero-p{margin:18px 0 26px}
+  .steps{grid-template-columns:1fr}
+  .step{padding:22px}
+  .band{padding:48px 24px}
+  .b2b{flex-direction:column;align-items:flex-start;padding:28px 24px;gap:22px}
+  .b2b-btn{width:100%;text-align:center}
+  .stats-inner{flex-direction:column;align-items:flex-start;gap:20px;padding:26px 20px}
+  .stats-row{gap:24px 34px}
+  .signup{max-width:none}
+  .footer-top{flex-direction:column;gap:30px}
+  .footer-cols{gap:32px}
+}
+/* small mobile */
+@media (max-width:380px){
+  .phone{width:288px}
+  .signup input{min-width:0}
+  .signup button{flex:1}
+  .stat b{font-size:1.7rem}
+  .badge-float{right:8px;padding:9px 11px}
 }
 </style>
 </head>
 <body>
-
-<nav class="nav" id="nav">
-  <a href="#" class="nav-logo">gottu<i></i></a>
-  <div class="nav-links">
-    <a href="#how">Comment ça marche</a>
-    <a href="#pricing">Tarifs</a>
-    <a href="#faq">FAQ</a>
-    <a href="#contact" class="nav-btn">Essayer gratuitement</a>
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="logo" aria-label="Gottu, accueil">
+      <img class="logo-lockup" src="img/logo-lockup-dark.png" alt="Gottu">
+    </a>
+    <nav class="nav-links">
+      <a href="#concept" class="ulink">Le concept</a>
+      <a href="#how" class="ulink">Comment ça marche</a>
+      <a href="#parcours" class="ulink">Les parcours</a>
+      <a href="#faq" class="ulink">FAQ</a>
+    </nav>
+    <a href="#waitlist" class="nav-cta press">Rejoindre la liste</a>
   </div>
-</nav>
+</header>
 
 <!-- HERO -->
-<section class="hero">
-  <div class="hero-text">
-    <h1>Votre barista sait <span class="highlight">déjà</span> quoi préparer.</h1>
-    <p class="hero-p">Gottu remplace vos cartes à tampons par une carte NFC intelligente. Votre client badge, son profil apparaît : prénom, boissons favorites, fidélité. En une seconde.</p>
-    <div class="hero-actions">
-      <a href="#contact" class="btn-main">
-        Essayer gratuitement
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10h12M12 5l5 5-5 5"/></svg>
-      </a>
-    </div>
-    <p class="hero-note" style="margin-top:16px">Sans engagement. Sans carte bancaire.<br>On vient installer chez vous.</p>
-  </div>
-  <div class="hero-visual">
-    <div class="hv-scene">
-
-      <!-- Chip stats — haut droite -->
-      <div class="hv-chip-1">
-        <div class="hvc1-num">22</div>
-        <div class="hvc1-label">passages aujourd'hui</div>
-        <div class="hvc1-row">
-          <span class="hvc1-dot" style="background:var(--sage)"></span>
-          <span class="hvc1-text">Heure de pointe : 8h30</span>
-        </div>
-        <div class="hvc1-row">
-          <span class="hvc1-dot" style="background:var(--honey)"></span>
-          <span class="hvc1-text">Top boisson : Latte avoine</span>
-        </div>
-        <div class="hvc1-drink">
-          <img src="img/953c358d43f35f52d5e3adf7448bb245.jpg" alt="Latte avoine">
-          <span class="hvc1-drink-text">Latte avoine · la boisson du jour</span>
+<section class="hero" id="top">
+  <div class="blob blob-a" aria-hidden="true"></div>
+  <div class="blob blob-b" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <div class="hero-grid">
+      <div>
+        <span class="over hero-eyebrow">
+          <span class="star" aria-hidden="true">✦</span>Café de spécialité · Paris · Mi-juillet 2026
+        </span>
+        <h1 class="serif">Le café de Paris,<br>à explorer comme<br><span class="italic" style="color:var(--orange)">un jeu.</span><span class="spark" style="display:inline-block;font-size:.4em;color:var(--sage);transform:translate(8px,-1.1em)">✦</span></h1>
+        <p class="hero-p">Gottu te guide de café en café à travers des parcours curatés. Tu valides chaque visite, ta carte se colore, tu collectionnes — l'ami connaisseur qui connaît toutes les bonnes adresses, et te les fait découvrir une par une.</p>
+        <div class="form-state" data-form>
+          <form class="signup" data-signup novalidate>
+            <input type="email" name="email" placeholder="ton@email.com" aria-label="Adresse email" required>
+            <button type="submit" class="press">Je m'inscris</button>
+          </form>
+          <p class="signup-note"><span aria-hidden="true">✓</span>Accès 24h avant tout le monde · zéro spam</p>
+          <div class="signup-done"><span class="tick" aria-hidden="true">✓</span>C'est noté — on te prévient au lancement.</div>
         </div>
       </div>
 
-      <!-- Carte principale : Léa -->
-      <div class="hv-main">
-        <div class="card-status"><span class="pulse"></span>Badge détecté</div>
-        <div class="card-person">
-          <div class="card-avatar">L</div>
-          <div>
-            <div class="card-name">Léa</div>
-            <div class="card-meta">47 visites &middot; hier</div>
-          </div>
-        </div>
-        <div class="card-section">
-          <div class="card-section-label">Fidélité</div>
-          <div class="progress-track"><div class="progress-fill"></div></div>
-          <div class="progress-meta"><span>En cours</span><span>7 / 10</span></div>
-        </div>
-        <div class="card-section">
-          <div class="card-section-label">Commandes favorites</div>
-          <div class="drink-photos">
-            <div class="drink-photo-card">
-              <img src="img/953c358d43f35f52d5e3adf7448bb245.jpg" alt="Latte avoine vanille">
-              <div class="drink-photo-label">Latte · Avoine · Vanille</div>
+      <div class="heroart">
+        <span class="spark" style="top:24px;left:14px;font-size:22px;color:var(--orange)">✦</span>
+        <span class="spark" style="bottom:60px;right:6px;font-size:15px;color:var(--purple);animation-delay:1s">✦</span>
+        <img src="img/logo-mascot-dark.png" alt="" aria-hidden="true" class="hero-mascot floaty" style="animation:floaty 6s ease-in-out infinite">
+        <div class="phone" role="img" aria-label="Aperçu de l'app Gottu : une carte de Paris dont les cafés visités se colorent au fil du parcours.">
+          <span class="btn btn-power" aria-hidden="true"></span>
+          <span class="btn btn-vu" aria-hidden="true"></span>
+          <span class="btn btn-vd" aria-hidden="true"></span>
+          <div class="phone-screen">
+            <div class="island" aria-hidden="true"></div>
+            <div class="statusbar" aria-hidden="true">
+              <span class="sb-time">9:41</span>
+              <span class="sb-icons">
+                <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.6" y="5" width="3" height="6" rx="1"/><rect x="9.2" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.8" y="0" width="3" height="11" rx="1"/></svg>
+                <svg width="16" height="11" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.6c2.5 0 4.8.95 6.5 2.5L16 3.5C13.9 1.5 11.1.3 8 .3S2.1 1.5 0 3.5L1.5 5.1C3.2 3.55 5.5 2.6 8 2.6z"/><path d="M8 6c1.4 0 2.7.5 3.7 1.4l1.5-1.6C11.8 4.6 10 3.9 8 3.9s-3.8.7-5.2 1.9l1.5 1.6C5.3 6.5 6.6 6 8 6z"/><path d="M8 9.4l2.2-2.3C9.6 6.5 8.8 6.2 8 6.2s-1.6.3-2.2.9L8 9.4z"/></svg>
+                <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="16" height="8" rx="1.5" fill="currentColor"/><path d="M23 4v4c.9-.3 1.4-1 1.4-2S23.9 4.3 23 4z" fill="currentColor" opacity=".55"/></svg>
+              </span>
             </div>
-            <div class="drink-photo-card">
-              <img src="img/9a897189061a44ccbc211f88205d161c.jpg" alt="Matcha latte">
-              <div class="drink-photo-label">Matcha latte · M</div>
+            <div class="phone-head">
+              <span><span class="serif">Le Marais</span><span class="sub">Parcours en cours</span></span>
+              <span class="pill">Amateur</span>
+            </div>
+            <div class="map" id="map" aria-hidden="true">
+              <div class="river"></div>
+              <div class="park" style="left:6%;top:8%;width:26%;height:22%"></div>
+              <div class="park" style="right:7%;bottom:9%;width:22%;height:24%"></div>
+              <div class="road" style="left:0;right:0;top:30%;height:5px"></div>
+              <div class="road" style="left:0;right:0;top:66%;height:5px"></div>
+              <div class="road" style="top:0;bottom:0;left:38%;width:5px"></div>
+              <div class="road" style="top:0;bottom:0;left:72%;width:5px"></div>
+              <svg class="route" id="route" preserveAspectRatio="none" aria-hidden="true"><path id="routepath" d=""/></svg>
+            </div>
+            <div class="phone-card">
+              <div class="phone-card-top">
+                <span class="label">Parcours du Marais</span>
+                <span class="count" id="pcount">0/10</span>
+              </div>
+              <div class="track"><i id="ptrack"></i></div>
+            </div>
+            <span class="gloss" aria-hidden="true"></span>
+          </div>
+          <div class="badge-float" id="badge">
+            <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5L7 22l5-3 5 3-1.5-9.5"/></svg></div>
+            <div><small class="over">Badge débloqué</small><b>Explorateur du Marais</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marqt marquee-track" id="marquee"></div>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats">
+  <div class="wrap stats-inner">
+    <div class="over" style="color:var(--orange-deep)">Là où la curiosité rencontre le café</div>
+    <div class="stats-row">
+      <div class="stat"><b class="serif">10</b><span>cafés fondateurs</span></div>
+      <div class="stat"><b class="serif">1<sup style="font-size:.5em">er</sup></b><span>parcours en juillet</span></div>
+      <div class="stat"><b class="serif">0 €</b><span>au lancement</span></div>
+      <div class="stat"><b class="serif">Paris</b><span>puis ville par ville</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONCEPT -->
+<section class="section" id="concept">
+  <span class="spark" style="top:90px;right:18%;font-size:18px;color:var(--sage)">✦</span>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="over tag">Le concept</div>
+      <h2 class="serif">Paris déborde de bons cafés.<br><span class="italic" style="color:#cabba9">Encore faut-il les trouver.</span></h2>
+      <p class="lead" style="margin:0">Entre l'adresse surcotée et la pépite à trois rues de chez toi, difficile de savoir où aller. Gottu fait le tri et transforme la chasse au bon café en aventure qu'on a vraiment envie de finir.</p>
+    </div>
+    <div class="cards-3">
+      <div class="card lift">
+        <div class="card-ic" style="background:var(--peach)"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></div>
+        <h3 class="serif">Des parcours curatés</h3>
+        <p>Pas un annuaire de 2 000 adresses. Une sélection serrée, café par café, pensée comme un itinéraire à vivre.</p>
+      </div>
+      <div class="card lift">
+        <div class="card-ic" style="background:var(--mint)"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5 7 22l5-3 5 3-1.5-9.5"/></svg></div>
+        <h3 class="serif">Une découverte qui récompense</h3>
+        <p>Chaque visite validée fait avancer ta progression, colore ta carte et débloque des badges. Explorer devient un plaisir en soi.</p>
+      </div>
+      <div class="card lift">
+        <div class="card-ic" style="background:var(--lavender)"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg></div>
+        <h3 class="serif">Un ami, jamais un snob</h3>
+        <p>Gottu te parle comme un pote connaisseur : enthousiaste, curieux, accessible. On t'explique pourquoi un café vaut le détour, sans jargon.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section white" id="how">
+  <div class="wrap">
+    <div class="how-head">
+      <div>
+        <div class="over tag">Comment ça marche</div>
+        <h2 class="serif" style="max-width:15ch">Quatre gestes,<br><span class="italic" style="color:var(--orange)">aucune carte à perdre.</span></h2>
+      </div>
+      <p class="lead">De l'envie d'un bon café à la satisfaction de boucler un parcours, tout tient dans ton téléphone.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num" style="background:var(--peach)"><span style="color:var(--orange-deep)">1</span></div>
+        <h3>Choisis un parcours</h3>
+        <p>Dix cafés triés sur le volet autour d'un quartier. Tu pars quand tu veux, dans l'ordre que tu veux.</p>
+      </div>
+      <div class="step">
+        <div class="step-num" style="background:var(--mint)"><span style="color:var(--sage-deep)">2</span></div>
+        <h3>Pousse la porte</h3>
+        <p>Tu commandes, tu profites. C'est le moment le plus important — Gottu s'occupe du reste.</p>
+      </div>
+      <div class="step">
+        <div class="step-num" style="background:var(--yellow)"><span style="color:var(--ink)">3</span></div>
+        <h3>Valide ta visite</h3>
+        <p>Le barista affiche un QR code, tu le scannes dans l'app. Une seconde, et la visite est enregistrée.</p>
+      </div>
+      <div class="step">
+        <div class="step-num" style="background:var(--lavender)"><span style="color:var(--purple-deep)">4</span></div>
+        <h3>Collectionne &amp; progresse</h3>
+        <p>Ta carte se colore, un badge tombe, ton niveau monte. Et ta carte Wallet se met à jour toute seule.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COLLECTION (dark) -->
+<section class="section dark">
+  <div class="blob" aria-hidden="true" style="top:-100px;right:-80px;width:380px;height:380px;border-radius:48% 52% 60% 40%/50% 45% 55% 50%;background:radial-gradient(circle,rgba(160,95,0,.16),transparent 70%)"></div>
+  <span class="spark" style="top:80px;left:8%;font-size:20px;color:var(--orange)">✦</span>
+  <span class="spark" style="bottom:120px;left:46%;font-size:14px;color:var(--sage);animation-delay:.8s">✦</span>
+  <div class="wrap" style="position:relative">
+    <div class="section-head" style="max-width:660px">
+      <div class="over tag">Ce que tu collectionnes</div>
+      <h2 class="serif">Plus tu explores,<br><span class="italic" style="color:var(--orange)">plus c'est à toi.</span></h2>
+      <p class="lead">Gottu garde la trace de chaque café que tu pousses. Au fil des visites, l'app devient le miroir de ton parcours d'amateur — et ça, on n'a pas envie de l'abandonner.</p>
+    </div>
+    <div class="collect">
+      <div class="collect-list">
+        <div class="collect-item">
+          <div class="ic" style="background:var(--peach)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></div>
+          <div><h3>La carte qui se colore</h3><p>Chaque café visité s'allume sur ta carte de Paris. Voir le quartier se remplir, c'est la meilleure raison d'y retourner.</p></div>
+        </div>
+        <div class="collect-item">
+          <div class="ic" style="background:var(--mint)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5 7 22l5-3 5 3-1.5-9.5"/></svg></div>
+          <div><h3>Les badges</h3><p>Premier parcours bouclé, dix cafés visités, explorateur d'un quartier… des badges thématiques à débloquer et à afficher.</p></div>
+        </div>
+        <div class="collect-item">
+          <div class="ic" style="background:var(--lavender)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 3 6-7"/><path d="M3 21h18"/></svg></div>
+          <div>
+            <h3>Les niveaux</h3>
+            <p>Tu montes lentement, visite après visite. Une vraie progression, pas un compteur qui s'emballe.</p>
+            <div class="chips">
+              <span class="chip">Curieux</span>
+              <span class="chip active">Amateur</span>
+              <span class="chip">Connaisseur</span>
+              <span class="chip">Expert</span>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Chip Thomas — bas droite -->
-      <div class="hv-chip-2">
-        <div class="hvc2-head">
-          <div class="hvc2-avatar">T</div>
-          <div>
-            <div class="hvc2-name">Thomas</div>
-            <div class="hvc2-meta">31 visites &middot; il y a 2j</div>
+      <div style="perspective:1000px">
+        <div class="collect-card">
+          <div class="blob-c" aria-hidden="true"></div>
+          <div class="cc-head">
+            <img class="cc-logo" src="img/logo-lockup-light.png" alt="Gottu" style="height:20px;width:auto;display:block">
+            <span class="cc-pill">Amateur</span>
+          </div>
+          <div class="cc-body">
+            <div>
+              <span class="over">Cafés visités</span>
+              <div class="cc-num serif">23 <small>/ Paris</small></div>
+              <span class="over">Toujours à jour, dans ton Wallet</span>
+            </div>
+            <div class="qr" aria-hidden="true"></div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <img src="img/e163d2ee9cf456cfa7e7bfc99b37889d.jpg" alt="" style="width:38px;height:38px;border-radius:10px;object-fit:cover;flex-shrink:0">
-          <span class="hvc2-tag" style="flex:1"><span class="hvc2-dot"></span>Americano &middot; S &middot; Sans sucre</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARCOURS TEASER -->
+<section class="section" id="parcours">
+  <div class="wrap">
+    <div class="parcours-card">
+      <div class="parcours-left">
+        <div class="over tag">Le premier parcours</div>
+        <h2 class="serif">Dix cafés. Un quartier.<br><span class="italic" style="color:var(--orange)">Juillet.</span></h2>
+        <p>On ouvre avec un quartier dense, choisi pour la qualité de ses adresses. Dix cafés fondateurs, un parcours à compléter — puis un nouveau parcours chaque mois.</p>
+        <div class="mini-stats">
+          <div><b class="serif">10</b><span>cafés fondateurs</span></div>
+          <div><b class="serif">1</b><span>quartier pour commencer</span></div>
+          <div><b class="serif">+1</b><span>parcours / mois</span></div>
         </div>
       </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- PROBLEM -->
-<section class="problem sr">
-  <div class="problem-box">
-    <div><h2>Les cartes à tampons,<br><span>c'est fini.</span></h2></div>
-    <div class="problem-right">
-      <p>Vos clients les perdent. Vos baristas oublient qui boit quoi. Quand un nouveau arrive dans l'équipe, il repart de zéro. Et vous, vous n'avez aucune idée de qui sont vos <strong>50 meilleurs clients</strong>.<br><br>Gottu change ça.</p>
-    </div>
-  </div>
-</section>
-
-<!-- STEPS -->
-<section class="steps-section" id="how">
-  <div class="section-tag">Comment ça marche</div>
-  <h2>3 secondes.<br><span>C'est tout.</span></h2>
-  <div class="steps-grid">
-    <div class="step-card sr sr-d1">
-      <div class="step-number">01</div>
-      <h3>Le client badge sa carte</h3>
-      <p>Une carte NFC au format carte de crédit. Il la passe devant le lecteur sur votre comptoir. C'est tout ce qu'il a à faire.</p>
-    </div>
-    <div class="step-card sr sr-d2">
-      <div class="step-number">02</div>
-      <h3>Son profil s'affiche</h3>
-      <p>Prénom, boissons favorites, compteur fidélité, notes. Votre barista sait instantanément quoi préparer. Même si c'est son premier jour.</p>
-    </div>
-    <div class="step-card sr sr-d3">
-      <div class="step-number">03</div>
-      <h3>La fidélité avance toute seule</h3>
-      <p>Plus de tampons à chercher. Le compteur s'incrémente automatiquement. Au 10e café, votre client est récompensé.</p>
-    </div>
-  </div>
-</section>
-
-<!-- BENEFITS -->
-<section class="benefits sr">
-  <div class="section-tag">Les bénéfices</div>
-  <h2>Ce que Gottu change dans votre quotidien</h2>
-  <div class="bento">
-    <div class="bento-item">
-      <div class="bento-accent"></div>
-      <div class="bento-icon">&#9996;&#65039;</div>
-      <h3>Vos habitués sont reconnus, même par le nouveau</h3>
-      <p>Les préférences de chaque client sont enregistrées. Lait d'avoine, sirop vanille, extra shot — c'est affiché à l'écran. Pas besoin de poser la question.</p>
-    </div>
-    <div class="bento-item">
-      <div class="bento-accent"></div>
-      <div class="bento-icon">&#9749;</div>
-      <h3>Votre programme fidélité fonctionne enfin</h3>
-      <p>Plus de cartes perdues, plus de tampons oubliés. Chaque visite compte. Vos clients le voient, et ils reviennent.</p>
-    </div>
-    <div class="bento-item">
-      <div class="bento-accent"></div>
-      <div class="bento-icon">&#128200;</div>
-      <h3>Vous connaissez enfin vos clients</h3>
-      <p>Qui vient le plus souvent ? Quelle boisson cartonne ? Quel jour est le plus calme ? Gottu vous donne des réponses, pas des intuitions.</p>
-    </div>
-    <div class="bento-item">
-      <div class="bento-accent"></div>
-      <div class="bento-icon">&#9889;</div>
-      <h3>Zéro friction pour vos clients</h3>
-      <p>Pas d'app à télécharger. Pas de compte à créer. Pas de QR code à scanner. Une carte dans le portefeuille, un geste, c'est fait.</p>
-    </div>
-  </div>
-</section>
-
-<!-- PRICING -->
-<section class="pricing" id="pricing">
-  <div class="pricing-wrap">
-    <div class="pricing-left sr">
-      <div class="section-tag">Tarifs</div>
-      <h2>29€/mois.<br><span>Vraiment tout</span> compris.</h2>
-      <p>On déteste les astérisques autant que vous. Pas d'engagement, pas de frais cachés. Si un mois ça ne vous convient plus, vous arrêtez.</p>
-    </div>
-    <div class="pricing-card sr sr-d2">
-      <div class="price-tag">Tout compris</div>
-      <div class="price-row">
-        <span class="price-num">29€</span>
-        <span class="price-unit">/mois</span>
+      <div class="parcours-art" aria-hidden="true">
+        <div class="ring" style="width:130px;height:130px"></div>
+        <div class="ring" style="width:230px;height:230px;border-color:rgba(246,241,234,.13)"></div>
+        <div class="ring" style="width:330px;height:330px;border-color:rgba(246,241,234,.08)"></div>
+        <span class="spark" style="top:60px;left:60px;font-size:18px;color:var(--orange)">✦</span>
+        <img src="img/logo-mascot-light.png" alt="" class="floaty" style="width:88px;position:relative;z-index:2;margin-bottom:14px;animation:floaty 6s ease-in-out infinite">
+        <div class="big">Juillet<span>2026</span></div>
       </div>
-      <p class="price-sub">Facturé mensuellement, sans engagement</p>
-      <ul class="feat-list">
-        <li>
-          <span class="feat-check"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="#2D7A4E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span><strong>La plateforme complète</strong> — profils clients, fidélité configurable, catalogue de boissons, dashboard.</span>
-        </li>
-        <li>
-          <span class="feat-check"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="#2D7A4E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span><strong>30 cartes NFC livrées chaque mois</strong> — automatiquement, sans rien commander.</span>
-        </li>
-        <li>
-          <span class="feat-check"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="#2D7A4E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span><strong>Un lecteur NFC installé chez vous</strong> — on vient, on installe, on vous forme.</span>
-        </li>
-        <li>
-          <span class="feat-check"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="#2D7A4E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span><strong>Support par WhatsApp</strong> — parce que vous n'avez pas le temps d'écrire des emails.</span>
-        </li>
-      </ul>
-      <a href="#contact" class="btn-main" style="width:100%;justify-content:center;">
-        Essayer gratuitement pendant 2 mois
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10h12M12 5l5 5-5 5"/></svg>
-      </a>
-      <p class="price-footer">2 mois d'essai gratuit &middot; Résiliation en 1 clic</p>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST BAND -->
+<section id="waitlist" style="padding:0 0 100px">
+  <div class="wrap">
+    <div class="band">
+      <div class="blob1" aria-hidden="true"></div>
+      <div class="blob2" aria-hidden="true"></div>
+      <span class="spark" style="top:40px;left:12%;font-size:20px;color:var(--orange)">✦</span>
+      <span class="spark" style="bottom:50px;right:16%;font-size:15px;color:var(--purple);animation-delay:.7s">✦</span>
+      <div class="band-inner">
+        <img class="bigstar floaty" src="img/logo-mascot-dark.png" alt="" aria-hidden="true" style="animation:floaty 5s ease-in-out infinite">
+        <h2 class="serif">Sois là dès <span class="italic" style="color:var(--orange-deeper)">le premier café.</span></h2>
+        <p>Inscris-toi à la liste d'attente : tu reçois ton accès 24h avant l'ouverture publique, et tu fais partie des tout premiers à explorer le parcours.</p>
+        <div class="form-state" data-form>
+          <form class="signup" data-signup novalidate>
+            <input type="email" name="email" placeholder="ton@email.com" aria-label="Adresse email" required>
+            <button type="submit" class="press">Rejoindre la liste</button>
+          </form>
+          <p class="signup-note">On te prévient au lancement, mi-juillet. C'est tout.</p>
+          <div class="signup-done"><span class="tick" aria-hidden="true">✓</span>Bienvenue dans le premier cercle. À très vite !</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- B2B -->
+<section id="cafes" style="padding:0 0 100px">
+  <div class="wrap">
+    <div class="b2b">
+      <div>
+        <div class="over tag">Vous êtes un café ?</div>
+        <h3 class="serif">Rejoignez les cafés fondateurs de Gottu.</h3>
+        <p>Une nouvelle vitrine, des clients qualifiés qui poussent la porte pour vous découvrir, et une place dans le tout premier parcours parisien. Les places fondatrices sont limitées.</p>
+      </div>
+      <a href="mailto:hello@gottu.io?subject=Devenir%20caf%C3%A9%20partenaire%20Gottu" class="b2b-btn press">Devenir café partenaire</a>
     </div>
   </div>
 </section>
 
 <!-- FAQ -->
-<section class="faq sr" id="faq">
-  <h2>Vos questions, nos réponses</h2>
-  <div class="faq-list">
-    <div class="faq-item">
-      <button class="faq-q">C'est compatible avec ma caisse ?<span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2v8M2 6h8"/></svg></span></button>
-      <div class="faq-a"><p>Gottu fonctionne indépendamment de votre caisse. C'est un outil complémentaire, pas un remplacement. Il tourne sur n'importe quel appareil avec un navigateur : votre PC, votre tablette, même votre téléphone.</p></div>
+<section class="section white" id="faq">
+  <div class="wrap faq faq-grid">
+    <div>
+      <div class="over tag">Tes questions</div>
+      <h2 class="serif">Tout ce qu'il<br><span class="italic" style="color:#cabba9">faut savoir</span></h2>
     </div>
-    <div class="faq-item">
-      <button class="faq-q">Mes clients vont accepter de porter une carte ?<span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2v8M2 6h8"/></svg></span></button>
-      <div class="faq-a"><p>C'est une carte au format carte de crédit, elle se glisse dans le portefeuille. Le geste est simple et la récompense fidélité fait le reste.</p></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q">Et si mon barista n'est pas à l'aise avec la tech ?<span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2v8M2 6h8"/></svg></span></button>
-      <div class="faq-a"><p>Si votre barista sait utiliser Instagram, il sait utiliser Gottu. L'interface est pensée pour le comptoir : gros boutons, zéro saisie, un badge et c'est affiché.</p></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q">Qu'est-ce qui se passe avec les données de mes clients ?<span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2v8M2 6h8"/></svg></span></button>
-      <div class="faq-a"><p>On collecte le minimum : un prénom, des boissons, un compteur. Pas d'email, pas de téléphone, pas de données bancaires. Tout est hébergé en France et conforme au RGPD.</p></div>
-    </div>
-    <div class="faq-item">
-      <button class="faq-q">Et si je veux arrêter ?<span class="faq-icon"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2v8M2 6h8"/></svg></span></button>
-      <div class="faq-a"><p>Vous arrêtez. Pas de préavis, pas de frais de résiliation, pas de mauvaise surprise. Les cartes de vos clients restent les leurs.</p></div>
+    <div>
+      <details>
+        <summary>C'est gratuit ?<span class="plus" aria-hidden="true">+</span></summary>
+        <p>Oui. Au lancement, tout est gratuit : télécharger l'app, suivre les parcours, valider tes visites, collectionner. On veut d'abord que tu explores.</p>
+      </details>
+      <details>
+        <summary>Faut-il télécharger une app ?<span class="plus" aria-hidden="true">+</span></summary>
+        <p>Oui, l'app Gottu, sur iOS et Android. Elle arrive mi-juillet. Inscris-toi à la liste d'attente pour être prévenu dès qu'elle est dispo.</p>
+      </details>
+      <details>
+        <summary>Comment je valide une visite ?<span class="plus" aria-hidden="true">+</span></summary>
+        <p>Sur place, le barista affiche un QR code temporaire. Tu le scannes dans l'app, et la visite est enregistrée instantanément. Pas de carte physique à porter, pas de tampon à chercher.</p>
+      </details>
+      <details>
+        <summary>C'est quoi exactement, un parcours ?<span class="plus" aria-hidden="true">+</span></summary>
+        <p>Une sélection curatée de cafés autour d'un quartier ou d'un thème, à compléter à ton rythme. Tu choisis l'ordre, tu pars quand tu veux. À la complétion, tu débloques un badge.</p>
+      </details>
+      <details>
+        <summary>Et mes données ?<span class="plus" aria-hidden="true">+</span></summary>
+        <p>On collecte le minimum nécessaire pour faire fonctionner l'app : ton profil, tes visites, ta progression. Tout est hébergé en Europe et conforme au RGPD. Pas de revente de données.</p>
+      </details>
+      <details>
+        <summary>C'est dispo partout en France ?<span class="plus" aria-hidden="true">+</span></summary>
+        <p>On commence à Paris, avec un premier parcours. L'idée est ensuite de dérouler ville par ville. Si tu veux Gottu dans ta ville, dis-le nous.</p>
+      </details>
     </div>
   </div>
 </section>
 
-<!-- FINAL CTA -->
-<section class="final" id="contact">
-  <div class="final-box">
-    <h2>Prêt à connaître vos clients ?</h2>
-    <p class="sub">2 mois gratuits, sans engagement. On vient installer chez vous, on forme votre équipe, et on vous laisse juger.</p>
-    <form action="https://api.web3forms.com/submit" method="POST">
-      <input type="hidden" name="access_key" value="6f834764-0c17-4213-8dff-d7d097f11dae">
-      <div class="form-grid">
-        <input class="form-input" type="text" name="cafe" placeholder="Nom du café" required>
-        <input class="form-input" type="text" name="quartier" placeholder="Quartier" required>
-      </div>
-      <div class="form-grid full">
-        <input class="form-input" type="tel" name="telephone" placeholder="Téléphone / WhatsApp" required>
-      </div>
-      <button type="submit" class="form-btn" style="margin-top:12px">Réserver mon installation gratuite &rarr;</button>
-    </form>
-  </div>
-</section>
-
+<!-- FOOTER -->
 <footer class="footer">
-  <div class="footer-left">
-    <span class="footer-logo">gottu<i></i></span>
-    <span class="footer-tagline">We got you.</span>
-  </div>
-  <div class="footer-links">
-    <a href="mentions-legales.html">Mentions légales</a>
-    <a href="confidentialite.html">Confidentialité</a>
-    <a href="mailto:hello@gottu.com">hello@gottu.com</a>
-    <a href="#">@gottu.coffee</a>
+  <span class="spark" style="top:50px;right:14%;font-size:16px;color:var(--orange)">✦</span>
+  <div class="wrap" style="position:relative">
+    <div class="footer-top">
+      <div>
+        <a href="#top" class="logo">
+          <img class="logo-lockup" src="img/logo-lockup-light.png" alt="Gottu">
+        </a>
+        <p class="footer-tagline serif">Là où la curiosité rencontre le café.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <div class="over">Gottu</div>
+          <a href="#concept" class="ulink">Le concept</a>
+          <a href="#how" class="ulink">Comment ça marche</a>
+          <a href="#parcours" class="ulink">Les parcours</a>
+        </div>
+        <div class="footer-col">
+          <div class="over">Plus</div>
+          <a href="#cafes" class="ulink">Vous êtes un café ?</a>
+          <a href="#faq" class="ulink">FAQ</a>
+          <a href="#waitlist" class="ulink">Liste d'attente</a>
+        </div>
+        <div class="footer-col">
+          <div class="over">Contact</div>
+          <a href="mailto:hello@gottu.io" class="ulink">hello@gottu.io</a>
+          <a href="https://instagram.com/gottu.coffee" target="_blank" rel="noopener" class="ulink">@gottu.coffee</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Gottu</span>
+      <span><a href="mentions-legales.html">Mentions légales</a> · <a href="confidentialite.html">Confidentialité</a></span>
+    </div>
   </div>
 </footer>
 
 <script>
-const nav=document.getElementById('nav');
-window.addEventListener('scroll',()=>nav.classList.toggle('stuck',scrollY>60));
+const WEB3FORMS_KEY = '6f834764-0c17-4213-8dff-d7d097f11dae';
 
-document.querySelectorAll('.faq-q').forEach(b=>{
-  b.addEventListener('click',()=>{
-    const item=b.parentElement,wasOpen=item.classList.contains('open');
-    document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
-    if(!wasOpen)item.classList.add('open');
+const nav = document.getElementById('nav');
+const onScroll = () => nav.classList.toggle('stuck', window.scrollY > 8);
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+
+// marquee
+const words = ['Curiosité','Roast','Rituel','Découverte','Quartier','Spécialité','We got you'];
+const group = words.map(w => `<span class="grp"><span class="w serif">${w}</span><span class="s" aria-hidden="true">✦</span></span>`).join('');
+document.getElementById('marquee').innerHTML = group + group;
+
+// waitlist forms
+document.querySelectorAll('[data-signup]').forEach(form => {
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const input = form.querySelector('input[type=email]');
+    if (!input || !input.value || !input.checkValidity()) { input && input.reportValidity && input.reportValidity(); return; }
+    const wrap = form.closest('[data-form]');
+    const data = new FormData();
+    data.append('access_key', WEB3FORMS_KEY);
+    data.append('email', input.value);
+    data.append('subject', 'Nouvelle inscription liste d\'attente Gottu');
+    fetch('https://api.web3forms.com/submit', {method:'POST', body:data}).catch(()=>{});
+    wrap.classList.add('done');
   });
 });
 
-const obs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('v')});
-},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
-document.querySelectorAll('.sr').forEach(el=>obs.observe(el));
+// animated map: pins light up, progress + badge
+(function(){
+  const map = document.getElementById('map');
+  const countEl = document.getElementById('pcount');
+  const track = document.getElementById('ptrack');
+  const badge = document.getElementById('badge');
+  const routePath = document.getElementById('routepath');
+  // serpentine order so the route reads as one continuous walk
+  const pos = [
+    {l:16,t:20},{l:40,t:13},{l:63,t:22},{l:82,t:38},
+    {l:72,t:60},{l:52,t:50},{l:25,t:46},
+    {l:31,t:72},{l:55,t:78},{l:84,t:72}
+  ];
+  const check = '<svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2 5 8.5 9.5 3.5"/></svg>';
+  const pins = pos.map(p => {
+    const el = document.createElement('span');
+    el.className = 'pin';
+    el.style.left = p.l + '%'; el.style.top = p.t + '%';
+    el.innerHTML = check;
+    map.appendChild(el);
+    return el;
+  });
+  const total = pos.length;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // build the route through the pin tips (in the map's pixel space)
+  const buildRoute = () => {
+    const w = map.clientWidth, h = map.clientHeight;
+    if (!w || !h) return null;
+    document.getElementById('route').setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    const pts = pins.map(el => [el.offsetLeft + el.offsetWidth/2, el.offsetTop + el.offsetHeight/2]);
+    routePath.setAttribute('d', 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L'));
+    const len = routePath.getTotalLength();
+    routePath.style.strokeDasharray = len;
+    routePath.style.strokeDashoffset = reduce ? 0 : len;
+    return len;
+  };
+
+  let lit = 0;
+  const update = () => {
+    countEl.textContent = lit + '/' + total;
+    track.style.width = (lit/total*100) + '%';
+    if (lit >= total) badge.classList.add('show');
+  };
+  const run = () => {
+    buildRoute();
+    if (reduce) { lit = total; pins.forEach(p=>p.classList.add('on')); update(); return; }
+    void routePath.getBoundingClientRect(); // flush so the dash transition runs
+    routePath.style.strokeDashoffset = 0; // draws over the full sequence
+    const t = setInterval(() => {
+      pins.forEach(p => p.classList.remove('cur'));
+      if (lit >= total) { clearInterval(t); return; }
+      pins[lit].classList.add('on');
+      if (lit + 1 < total) pins[lit + 1].classList.add('cur');
+      lit++;
+      update();
+    }, 240);
+  };
+  window.addEventListener('resize', () => { if (lit >= total) buildRoute(); });
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) { run(); io.disconnect(); } });
+    }, {threshold:.35});
+    io.observe(map);
+  } else { run(); }
+})();
 </script>
 
 </body>

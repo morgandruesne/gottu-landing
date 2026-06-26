@@ -6,222 +6,145 @@
 <title>Mentions légales — Gottu</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
 <style>
-:root {
-  --ink: #171411;
-  --paper: #FAF6EF;
-  --sage: #4CA671;
-  --sage-pale: #E3F2E9;
-  --sage-deep: #2D7A4E;
-  --honey: #E9A23B;
-  --honey-pale: #FFF3DB;
-  --blush: #EB6E56;
-  --clay: #C4A882;
-  --fog: #EDE8DF;
-  --text-mid: #6D6355;
-  --text-light: #A39888;
+:root{
+  --paper:#f6f1ea;
+  --ink:#2e2622;
+  --orange:#ec8a55;
+  --orange-deep:#c47a3d;
+  --text-mid:#6b5d54;
+  --text-light:#a29386;
+  --line:#ece3d6;
+  --peach:#ffe1cf;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;overflow-x:hidden}
-body{
-  font-family:'Outfit',sans-serif;
-  background:var(--paper);
-  color:var(--ink);
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-}
-h1,h2,h3,.display{font-family:'Bricolage Grotesque',sans-serif}
+body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{text-decoration:none;color:inherit}
-img{max-width:100%}
+.serif{font-family:'Newsreader',Georgia,serif;font-weight:300;letter-spacing:-.015em;line-height:1.05}
 
-/* ═══ GRAIN OVERLAY ═══ */
-body::after{
-  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:9999;
-}
+.logo{display:inline-flex;align-items:center}
+.logo img{display:block;width:auto;height:28px}
 
-/* ═══ NAV ═══ */
-.nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:20px 40px;
-  display:flex;justify-content:space-between;align-items:center;
-  background:rgba(250,246,239,0.92);
-  backdrop-filter:blur(24px);
-  box-shadow:0 1px 0 var(--fog);
-}
-.nav-logo{
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-weight:800;font-size:26px;letter-spacing:-0.5px;
-}
-.nav-logo i{
-  display:inline-block;width:8px;height:8px;
-  background:var(--sage);border-radius:50%;
-  margin-left:1px;transform:translateY(-8px);
-}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(246,241,234,.85);backdrop-filter:saturate(150%) blur(12px);border-bottom:1px solid var(--line)}
+.nav-inner{max-width:1160px;margin:0 auto;padding:0 28px;height:70px;display:flex;align-items:center}
 
-/* ═══ PAGE CONTENT ═══ */
-.page-wrap{
-  max-width:760px;
-  margin:0 auto;
-  padding:140px 40px 100px;
-}
-.page-tag{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--sage-pale);color:var(--sage-deep);
-  padding:6px 14px;border-radius:100px;
-  font-size:12px;font-weight:700;text-transform:uppercase;
-  letter-spacing:1px;margin-bottom:20px;
-}
-.page-tag::before{content:'';width:6px;height:6px;background:var(--sage);border-radius:50%}
-.page-title{
-  font-size:clamp(36px,5vw,56px);
-  font-weight:800;letter-spacing:-2px;
-  line-height:1.05;
-  margin-bottom:12px;
-}
-.page-updated{
-  font-size:13px;color:var(--text-light);
-  margin-bottom:56px;
-}
+.page-wrap{max-width:760px;margin:0 auto;padding:130px 28px 100px}
+.page-tag{display:inline-flex;align-items:center;gap:7px;background:var(--peach);color:var(--orange-deep);padding:6px 14px;border-radius:100px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.15em;margin-bottom:20px}
+.page-tag::before{content:"✦";font-size:11px}
+.page-title{font-size:clamp(36px,5vw,56px);margin-bottom:12px}
+.page-updated{font-size:13px;color:var(--text-light);margin-bottom:56px}
 
-.legal-section{
-  margin-bottom:48px;
-}
-.legal-section h2{
-  font-size:20px;
-  font-weight:700;
-  letter-spacing:-0.3px;
-  margin-bottom:16px;
-  padding-bottom:12px;
-  border-bottom:1px solid var(--fog);
-}
-.legal-section p{
-  font-size:15px;
-  line-height:1.85;
-  color:var(--text-mid);
-  margin-bottom:12px;
-}
+.legal-section{margin-bottom:48px}
+.legal-section h2{font-size:20px;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.legal-section p{font-size:15px;line-height:1.85;color:var(--text-mid);margin-bottom:12px}
 .legal-section p:last-child{margin-bottom:0}
-.legal-section strong{
-  color:var(--ink);
-  font-weight:600;
-}
-.legal-section a{
-  color:var(--sage-deep);
-  text-decoration:underline;
-  text-underline-offset:3px;
-}
-.legal-section a:hover{color:var(--sage)}
+.legal-section strong{color:var(--ink);font-weight:600}
+.legal-section a{color:var(--orange-deep);text-decoration:underline;text-underline-offset:3px}
+.legal-section a:hover{color:var(--orange)}
 
-/* ═══ FOOTER ═══ */
-.footer{
-  padding:32px 60px;
-  border-top:1px solid var(--fog);
-  display:flex;justify-content:space-between;align-items:center;
-  flex-wrap:wrap;gap:16px;
-}
-.footer-left{display:flex;align-items:center;gap:20px}
-.footer-logo{
-  font-family:'Bricolage Grotesque',sans-serif;
-  font-weight:800;font-size:18px;color:var(--text-light);
-}
-.footer-logo i{
-  display:inline-block;width:5px;height:5px;
-  background:var(--sage);border-radius:50%;
-  margin-left:1px;transform:translateY(-6px);
-}
-.footer-tagline{font-size:12px;color:var(--text-light);font-style:italic}
-.footer-links{display:flex;gap:20px}
-.footer-links a{font-size:12px;color:var(--text-light);transition:color 0.2s}
-.footer-links a:hover{color:var(--ink)}
-.footer-links a.active{color:var(--sage-deep);font-weight:600}
+.footer{background:var(--ink);color:var(--paper);padding:40px 28px}
+.footer-inner{max-width:1160px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-left{display:flex;align-items:center;gap:16px}
+.footer-tagline{font-size:13px;color:rgba(246,241,234,.5);font-style:italic;font-family:'Newsreader',serif}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{font-size:13px;color:rgba(246,241,234,.6);transition:color .2s}
+.footer-links a:hover{color:var(--paper)}
+.footer-links a.active{color:var(--orange)}
 
-/* ═══ RESPONSIVE ═══ */
 @media(max-width:900px){
-  .nav{padding:16px 24px}
-  .page-wrap{padding:110px 24px 80px}
-  .footer{padding:24px;flex-direction:column;text-align:center}
-  .footer-left{flex-direction:column;gap:4px}
+  .footer-inner{flex-direction:column;text-align:center}
 }
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <a href="index.html" class="nav-logo">gottu<i></i></a>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <img src="img/logo-lockup-dark.png" alt="Gottu">
+    </a>
+  </div>
 </nav>
 
 <div class="page-wrap">
   <div class="page-tag">Légal</div>
-  <h1 class="page-title">Mentions légales</h1>
-  <p class="page-updated">Dernière mise à jour : avril 2026</p>
+  <h1 class="page-title serif">Mentions légales</h1>
+  <p class="page-updated">Dernière mise à jour : juin 2026</p>
 
   <div class="legal-section">
     <h2>1. Éditeur du site</h2>
-    <p>Le site <strong>gottu.coffee</strong> est édité par la société <strong>Gottu SAS</strong>, société par actions simplifiée au capital de 1 000 €, immatriculée au Registre du Commerce et des Sociétés de Paris sous le numéro <strong>XXX XXX XXX</strong>.</p>
+    <p>Le site <strong>gottu.io</strong> est édité par la société <strong>Gottu SAS</strong>, société par actions simplifiée au capital de 1 000 €, immatriculée au Registre du Commerce et des Sociétés de Paris sous le numéro <strong>XXX XXX XXX</strong>.</p>
     <p><strong>Siège social :</strong> [Adresse, Code postal, Ville]<br>
-    <strong>Téléphone :</strong> [Numéro de téléphone]<br>
-    <strong>Email :</strong> <a href="mailto:hello@gottu.coffee">hello@gottu.coffee</a></p>
+    <strong>Email :</strong> <a href="mailto:hello@gottu.io">hello@gottu.io</a></p>
     <p><strong>Directeur de la publication :</strong> [Nom du dirigeant]</p>
   </div>
 
   <div class="legal-section">
-    <h2>2. Hébergement</h2>
-    <p>Le site est hébergé par :</p>
-    <p><strong>Vercel Inc.</strong><br>
-    440 N Barranca Ave #4133, Covina, CA 91723, États-Unis<br>
-    <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a></p>
-    <p>Les données des clients Gottu sont hébergées sur des serveurs situés en <strong>France et dans l'Union Européenne</strong>.</p>
+    <h2>2. Présentation du service</h2>
+    <p>Gottu est une application mobile de découverte de cafés de spécialité. Elle propose des <strong>parcours curatés</strong> : l'utilisateur visite des cafés, valide chaque visite via un QR code affiché sur place, fait progresser sa carte et débloque des badges. Le service est en cours de lancement, à Paris, à partir de mi-juillet 2026.</p>
   </div>
 
   <div class="legal-section">
-    <h2>3. Propriété intellectuelle</h2>
+    <h2>3. Hébergement</h2>
+    <p>Le site est hébergé par :</p>
+    <p><strong>GitHub, Inc.</strong><br>
+    88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis<br>
+    <a href="https://github.com" target="_blank" rel="noopener">github.com</a></p>
+    <p>Les données des utilisateurs Gottu sont hébergées sur des serveurs situés dans l'<strong>Union Européenne</strong>.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>4. Propriété intellectuelle</h2>
     <p>L'ensemble des contenus présents sur ce site (textes, images, illustrations, logos, icônes, sons, vidéos) sont la propriété exclusive de Gottu SAS ou de ses partenaires, et sont protégés par les lois françaises et internationales relatives à la propriété intellectuelle.</p>
     <p>Toute reproduction, représentation, modification, publication ou adaptation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite sans l'autorisation écrite préalable de Gottu SAS.</p>
   </div>
 
   <div class="legal-section">
-    <h2>4. Données personnelles et RGPD</h2>
+    <h2>5. Données personnelles et RGPD</h2>
     <p>Gottu s'engage à protéger la vie privée de ses utilisateurs et à traiter les données personnelles conformément au <strong>Règlement Général sur la Protection des Données (RGPD)</strong> et à la loi Informatique et Libertés.</p>
-    <p><strong>Données collectées via le formulaire de contact :</strong> nom du café, quartier, numéro de téléphone. Ces données sont utilisées uniquement pour vous recontacter dans le cadre de votre demande d'installation.</p>
-    <p><strong>Données collectées via les cartes NFC Gottu :</strong> un prénom, des préférences de boissons, un compteur de fidélité. Aucune donnée d'identification sensible (email, téléphone, données bancaires) n'est collectée via les cartes.</p>
-    <p>Conformément à la réglementation en vigueur, vous disposez d'un droit d'accès, de rectification, de portabilité et d'effacement de vos données. Pour exercer ces droits, contactez-nous à : <a href="mailto:privacy@gottu.coffee">privacy@gottu.coffee</a>.</p>
+    <p><strong>Données collectées via la liste d'attente :</strong> votre adresse email, utilisée uniquement pour vous prévenir du lancement de l'application.</p>
+    <p><strong>Données collectées via l'application :</strong> votre profil, vos visites validées et votre progression, nécessaires au fonctionnement du service. Pas de revente de données à des tiers.</p>
+    <p>Conformément à la réglementation en vigueur, vous disposez d'un droit d'accès, de rectification, de portabilité et d'effacement de vos données. Pour exercer ces droits, contactez-nous à : <a href="mailto:hello@gottu.io">hello@gottu.io</a>. Pour le détail, consultez notre <a href="confidentialite.html">politique de confidentialité</a>.</p>
     <p>Vous pouvez également introduire une réclamation auprès de la <strong>CNIL</strong> : <a href="https://www.cnil.fr" target="_blank" rel="noopener">cnil.fr</a>.</p>
   </div>
 
   <div class="legal-section">
-    <h2>5. Cookies</h2>
+    <h2>6. Cookies</h2>
     <p>Ce site n'utilise pas de cookies de tracking ou publicitaires. Seuls des cookies techniques strictement nécessaires au bon fonctionnement du site peuvent être utilisés.</p>
   </div>
 
   <div class="legal-section">
-    <h2>6. Liens hypertextes</h2>
+    <h2>7. Liens hypertextes</h2>
     <p>Le site peut contenir des liens vers des sites tiers. Gottu SAS n'exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu ou à leurs pratiques en matière de données personnelles.</p>
   </div>
 
   <div class="legal-section">
-    <h2>7. Limitation de responsabilité</h2>
+    <h2>8. Limitation de responsabilité</h2>
     <p>Gottu SAS s'efforce d'assurer l'exactitude et la mise à jour des informations diffusées sur ce site, mais ne peut garantir l'exactitude, la précision ou l'exhaustivité des informations mises à disposition. Gottu SAS décline toute responsabilité pour toute imprécision, inexactitude ou omission portant sur des informations disponibles sur ce site.</p>
   </div>
 
   <div class="legal-section">
-    <h2>8. Droit applicable</h2>
+    <h2>9. Droit applicable</h2>
     <p>Les présentes mentions légales sont régies par le droit français. En cas de litige, les tribunaux français seront compétents.</p>
   </div>
 </div>
 
 <footer class="footer">
-  <div class="footer-left">
-    <span class="footer-logo">gottu<i></i></span>
-    <span class="footer-tagline">We got you.</span>
-  </div>
-  <div class="footer-links">
-    <a href="mentions-legales.html" class="active">Mentions légales</a>
-    <a href="confidentialite.html">Confidentialité</a>
-    <a href="mailto:hello@gottu.coffee">hello@gottu.coffee</a>
-    <a href="#">@gottu.coffee</a>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <a href="index.html" class="logo"><img src="img/logo-lockup-light.png" alt="Gottu"></a>
+      <span class="footer-tagline">Là où la curiosité rencontre le café.</span>
+    </div>
+    <div class="footer-links">
+      <a href="mentions-legales.html" class="active">Mentions légales</a>
+      <a href="confidentialite.html">Confidentialité</a>
+      <a href="mailto:hello@gottu.io">hello@gottu.io</a>
+      <a href="https://instagram.com/gottu.coffee" target="_blank" rel="noopener">@gottu.coffee</a>
+    </div>
   </div>
 </footer>
 
