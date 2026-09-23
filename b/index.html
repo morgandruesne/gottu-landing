@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gottu — Valide ta visite dans l'app</title>
+<meta name="description" content="Tu as scanné un QR Gottu. Ouvre l'app pour valider ta visite, ou inscris-toi à la liste d'attente.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f7f2ea;
+  --ink:#0e0b0a;
+  --orange:#a05f00;
+  --orange-deep:#8a5200;
+  --peach:#ffe5c0;
+  --text-mid:#6b5d54;
+  --text-light:#a29079;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:'Helvetica Neue',Helvetica,Arial,system-ui,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+.page{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:32px 22px 48px;
+}
+.card{
+  width:min(440px,100%);
+  text-align:center;
+}
+.logo{height:28px;margin-bottom:28px}
+.mascot{width:84px;height:auto;margin-bottom:18px}
+h1{
+  font-family:'Fredoka','Helvetica Neue',Arial,sans-serif;
+  font-weight:600;
+  font-size:clamp(2rem,8vw,2.7rem);
+  letter-spacing:-.02em;
+  line-height:1.05;
+  margin:0 0 14px;
+}
+.lead{color:var(--text-mid);font-size:1.05rem;line-height:1.55;margin:0 0 26px}
+.actions{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.open{
+  display:flex;align-items:center;justify-content:center;
+  height:54px;border-radius:15px;background:var(--ink);color:var(--paper);
+  font-weight:600;font-size:15.5px;text-decoration:none;
+}
+.home{
+  color:var(--text-mid);font-size:14px;text-decoration:underline;text-underline-offset:3px;
+}
+form{display:flex;gap:8px;flex-wrap:wrap}
+input{
+  flex:1;min-width:180px;height:54px;border:1px solid #e0d6c8;border-radius:15px;
+  padding:0 16px;font:inherit;font-size:15.5px;background:#fff;color:var(--ink);outline:none;
+}
+input:focus{border-color:var(--orange)}
+button{
+  border:0;height:54px;padding:0 18px;border-radius:15px;background:var(--orange);color:#fff;
+  font:inherit;font-weight:600;font-size:15px;cursor:pointer;
+}
+.note{margin:12px 0 0;font-size:13px;color:var(--text-light)}
+.done{display:none;margin-top:8px;font-weight:600;background:var(--peach);border-radius:15px;padding:14px 16px}
+.form-state.done form,.form-state.done .note{display:none}
+.form-state.done .done{display:block}
+.opening{display:none;margin-top:8px;color:var(--text-mid)}
+body.is-opening .opening{display:block}
+body.is-opening .actions,body.is-opening form,body.is-opening .note,body.is-opening .lead{display:none}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="card">
+    <a href="/"><img class="logo" src="/img/logo-lockup-dark.png" alt="Gottu"></a>
+    <img class="mascot" src="/img/logo-mascot-dark.png" alt="">
+    <h1 id="title">Ce café t'attend dans l'app.</h1>
+    <p class="lead" id="lead">Tu as scanné le QR du comptoir. La visite se valide dans Gottu — une seconde, et elle est enregistrée.</p>
+    <p class="opening">Ouverture de Gottu…</p>
+    <div class="actions" id="actions">
+      <a class="open" id="open" href="/">J'ai déjà l'app</a>
+      <a class="home" href="/">Pas encore l'app — voir Gottu</a>
+    </div>
+    <div class="form-state" data-form>
+      <form data-signup novalidate>
+        <input type="email" name="email" placeholder="ton@email.com" aria-label="Adresse email" required>
+        <button type="submit">Rejoindre la liste</button>
+      </form>
+      <p class="note">L'app arrive mi-octobre. On te prévient, c'est tout.</p>
+      <p class="done">Bienvenue dans le premier cercle. À très vite.</p>
+    </div>
+  </div>
+</main>
+<script>
+const WEB3FORMS_KEY = '6f834764-0c17-4213-8dff-d7d097f11dae';
+const params = new URLSearchParams(location.search);
+const token = (params.get('t') || '').trim();
+const step = params.get('try') || '';
+const stay = params.get('stay') === '1';
+
+const title = document.getElementById('title');
+const lead = document.getElementById('lead');
+const open = document.getElementById('open');
+
+if (!token) {
+  title.textContent = 'Gottu se vit dans l\'app.';
+  lead.textContent = 'Les visites se valident en scannant le QR du comptoir depuis Gottu. Inscris-toi pour être là au lancement.';
+  document.getElementById('actions').hidden = true;
+} else {
+  const encoded = encodeURIComponent(token);
+  const iosHref = 'gottu://b?t=' + encoded;
+  open.href = iosHref;
+
+  const android = /Android/i.test(navigator.userAgent);
+  if (android && !stay) {
+    const attempts = [
+      { scheme: 'gottu', pkg: 'com.gottu.app', next: 'staging' },
+      { scheme: 'gottu-staging', pkg: 'com.gottu.app.staging', next: 'stay' },
+    ];
+    const current = step === 'staging' ? attempts[1] : attempts[0];
+    const fallback = new URL('/b/', location.origin);
+    fallback.searchParams.set('t', token);
+    if (current.next === 'stay') fallback.searchParams.set('stay', '1');
+    else fallback.searchParams.set('try', current.next);
+    const intent = 'intent://b?t=' + encoded
+      + '#Intent;scheme=' + current.scheme
+      + ';package=' + current.pkg
+      + ';S.browser_fallback_url=' + encodeURIComponent(fallback.toString())
+      + ';end';
+    document.body.classList.add('is-opening');
+    location.replace(intent);
+  }
+}
+
+document.querySelector('[data-signup]').addEventListener('submit', (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const input = form.querySelector('input[type=email]');
+  if (!input.value || !input.checkValidity()) {
+    input.reportValidity();
+    return;
+  }
+  const data = new FormData();
+  data.append('access_key', WEB3FORMS_KEY);
+  data.append('email', input.value);
+  data.append('subject', 'Nouvelle inscription liste d\'attente Gottu');
+  data.append('source', 'qr-badge');
+  fetch('https://api.web3forms.com/submit', { method: 'POST', body: data }).catch(() => {});
+  form.closest('[data-form]').classList.add('done');
+});
+</script>
+</body>
+</html>

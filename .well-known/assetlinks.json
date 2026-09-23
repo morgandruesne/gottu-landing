@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.gottu.app.staging",
+      "sha256_cert_fingerprints": [
+        "D5:07:67:21:B6:92:5F:E3:07:48:4E:5A:29:56:16:0A:C9:0B:7B:66:74:DD:20:C4:B0:04:A6:4F:D9:D5:22:15"
+      ]
+    }
+  }
+]

@@ -1,0 +1,3 @@
+# GitHub Pages uses Jekyll, which skips dot-directories unless listed here.
+include:
+  - .well-known
