@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["REPLACE_APPLE_TEAM_ID.com.gottu.app"],
+        "components": [
+          { "/": "/b", "?": { "t": "*" }, "comment": "Printed café QR" },
+          { "/": "/b/", "?": { "t": "*" }, "comment": "Printed café QR" }
+        ]
+      }
+    ]
+  }
+}
