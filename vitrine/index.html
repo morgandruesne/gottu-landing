@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOTTU</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" sizes="32x32" href="../img/favicon-32.png">
+<style>
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f7f2ea;color:#0e0b0a;font-family:Helvetica,Arial,sans-serif}
+  a{color:#a05f00}
+</style>
+<script>
+  // Destination du QR https://gottu.io/vitrine/
+  // Changer ces trois adresses pour viser l'App Store, le Play Store ou autre.
+  var IOS = "https://instagram.com/gottu.cafe";
+  var ANDROID = "https://instagram.com/gottu.cafe";
+  var DEFAULT = "https://instagram.com/gottu.cafe";
+  var ua = navigator.userAgent || "";
+  var url = /iPhone|iPad|iPod/i.test(ua) ? IOS : /Android/i.test(ua) ? ANDROID : DEFAULT;
+  document.addEventListener("DOMContentLoaded", function () {
+    var link = document.getElementById("go");
+    if (link) link.href = url;
+  });
+  location.replace(url);
+</script>
+</head>
+<body>
+  <p><a id="go" href="https://instagram.com/gottu.cafe">Continuer vers Instagram</a></p>
+</body>
+</html>
