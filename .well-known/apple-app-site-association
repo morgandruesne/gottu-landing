@@ -3,7 +3,10 @@
     "apps": [],
     "details": [
       {
-        "appIDs": ["REPLACE_APPLE_TEAM_ID.com.gottu.app"],
+        "appIDs": [
+          "9L9MH586NL.com.gottu.app.staging",
+          "9L9MH586NL.com.gottu.app"
+        ],
         "components": [
           { "/": "/b", "?": { "t": "*" }, "comment": "Printed café QR" },
           { "/": "/b/", "?": { "t": "*" }, "comment": "Printed café QR" }
