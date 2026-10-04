@@ -13,19 +13,51 @@
 <script>
   // Destination du QR https://gottu.io/vitrine/
   // Changer ces trois adresses pour viser l'App Store, le Play Store ou autre.
+  // Un profil Instagram s'ouvre dans l'app sur téléphone.
   var IOS = "https://instagram.com/gottu.cafe";
   var ANDROID = "https://instagram.com/gottu.cafe";
   var DEFAULT = "https://instagram.com/gottu.cafe";
   var ua = navigator.userAgent || "";
-  var url = /iPhone|iPad|iPod/i.test(ua) ? IOS : /Android/i.test(ua) ? ANDROID : DEFAULT;
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+  var url = isIOS ? IOS : isAndroid ? ANDROID : DEFAULT;
+
+  function instagramUsername(target) {
+    var match = String(target).match(/instagram\.com\/([A-Za-z0-9._]+)/i);
+    if (!match) return "";
+    if (/^(p|reel|reels|stories|explore)$/i.test(match[1])) return "";
+    return match[1];
+  }
+
+  function openTarget(target) {
+    var username = instagramUsername(target);
+    if (username && isAndroid) {
+      location.href = "intent://www.instagram.com/" + username + "/#Intent;package=com.instagram.android;scheme=https;S.browser_fallback_url=" + encodeURIComponent(target) + ";end";
+      return;
+    }
+    if (username && isIOS) {
+      var timer = setTimeout(function () {
+        if (!document.hidden) location.replace(target);
+      }, 1200);
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) clearTimeout(timer);
+      });
+      location.href = "instagram://user?username=" + username;
+      return;
+    }
+    location.replace(target);
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     var link = document.getElementById("go");
-    if (link) link.href = url;
+    if (!link) return;
+    var username = instagramUsername(url);
+    link.href = username && (isIOS || isAndroid) ? "instagram://user?username=" + username : url;
   });
-  location.replace(url);
+  openTarget(url);
 </script>
 </head>
 <body>
-  <p><a id="go" href="https://instagram.com/gottu.cafe">Continuer vers Instagram</a></p>
+  <p><a id="go" href="https://instagram.com/gottu.cafe">Ouvrir Instagram</a></p>
 </body>
 </html>
