@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supprimer votre compte GOTTU - Gottu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f6f1ea;
+  --ink:#2e2622;
+  --orange:#ec8a55;
+  --orange-deep:#c47a3d;
+  --text-mid:#6b5d54;
+  --text-light:#a29386;
+  --line:#ece3d6;
+  --peach:#ffe1cf;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+.serif{font-family:'Newsreader',Georgia,serif;font-weight:300;letter-spacing:-.015em;line-height:1.05}
+
+.logo{display:inline-flex;align-items:center}
+.logo img{display:block;width:auto;height:28px}
+
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(246,241,234,.85);backdrop-filter:saturate(150%) blur(12px);border-bottom:1px solid var(--line)}
+.nav-inner{max-width:1160px;margin:0 auto;padding:0 28px;height:70px;display:flex;align-items:center}
+
+.page-wrap{max-width:760px;margin:0 auto;padding:130px 28px 100px}
+.page-tag{display:inline-flex;align-items:center;gap:7px;background:var(--peach);color:var(--orange-deep);padding:6px 14px;border-radius:100px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.15em;margin-bottom:20px}
+.page-tag::before{content:"✦";font-size:11px}
+.page-title{font-size:clamp(36px,5vw,56px);margin-bottom:12px}
+.page-updated{font-size:13px;color:var(--text-light);margin-bottom:56px}
+
+.legal-section{margin-bottom:48px}
+.legal-section h2{font-size:20px;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.legal-section p{font-size:15px;line-height:1.85;color:var(--text-mid);margin-bottom:12px}
+.legal-section p:last-child{margin-bottom:0}
+.legal-section strong{color:var(--ink);font-weight:600}
+.legal-section a{color:var(--orange-deep);text-decoration:underline;text-underline-offset:3px}
+.legal-section a:hover{color:var(--orange)}
+.legal-section ul{list-style:none;margin:8px 0 12px;display:flex;flex-direction:column;gap:6px}
+.legal-section ul li{font-size:15px;line-height:1.7;color:var(--text-mid);padding-left:20px;position:relative}
+.legal-section ul li::before{content:'';position:absolute;left:0;top:10px;width:6px;height:6px;background:var(--orange);border-radius:50%}
+
+.steps{list-style:none;counter-reset:step;margin:8px 0 0;display:flex;flex-direction:column;gap:14px}
+.steps li{counter-increment:step;position:relative;padding:16px 18px 16px 64px;background:#fff;border:1px solid var(--line);border-radius:16px;font-size:16px;line-height:1.55;color:var(--ink);font-weight:600}
+.steps li::before{content:counter(step);position:absolute;left:16px;top:16px;width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;font-size:14px;font-weight:700;line-height:32px;text-align:center}
+
+.footer{background:var(--ink);color:var(--paper);padding:40px 28px}
+.footer-inner{max-width:1160px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-left{display:flex;align-items:center;gap:16px}
+.footer-tagline{font-size:13px;color:rgba(246,241,234,.5);font-style:italic;font-family:'Newsreader',serif}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{font-size:13px;color:rgba(246,241,234,.6);transition:color .2s}
+.footer-links a:hover{color:var(--paper)}
+.footer-links a.active{color:var(--orange)}
+
+@media(max-width:900px){
+  .footer-inner{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <img src="img/logo-lockup-dark.png" alt="Gottu">
+    </a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-tag">Compte</div>
+  <h1 class="page-title serif">Supprimer votre compte GOTTU</h1>
+  <p class="page-updated">Dernière mise à jour : 6 octobre 2026</p>
+
+  <div class="legal-section">
+    <h2>Supprimer le compte dans l’application</h2>
+    <p><strong>Gottu SAS</strong> édite l’application <strong>GOTTU</strong>. Vous pouvez supprimer votre compte vous-même, directement dans l’application.</p>
+    <ol class="steps">
+      <li>Ouvrez l’application GOTTU et connectez-vous.</li>
+      <li>Allez dans Réglages.</li>
+      <li>Ouvrez Modifier le profil.</li>
+      <li>Choisissez Supprimer le compte et confirmez.</li>
+      <li>Vous devez être en ligne. La suppression est immédiate.</li>
+    </ol>
+  </div>
+
+  <div class="legal-section">
+    <h2>Ce qui est supprimé</h2>
+    <p>La suppression porte sur <strong>l’ensemble du compte</strong> et sur les données personnelles qui y sont associées :</p>
+    <ul>
+      <li>Profil</li>
+      <li>Visites</li>
+      <li>Grains</li>
+      <li>Niveaux</li>
+      <li>Badges</li>
+      <li>Consentements</li>
+      <li>Appareils de notification</li>
+    </ul>
+    <p>L’application ne permet pas de supprimer seulement une partie de ces données. La suppression concerne toujours le compte entier.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>Ce qui reste</h2>
+    <p>Les contenus éditoriaux des cafés et des parcours ne sont pas des données personnelles. Ils restent en ligne après la suppression de votre compte.</p>
+    <p>Aucune donnée bancaire n’est collectée.</p>
+  </div>
+
+  <div class="legal-section">
+    <h2>Si vous ne pouvez pas ouvrir l’application</h2>
+    <p>Écrivez à <a href="mailto:contact@gottu.io">contact@gottu.io</a> depuis l’adresse associée à votre compte, avec pour objet « Suppression de mon compte GOTTU ».</p>
+    <p>Gottu SAS vous répond dans un délai d’un mois.</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <a href="index.html" class="logo"><img src="img/logo-lockup-light.png" alt="Gottu"></a>
+      <span class="footer-tagline">Là où la curiosité rencontre le café.</span>
+    </div>
+    <div class="footer-links">
+      <a href="index.html">Accueil</a>
+      <a href="mentions-legales.html">Mentions légales</a>
+      <a href="confidentialite.html">Confidentialité</a>
+      <a href="suppression-compte.html" class="active">Supprimer le compte</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
