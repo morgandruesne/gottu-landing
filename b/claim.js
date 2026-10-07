@@ -1,7 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.108.2';
 
-const CGU_VERSION = '2026-06';
-const PRIVACY_VERSION = '2026-06';
+const CGU_VERSION = '2026-10';
+const PRIVACY_VERSION = '2026-10';
 const PROVIDER_KEY = 'gottu.claim.provider';
 const CONSENT_KEY = 'gottu.claim.consent';
 
@@ -207,7 +207,7 @@ function renderAuth(supabase, cafeName) {
   panel.innerHTML = `
     <label class="check">
       <input id="consent" type="checkbox">
-      <span>J'accepte les <a class="inline" href="/mentions-legales.html">mentions légales</a> et la <a class="inline" href="/confidentialite.html">politique de confidentialité</a>.</span>
+      <span>J'accepte les <a class="inline" href="/cgu.html">CGU</a> et la <a class="inline" href="/confidentialite.html">politique de confidentialité</a>.</span>
     </label>
     <p class="alert hidden" id="form-error"></p>
     <button class="primary" type="button" id="apple">Continuer avec Apple</button>
