@@ -4,74 +4,83 @@ const CGU_VERSION = '2026-10';
 const PRIVACY_VERSION = '2026-10';
 const PROVIDER_KEY = 'gottu.claim.provider';
 const CONSENT_KEY = 'gottu.claim.consent';
+const VERIFY_HOLD_MS = 700;
 
 const STORE_CODES = new Set(['OK', 'RECENTLY_VISITED', 'ALREADY_VISITED']);
 
-const BLOCKED_COPY = {
-  INVALID_QR: "Ce QR n'est pas valide.",
-  INACTIVE_CAFE: "Ce café n'est pas disponible.",
-  LOCATION_REQUIRED: 'Active la localisation et réessaie.',
-  TOO_FAR: "Tu n'es pas assez près du café.",
-  INTERNAL_ERROR: "Réessaie, la visite n'a pas été enregistrée.",
-  BAD_REQUEST: "Réessaie, la visite n'a pas été enregistrée.",
-  RATE_LIMITED: 'Réessaie dans un moment.',
+const COPY = {
+  passwordShort: 'Le mot de passe doit faire au moins 8 caractères.',
+  passwordLong: 'Le mot de passe est trop long.',
+  needEmail: 'Indique ton e-mail.',
+  appleFail: "Apple n'a pas pu ouvrir la connexion. Réessaie.",
+  googleFail: "Google n'a pas pu ouvrir la connexion. Réessaie.",
+  signupFail: "Le compte n'a pas pu être créé. Réessaie.",
+  accountExists: 'Ce compte existe déjà. Connecte-toi.',
+  needBoth: 'Indique ton e-mail et ton mot de passe.',
+  badLogin: 'E-mail ou mot de passe incorrect.',
+  badCode: 'Ce code ne marche pas. Réessaie.',
+  cgu: 'Coche les CGU pour continuer.',
+  invalidQr: "Ce QR n'est pas valide.",
+  inactiveCafe: "Ce café n'est pas disponible.",
+  consent: 'Accepte les conditions, puis réessaie.',
+  rate: 'Réessaie dans un moment.',
+  generic: "Réessaie, la visite n'a pas été enregistrée.",
+  missingConfig: "Cette page n'est pas encore configurée.",
+  resendFail: "Le code n'a pas pu être renvoyé. Réessaie.",
+  resendOk: 'Code renvoyé.',
 };
-
-const title = document.querySelector('#title');
-const lead = document.querySelector('#lead');
-const panel = document.querySelector('#panel');
-const openApp = document.querySelector('#open-app');
 
 const config = window.GOTTU_CLAIM ?? {};
 const token = new URLSearchParams(location.search).get('t')?.trim() ?? '';
 
-function methodLabel(provider) {
-  if (provider === 'apple') return 'Apple';
-  if (provider === 'google') return 'Google';
-  return 'e-mail';
+const screens = Object.fromEntries(
+  [...document.querySelectorAll('[data-screen]')].map((section) => [section.dataset.screen, section]),
+);
+
+const locating = document.querySelector('#locating');
+const cguRow = document.querySelector('#cgu-row');
+const cguInput = document.querySelector('#cgu');
+const cguWarn = document.querySelector('#cgu-warn');
+const authActions = document.querySelector('#auth-actions');
+const welcomeError = document.querySelector('#welcome-error');
+const emailForm = document.querySelector('#email-form');
+const emailInput = document.querySelector('#email');
+const passwordInput = document.querySelector('#password');
+const emailError = document.querySelector('#email-error');
+const emailEyebrow = document.querySelector('#email-eyebrow');
+const codeEyebrow = document.querySelector('#code-eyebrow');
+const codeEmail = document.querySelector('#code-email');
+const codeGrid = document.querySelector('#code-grid');
+const codeInput = document.querySelector('#otp');
+const codeNote = document.querySelector('#code-note');
+const codeGo = document.querySelector('#code-go');
+const whyLead = document.querySelector('#why-lead');
+const geoTitle = document.querySelector('#geo-title');
+const farTitle = document.querySelector('#far-title');
+const farText = document.querySelector('#far-text');
+const blockedMessage = document.querySelector('#blocked-message');
+const blockedRetry = document.querySelector('#blocked-retry');
+const digitCells = [...codeGrid.querySelectorAll('.digit')];
+
+let cafeName = '';
+let cafeAddress = '';
+let pendingEmail = '';
+let busy = false;
+let claiming = false;
+let supabase = null;
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
 
-function showAppLink(visible) {
-  if (!token) {
-    openApp.classList.add('hidden');
-    return;
-  }
-  openApp.href = `gottu://b?t=${encodeURIComponent(token)}`;
-  openApp.classList.toggle('hidden', !visible);
+function reducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-function setBlocked(message, retry) {
-  title.textContent = 'Visite non enregistrée';
-  lead.textContent = message;
-  panel.classList.remove('hidden');
-  panel.innerHTML = retry
-    ? '<button class="primary" type="button" id="retry">Réessayer</button>'
-    : '';
-  showAppLink(true);
-  document.querySelector('#retry')?.addEventListener('click', retry);
-}
-
-function storeLinks() {
-  const links = [];
-  if (config.appStoreUrl) {
-    links.push(`<a class="secondary store" href="${config.appStoreUrl}">Télécharger sur l'App Store</a>`);
-  }
-  if (config.playStoreUrl) {
-    links.push(`<a class="secondary store" href="${config.playStoreUrl}">Télécharger sur le Play Store</a>`);
-  }
-  return links.join('');
-}
-
-function showSuccess(code, provider) {
-  const method = methodLabel(provider);
-  const recorded = code === 'OK';
-  title.textContent = recorded ? 'Visite enregistrée' : 'Tu as déjà badgé ici';
-  lead.textContent = recorded
-    ? `Dans l'app, connecte-toi avec ${method}.`
-    : `Dans l'app, connecte-toi avec ${method} pour voir ta carte.`;
-  panel.classList.remove('hidden');
-  panel.innerHTML = storeLinks();
-  showAppLink(false);
+function upper(value) {
+  return value.toLocaleUpperCase('fr-FR');
 }
 
 function utf8Size(value) {
@@ -79,14 +88,319 @@ function utf8Size(value) {
 }
 
 function passwordError(password) {
-  if (password.length < 8) return 'Le mot de passe doit faire au moins 8 caractères.';
-  if (utf8Size(password) > 72) return 'Le mot de passe est trop long.';
+  if (password.length < 8) return COPY.passwordShort;
+  if (utf8Size(password) > 72) return COPY.passwordLong;
   return null;
+}
+
+function storeUrl(value) {
+  if (typeof value !== 'string') return '';
+  const url = value.trim();
+  if (!url || url === '#') return '';
+  return url;
+}
+
+function show(step) {
+  document.body.dataset.step = step;
+  for (const [name, section] of Object.entries(screens)) {
+    section.hidden = name !== step;
+  }
+  locating.hidden = true;
+  locating.classList.remove('run');
+  window.scrollTo(0, 0);
+}
+
+function showLocating() {
+  show('geo');
+  locating.hidden = false;
+  locating.classList.remove('run');
+  void locating.offsetWidth;
+  locating.classList.add('run');
+}
+
+function showBlocked(message, retry) {
+  blockedMessage.textContent = message;
+  blockedRetry.hidden = !retry;
+  blockedRetry.onclick = retry || null;
+  show('blocked');
+}
+
+function showFar(denied) {
+  farTitle.textContent = denied ? 'POSITION REQUISE' : 'TROP LOIN DU CAFÉ';
+  farText.textContent = denied
+    ? `Sans ta position, on ne peut pas confirmer que tu es chez ${cafeName}. Autorise-la dans les réglages du navigateur.`
+    : `Tu n'es pas assez près de ${cafeName}. Rapproche-toi à moins de 300 m et réessaie.`;
+  show('far');
+}
+
+function applyCafe() {
+  const cafeUp = upper(cafeName);
+  document.querySelectorAll('[data-cafe-up]').forEach((node) => {
+    node.textContent = cafeUp;
+  });
+  emailEyebrow.textContent = `${cafeUp} · ÉTAPE 1/2`;
+  codeEyebrow.textContent = `${cafeUp} · ÉTAPE 2/2`;
+  geoTitle.textContent = `ES-TU BIEN CHEZ ${cafeUp} ?`;
+  whyLead.textContent = `Ta position sert une seule fois, à confirmer que tu es bien chez ${cafeName}.`;
+  const row = document.querySelector('[data-address-row]');
+  const address = document.querySelector('[data-address]');
+  if (cafeAddress) {
+    address.textContent = cafeAddress;
+    row.hidden = false;
+  } else {
+    address.textContent = '';
+    row.hidden = true;
+  }
+}
+
+function syncCgu() {
+  const on = cguInput.checked;
+  cguRow.classList.toggle('is-on', on);
+  authActions.classList.toggle('is-ready', on);
+  if (on) cguWarn.hidden = true;
+}
+
+function requireCgu() {
+  if (cguInput.checked) return true;
+  cguWarn.hidden = false;
+  cguRow.classList.remove('shake');
+  void cguRow.offsetWidth;
+  cguRow.classList.add('shake');
+  return false;
+}
+
+function remember(provider) {
+  if (!requireCgu()) return false;
+  sessionStorage.setItem(CONSENT_KEY, '1');
+  sessionStorage.setItem(PROVIDER_KEY, provider);
+  welcomeError.textContent = '';
+  return true;
+}
+
+function methodLine(provider, email) {
+  if (provider === 'apple') return "Dans l'app, connecte-toi avec Apple.";
+  if (provider === 'google') return "Dans l'app, connecte-toi avec Google.";
+  return `Dans l'app, connecte-toi avec ton e-mail ${email}.`;
+}
+
+function armAppLinks() {
+  const href = token ? `gottu://b?t=${encodeURIComponent(token)}` : '';
+  document.querySelectorAll('[data-open-app]').forEach((link) => {
+    if (!href) {
+      link.hidden = true;
+      link.removeAttribute('href');
+      return;
+    }
+    link.hidden = false;
+    link.href = href;
+  });
+}
+
+function drawQr() {
+  const grid = document.querySelector('#qr-cells');
+  const fragment = document.createDocumentFragment();
+  for (let i = 0; i < 121; i += 1) {
+    const row = Math.floor(i / 11);
+    const col = i % 11;
+    const finder = (row < 3 && (col < 3 || col > 7)) || (row > 7 && col < 3);
+    const on = finder
+      ? !(row % 3 === 1 && col % 3 === 1) || (row === 1 && col === 1)
+      : ((i * 37 + row * 11 + col * 7) % 5) > 1;
+    const cell = document.createElement('span');
+    if (on) cell.className = 'on';
+    fragment.appendChild(cell);
+  }
+  grid.appendChild(fragment);
+}
+
+function renderDigits(value) {
+  digitCells.forEach((cell, index) => {
+    const char = value[index] ?? '';
+    const label = cell.querySelector('b');
+    const caret = cell.querySelector('.caret');
+    const wasFilled = cell.classList.contains('filled');
+    label.textContent = char;
+    cell.classList.toggle('filled', Boolean(char));
+    cell.classList.toggle('current', index === value.length);
+    caret.hidden = index !== value.length;
+    if (char && !wasFilled) {
+      cell.classList.remove('pop');
+      void cell.offsetWidth;
+      cell.classList.add('pop');
+    }
+  });
+  const ready = value.length === 6;
+  codeGo.textContent = ready ? 'Valider' : 'Coller le code reçu';
+  codeGo.classList.toggle('dark', ready);
+  codeGo.classList.toggle('pulse', ready);
+}
+
+function currentCode() {
+  return codeInput.value.replace(/\D/g, '').slice(0, 6);
+}
+
+function animateCount(node, target) {
+  if (reducedMotion()) {
+    node.textContent = String(target);
+    return;
+  }
+  const start = performance.now();
+  const duration = Math.min(1200, 400 + Math.abs(target) * 16);
+  const tick = (now) => {
+    const progress = Math.min(1, (now - start) / duration);
+    if (progress >= 1) {
+      node.textContent = String(target);
+      return;
+    }
+    const eased = 1 - (1 - progress) ** 3;
+    node.textContent = String(Math.round(target * eased));
+    requestAnimationFrame(tick);
+  };
+  node.textContent = '0';
+  requestAnimationFrame(tick);
+}
+
+function burst(layer) {
+  if (!layer) return;
+  layer.replaceChildren();
+  if (reducedMotion()) return;
+  const colors = ['#ffe5c0', '#a05f00', '#fff'];
+  for (let i = 0; i < 30; i += 1) {
+    const piece = document.createElement('span');
+    piece.className = 'confetti';
+    const size = 8 + (i % 4) * 3;
+    piece.style.width = `${size}px`;
+    piece.style.height = `${i % 2 ? size : 5}px`;
+    piece.style.borderRadius = i % 5 === 0 ? '50%' : '2px';
+    piece.style.background = colors[i % 3];
+    layer.appendChild(piece);
+    const angle = (i / 30) * Math.PI * 2 + Math.random() * 0.4;
+    const distance = 90 + Math.random() * 150;
+    const dx = Math.cos(angle) * distance;
+    const dy = Math.sin(angle) * distance - 40;
+    const rot = (Math.random() - 0.5) * 900;
+    piece.animate(
+      [
+        { transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
+        {
+          transform: `translate(${dx}px, ${dy}px) scale(1) rotate(${rot / 2}deg)`,
+          opacity: 1,
+          offset: 0.45,
+        },
+        {
+          transform: `translate(${dx * 1.15}px, ${dy + 220}px) scale(.9) rotate(${rot}deg)`,
+          opacity: 0,
+        },
+      ],
+      {
+        duration: 1800 + Math.random() * 600,
+        delay: Math.random() * 150,
+        easing: 'cubic-bezier(.2,.7,.3,1)',
+        fill: 'forwards',
+      },
+    );
+  }
+}
+
+function fillParcours(root, items) {
+  const card = root.querySelector('[data-parcours]');
+  const list = root.querySelector('[data-parcours-list]');
+  list.replaceChildren();
+  if (!items.length) {
+    card.hidden = true;
+    return;
+  }
+  card.hidden = false;
+  for (const item of items) {
+    const block = document.createElement('div');
+    block.className = 'path';
+    const head = document.createElement('div');
+    head.className = 'path-head';
+    const name = document.createElement('span');
+    name.className = 'path-name';
+    name.textContent = upper(item.title);
+    const count = document.createElement('span');
+    count.className = 'path-count';
+    count.textContent = `${item.visited} / ${item.total}`;
+    head.append(name, count);
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    const fill = document.createElement('span');
+    const pct = Math.max(0, Math.min(100, (item.visited / item.total) * 100));
+    fill.style.setProperty('--w', `${pct}%`);
+    bar.append(fill);
+    block.append(head, bar);
+    list.append(block);
+  }
+}
+
+function badgeName(item) {
+  if (typeof item === 'string') return item.trim();
+  if (item && typeof item.name === 'string') return item.name.trim();
+  return '';
+}
+
+function fillBadges(root, badges) {
+  const card = root.querySelector('[data-badges]');
+  if (!Array.isArray(badges) || badges.length === 0) {
+    card.hidden = true;
+    return;
+  }
+  card.hidden = false;
+  const count = badges.length;
+  root.querySelector('[data-badge-title]').textContent = count > 1
+    ? `${count} BADGES T'ATTENDENT`
+    : "1 BADGE T'ATTEND";
+  const list = root.querySelector('[data-badge-names]');
+  list.replaceChildren();
+  for (const item of badges) {
+    const name = badgeName(item);
+    if (!name) continue;
+    const li = document.createElement('li');
+    li.textContent = name;
+    list.append(li);
+  }
+}
+
+function fillStores(root) {
+  const row = root.querySelector('[data-stores]');
+  const links = [
+    [root.querySelector('[data-store="apple"]'), storeUrl(config.appStoreUrl)],
+    [root.querySelector('[data-store="play"]'), storeUrl(config.playStoreUrl)],
+  ];
+  let visible = 0;
+  for (const [link, href] of links) {
+    if (!href) {
+      link.hidden = true;
+      link.removeAttribute('href');
+      continue;
+    }
+    link.href = href;
+    link.hidden = false;
+    visible += 1;
+  }
+  row.hidden = visible === 0;
+  row.classList.toggle('is-single', visible === 1);
+}
+
+function paintOutcome(root, { grains, badges, parcours, provider, email }) {
+  fillParcours(root, parcours);
+  fillBadges(root, badges);
+  fillStores(root);
+  root.querySelector('[data-method]').textContent = methodLine(provider, email);
+  const pill = root.querySelector('[data-grains]');
+  if (!pill) return null;
+  const awarded = typeof grains === 'number' && Number.isFinite(grains);
+  pill.hidden = !awarded;
+  if (!awarded) return null;
+  const node = pill.querySelector('[data-grains-n]');
+  node.textContent = '0';
+  return node;
 }
 
 function requireConfig() {
   if (!config.supabaseUrl || !config.supabaseAnonKey) {
-    setBlocked('Cette page n’est pas encore configurée.', null);
+    showBlocked(COPY.missingConfig, null);
     return null;
   }
   return createClient(config.supabaseUrl, config.supabaseAnonKey, {
@@ -108,16 +422,16 @@ async function readFunctionResult(data, error) {
   return { code: 'INTERNAL_ERROR' };
 }
 
-async function previewCafe(supabase) {
-  const { data, error } = await supabase.functions.invoke('preview_badge_link', {
+async function previewCafe(client) {
+  const { data, error } = await client.functions.invoke('preview_badge_link', {
     body: { qr_token: token },
   });
   return readFunctionResult(data, error);
 }
 
-async function recordConsent(supabase, userId) {
+async function recordConsent(client, userId) {
   const now = new Date().toISOString();
-  const { error } = await supabase.from('consents').insert({
+  const { error } = await client.from('consents').insert({
     user_id: userId,
     cgu_version: CGU_VERSION,
     cgu_accepted_at: now,
@@ -142,214 +456,373 @@ function readPosition() {
   });
 }
 
-async function claimVisit(supabase, provider) {
-  title.textContent = 'Enregistrement…';
-  lead.textContent = 'On vérifie que tu es au café.';
-  panel.classList.add('hidden');
-  showAppLink(false);
-
-  let position;
+async function loadParcours(client, userId, cafeId) {
+  if (!userId || typeof cafeId !== 'string' || !cafeId) return [];
   try {
-    position = await readPosition();
+    const [paths, progress] = await Promise.all([
+      client.from('parcours').select('id, title, cafe_order, status'),
+      client.from('parcours_progress').select('parcours_id, visited_count, total_count').eq('user_id', userId),
+    ]);
+    if (paths.error || progress.error) return [];
+    const byId = new Map((progress.data ?? []).map((row) => [row.parcours_id, row]));
+    const items = [];
+    for (const row of paths.data ?? []) {
+      if (row.status !== 'active' && row.status !== 'preview') continue;
+      const order = Array.isArray(row.cafe_order) ? row.cafe_order : [];
+      if (!order.includes(cafeId)) continue;
+      const prog = byId.get(row.id);
+      const visited = Number(prog?.visited_count);
+      const total = Number(prog?.total_count);
+      if (!Number.isFinite(visited) || !Number.isFinite(total) || total <= 0) continue;
+      if (typeof row.title !== 'string' || !row.title.trim()) continue;
+      items.push({ title: row.title, visited, total });
+    }
+    return items;
   } catch {
-    setBlocked(BLOCKED_COPY.LOCATION_REQUIRED, () => {
-      void claimVisit(supabase, provider);
-    });
-    return;
+    return [];
   }
+}
 
-  const { data: userData } = await supabase.auth.getUser();
-  const userId = userData.user?.id;
-  if (!userId) {
-    renderAuth(supabase, null);
-    return;
+function previewFailure(code) {
+  if (code === 'INVALID_QR') return { message: COPY.invalidQr, retry: false };
+  if (code === 'INACTIVE_CAFE') return { message: COPY.inactiveCafe, retry: false };
+  if (code === 'RATE_LIMITED') return { message: COPY.rate, retry: true };
+  return { message: COPY.generic, retry: true };
+}
+
+function claimFailure(result) {
+  if (result.code === 'INVALID_QR') return { message: COPY.invalidQr, retry: null };
+  if (result.code === 'INACTIVE_CAFE') return { message: COPY.inactiveCafe, retry: null };
+  if (result.code === 'UNAUTHORIZED' && result.message === 'Consent required') {
+    return { message: COPY.consent, retry: 'welcome' };
   }
+  if (result.code === 'RATE_LIMITED') return { message: COPY.rate, retry: 'claim' };
+  return { message: COPY.generic, retry: 'claim' };
+}
 
+async function claimVisit(provider) {
+  if (claiming) return;
+  claiming = true;
+  showLocating();
   try {
-    await recordConsent(supabase, userId);
-  } catch {
-    setBlocked(BLOCKED_COPY.INTERNAL_ERROR, () => {
-      void claimVisit(supabase, provider);
-    });
-    return;
-  }
+    let position;
+    try {
+      position = await readPosition();
+    } catch {
+      showFar(true);
+      return;
+    }
 
-  const { data, error } = await supabase.functions.invoke('claim_badge_web', {
-    body: {
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    const user = userData.user;
+    if (userError || !user?.id) {
+      show('welcome');
+      return;
+    }
+
+    try {
+      await recordConsent(supabase, user.id);
+    } catch {
+      showBlocked(COPY.generic, () => {
+        void claimVisit(provider);
+      });
+      return;
+    }
+
+    const body = {
       qr_token: token,
       lat: position.coords.latitude,
       lng: position.coords.longitude,
-      ...(Number.isFinite(position.coords.accuracy) ? { accuracy: position.coords.accuracy } : {}),
-    },
-  });
-  const result = await readFunctionResult(data, error);
+    };
+    if (Number.isFinite(position.coords.accuracy)) body.accuracy = position.coords.accuracy;
 
-  if (STORE_CODES.has(result.code)) {
-    sessionStorage.removeItem(PROVIDER_KEY);
-    sessionStorage.removeItem(CONSENT_KEY);
-    showSuccess(result.code, provider);
-    return;
-  }
+    const { data, error } = await supabase.functions.invoke('claim_badge_web', { body });
+    const result = await readFunctionResult(data, error);
 
-  const message =
-    result.code === 'UNAUTHORIZED' && result.message === 'Consent required'
-      ? 'Accepte les conditions, puis réessaie.'
-      : (BLOCKED_COPY[result.code] ?? BLOCKED_COPY.INTERNAL_ERROR);
-
-  const canRetry = result.code !== 'INVALID_QR' && result.code !== 'INACTIVE_CAFE';
-  setBlocked(message, canRetry ? () => { void claimVisit(supabase, provider); } : null);
-}
-
-function renderAuth(supabase, cafeName) {
-  title.textContent = cafeName ? `Tu es chez ${cafeName}` : 'Garder cette visite';
-  lead.textContent = 'Crée ton compte ici. La visite est enregistrée avant le téléchargement.';
-  panel.classList.remove('hidden');
-  panel.innerHTML = `
-    <label class="check">
-      <input id="consent" type="checkbox">
-      <span>J'accepte les <a class="inline" href="/cgu.html">CGU</a> et la <a class="inline" href="/confidentialite.html">politique de confidentialité</a>.</span>
-    </label>
-    <p class="alert hidden" id="form-error"></p>
-    <button class="primary" type="button" id="apple">Continuer avec Apple</button>
-    <button class="secondary" type="button" id="google">Continuer avec Google</button>
-    <label for="email">E-mail</label>
-    <input id="email" type="email" autocomplete="email" inputmode="email">
-    <label for="password">Mot de passe</label>
-    <input id="password" type="password" autocomplete="new-password">
-    <button class="primary" type="button" id="email-new">Créer le compte</button>
-    <button class="ghost" type="button" id="email-in">J'ai déjà un compte</button>
-    <div id="otp-box" class="hidden">
-      <label for="otp">Code à 6 chiffres</label>
-      <input id="otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
-      <button class="primary" type="button" id="otp-go">Valider le code</button>
-    </div>
-  `;
-  showAppLink(true);
-
-  const errorLine = panel.querySelector('#form-error');
-  const showError = (message) => {
-    errorLine.textContent = message;
-    errorLine.classList.remove('hidden');
-  };
-
-  const consentChecked = () => panel.querySelector('#consent').checked;
-
-  const remember = (provider) => {
-    if (!consentChecked()) {
-      showError('Accepte les conditions pour garder cette visite.');
-      return false;
-    }
-    sessionStorage.setItem(CONSENT_KEY, '1');
-    sessionStorage.setItem(PROVIDER_KEY, provider);
-    return true;
-  };
-
-  panel.querySelector('#apple').addEventListener('click', async () => {
-    if (!remember('apple')) return;
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-      options: { redirectTo: location.href },
-    });
-    if (error) showError("Apple n'a pas pu ouvrir la connexion. Réessaie.");
-  });
-
-  panel.querySelector('#google').addEventListener('click', async () => {
-    if (!remember('google')) return;
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: location.href },
-    });
-    if (error) showError("Google n'a pas pu ouvrir la connexion. Réessaie.");
-  });
-
-  panel.querySelector('#email-new').addEventListener('click', async () => {
-    if (!remember('email')) return;
-    const email = panel.querySelector('#email').value.trim();
-    const password = panel.querySelector('#password').value;
-    const passwordProblem = passwordError(password);
-    if (!email || passwordProblem) {
-      showError(passwordProblem ?? 'Indique ton e-mail.');
+    if (STORE_CODES.has(result.code)) {
+      const cafeId = typeof result.data?.cafe_id === 'string' ? result.data.cafe_id : '';
+      const parcours = await loadParcours(supabase, user.id, cafeId);
+      const email = user.email || pendingEmail || '';
+      sessionStorage.removeItem(PROVIDER_KEY);
+      sessionStorage.removeItem(CONSENT_KEY);
+      const outcome = {
+        badges: result.data?.unlocked_badges,
+        parcours,
+        provider,
+        email,
+      };
+      if (result.code === 'OK') {
+        const grains = result.data?.grains_awarded;
+        const grainsNode = paintOutcome(screens.done, { ...outcome, grains });
+        show('done');
+        if (grainsNode) animateCount(grainsNode, grains);
+        burst(screens.done.querySelector('[data-confetti]'));
+      } else {
+        paintOutcome(screens.already, outcome);
+        show('already');
+      }
       return;
     }
+
+    if (result.code === 'TOO_FAR') {
+      showFar(false);
+      return;
+    }
+
+    const failure = claimFailure(result);
+    if (failure.retry === 'welcome') {
+      showBlocked(failure.message, () => {
+        sessionStorage.removeItem(CONSENT_KEY);
+        cguInput.checked = false;
+        syncCgu();
+        show('welcome');
+      });
+      return;
+    }
+    showBlocked(failure.message, failure.retry ? () => { void claimVisit(provider); } : null);
+  } finally {
+    claiming = false;
+  }
+}
+
+function openEmail() {
+  if (!remember('email')) return;
+  emailError.textContent = '';
+  show('email');
+  emailInput.focus();
+}
+
+async function signUp(event) {
+  event.preventDefault();
+  if (busy) return;
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  const passwordProblem = passwordError(password);
+  if (!email || passwordProblem) {
+    emailError.textContent = passwordProblem ?? COPY.needEmail;
+    return;
+  }
+  busy = true;
+  emailError.textContent = '';
+  try {
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
-      showError("Le compte n'a pas pu être créé. Réessaie.");
+      emailError.textContent = COPY.signupFail;
       return;
     }
     if ((data.user?.identities?.length ?? 0) === 0) {
-      showError('Ce compte existe déjà. Connecte-toi.');
+      emailError.textContent = COPY.accountExists;
       return;
     }
+    pendingEmail = email;
     if (data.session) {
-      await claimVisit(supabase, 'email');
+      show('why');
       return;
     }
-    panel.querySelector('#otp-box').classList.remove('hidden');
-    showError('Entre le code reçu par e-mail.');
-  });
+    codeEmail.textContent = email;
+    codeInput.value = '';
+    renderDigits('');
+    codeNote.textContent = '';
+    show('code');
+    codeInput.focus();
+  } finally {
+    busy = false;
+  }
+}
 
-  panel.querySelector('#email-in').addEventListener('click', async () => {
-    if (!remember('email')) return;
-    const email = panel.querySelector('#email').value.trim();
-    const password = panel.querySelector('#password').value;
-    if (!email || !password) {
-      showError('Indique ton e-mail et ton mot de passe.');
-      return;
-    }
+async function signIn() {
+  if (busy) return;
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  if (!email || !password) {
+    emailError.textContent = COPY.needBoth;
+    return;
+  }
+  busy = true;
+  emailError.textContent = '';
+  try {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      showError('E-mail ou mot de passe incorrect.');
+      emailError.textContent = COPY.badLogin;
       return;
     }
-    await claimVisit(supabase, 'email');
-  });
+    pendingEmail = email;
+    show('why');
+  } finally {
+    busy = false;
+  }
+}
 
-  panel.querySelector('#otp-go').addEventListener('click', async () => {
-    const email = panel.querySelector('#email').value.trim();
-    const otp = panel.querySelector('#otp').value.trim();
-    const { error } = await supabase.auth.verifyOtp({ email, token: otp, type: 'email' });
+async function pasteCode() {
+  let text = '';
+  try {
+    text = await navigator.clipboard.readText();
+  } catch {
+    return;
+  }
+  const digits = text.trim();
+  if (!/^\d{6}$/.test(digits)) return;
+  codeInput.value = digits;
+  renderDigits(digits);
+}
+
+async function verifyCode() {
+  if (busy) return;
+  const otp = currentCode();
+  if (otp.length !== 6) return;
+  busy = true;
+  codeNote.textContent = '';
+  try {
+    const { error } = await supabase.auth.verifyOtp({
+      email: pendingEmail,
+      token: otp,
+      type: 'email',
+    });
     if (error) {
-      showError('Ce code ne marche pas. Réessaie.');
+      codeNote.textContent = COPY.badCode;
       return;
     }
-    await claimVisit(supabase, 'email');
+    show('why');
+  } finally {
+    busy = false;
+  }
+}
+
+async function resendCode() {
+  if (busy || !pendingEmail) return;
+  busy = true;
+  codeNote.textContent = '';
+  try {
+    const { error } = await supabase.auth.resend({ type: 'signup', email: pendingEmail });
+    codeNote.textContent = error ? COPY.resendFail : COPY.resendOk;
+  } finally {
+    busy = false;
+  }
+}
+
+async function oauth(provider) {
+  if (!supabase || !remember(provider) || busy) return;
+  busy = true;
+  const fail = provider === 'apple' ? COPY.appleFail : COPY.googleFail;
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: location.href },
+    });
+    if (error) welcomeError.textContent = fail;
+  } catch {
+    welcomeError.textContent = fail;
+  } finally {
+    busy = false;
+  }
+}
+
+function bind() {
+  cguRow.addEventListener('click', (event) => {
+    if (event.target.closest('a')) return;
+    if (event.target === cguInput) return;
+    cguInput.checked = !cguInput.checked;
+    syncCgu();
+  });
+  cguInput.addEventListener('change', syncCgu);
+  cguInput.setAttribute('aria-labelledby', 'cgu-copy');
+
+  document.querySelector('#apple').addEventListener('click', () => {
+    void oauth('apple');
+  });
+  document.querySelector('#google').addEventListener('click', () => {
+    void oauth('google');
+  });
+  document.querySelector('#email-go').addEventListener('click', openEmail);
+  document.querySelector('#email-back').addEventListener('click', () => {
+    show('welcome');
+  });
+  document.querySelector('#code-back').addEventListener('click', () => {
+    show('email');
+  });
+  emailForm.addEventListener('submit', (event) => {
+    void signUp(event);
+  });
+  document.querySelector('#email-in').addEventListener('click', () => {
+    void signIn();
+  });
+  codeInput.addEventListener('input', () => {
+    const next = currentCode();
+    if (codeInput.value !== next) codeInput.value = next;
+    renderDigits(next);
+  });
+  codeGrid.addEventListener('click', () => {
+    codeInput.focus();
+  });
+  document.querySelector('#resend').addEventListener('click', () => {
+    void resendCode();
+  });
+  codeGo.addEventListener('click', () => {
+    if (currentCode().length < 6) {
+      void pasteCode();
+      return;
+    }
+    void verifyCode();
+  });
+  document.querySelector('#why-go').addEventListener('click', () => {
+    show('geo');
+  });
+  document.querySelector('#geo-go').addEventListener('click', () => {
+    const provider = sessionStorage.getItem(PROVIDER_KEY) || 'email';
+    void claimVisit(provider);
+  });
+  document.querySelector('#far-retry').addEventListener('click', () => {
+    show('geo');
   });
 }
 
 async function start() {
   if (!token) {
-    setBlocked(BLOCKED_COPY.INVALID_QR, null);
+    showBlocked(COPY.invalidQr, null);
     return;
   }
 
-  const supabase = requireConfig();
+  supabase = requireConfig();
   if (!supabase) return;
 
-  const preview = await previewCafe(supabase);
-  if (preview.code === 'INVALID_QR' || preview.code === 'INACTIVE_CAFE') {
-    setBlocked(BLOCKED_COPY[preview.code], null);
+  show('verify');
+  const started = performance.now();
+  let preview;
+  try {
+    preview = await previewCafe(supabase);
+  } finally {
+    const elapsed = performance.now() - started;
+    if (elapsed < VERIFY_HOLD_MS) await wait(VERIFY_HOLD_MS - elapsed);
+  }
+
+  const name = preview.data?.name;
+  if (preview.code !== 'OK' || typeof name !== 'string' || !name.trim()) {
+    const failure = previewFailure(preview.code);
+    showBlocked(failure.message, failure.retry ? () => { location.reload(); } : null);
     return;
   }
-  if (preview.code !== 'OK' || !preview.data?.name) {
-    setBlocked(BLOCKED_COPY[preview.code] ?? BLOCKED_COPY.INTERNAL_ERROR, () => {
-      location.reload();
-    });
-    return;
-  }
+
+  cafeName = name.trim();
+  const address = preview.data?.address;
+  cafeAddress = typeof address === 'string' ? address.trim() : '';
+  applyCafe();
 
   const { data: sessionData } = await supabase.auth.getSession();
   const provider = sessionStorage.getItem(PROVIDER_KEY);
   if (sessionData.session && sessionStorage.getItem(CONSENT_KEY) === '1' && provider) {
-    title.textContent = `Tu es chez ${preview.data.name}`;
-    await claimVisit(supabase, provider);
+    show('why');
     return;
   }
 
-  renderAuth(supabase, preview.data.name);
+  show('welcome');
 }
 
+drawQr();
+armAppLinks();
+bind();
+renderDigits('');
 start().catch(() => {
-  setBlocked(BLOCKED_COPY.INTERNAL_ERROR, () => {
+  showBlocked(COPY.generic, () => {
     location.reload();
   });
 });
