@@ -3,8 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+(function () {
+  var ua = navigator.userAgent || '';
+  var ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (ios) document.documentElement.dataset.os = 'ios';
+})();
+</script>
 <title>Gottu : le café de Paris, à explorer comme un jeu</title>
-<meta name="description" content="Gottu te guide de café en café à travers des parcours curatés. Valide chaque visite, colore ta carte, collectionne. L'ami connaisseur qui te fait découvrir les meilleurs cafés de Paris.">
+<meta name="description" content="Gottu est ouvert à Paris. Le premier parcours, Saint Ambroise, relie cinq cafés du 11e. Tu valides chaque visite, ta carte se colore, tu collectionnes.">
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -105,6 +112,29 @@ h1,h2,h3{margin:0}
 .form-state.done .signup{display:none}
 .form-state.done .signup-note{display:none}
 .form-state.done .signup-done{display:inline-flex}
+.only-ios{display:none}
+html[data-os="ios"] .only-other{display:none}
+html[data-os="ios"] .only-ios{display:block}
+html[data-os="ios"] a.nav-cta.only-ios{display:inline-block}
+.download{max-width:480px}
+.store-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.band .store-row{justify-content:center}
+.play-btn{
+  display:inline-flex;align-items:center;gap:12px;
+  background:var(--ink);color:#fff;text-decoration:none;
+  border-radius:15px;padding:8px 18px 8px 12px;min-height:54px;
+  box-shadow:0 8px 22px rgba(14,11,10,.18);
+}
+.play-btn small{display:block;font-size:10px;font-weight:500;letter-spacing:.04em;opacity:.75;line-height:1.15;text-transform:uppercase}
+.play-btn strong{display:block;font-size:16px;font-weight:700;line-height:1.15}
+.band .play-btn{box-shadow:none}
+.store-soon{cursor:default}
+.store-soon .sad{font-size:22px;line-height:1;width:26px;text-align:center}
+.ios-msg{
+  margin:0;font-weight:600;font-size:1.08rem;line-height:1.45;color:var(--ink);
+  background:#fff;border-radius:15px;padding:.95em 1.2em;max-width:36ch;
+}
+.band p.ios-msg{margin-left:auto;margin-right:auto;background:rgba(255,255,255,.94);color:var(--ink);font-weight:600}
 
 /* phone mockup */
 .heroart{position:relative;display:flex;justify-content:center}
@@ -128,17 +158,19 @@ h1,h2,h3{margin:0}
 .phone-head .serif{font-size:21px;color:var(--ink)}
 .phone-head .sub{display:block;font-size:10.5px;font-weight:600;color:var(--text-light);letter-spacing:.02em;margin-top:2px}
 .pill{font-size:11px;font-weight:700;color:var(--orange-deep);background:var(--peach);padding:5px 11px;border-radius:999px}
-.map{position:relative;height:360px;margin:0 16px;border-radius:22px;overflow:hidden;background:linear-gradient(135deg,#efe8dd,#e6dccb);box-shadow:inset 0 0 0 1px rgba(160,95,0,.06)}
-.map .road{position:absolute;background:#faf6ee;border-radius:2px}
-.map .park{position:absolute;background:#e8e0cf;border-radius:11px;opacity:.95}
-.map .river{position:absolute;left:-30px;top:44%;width:400px;height:38px;background:linear-gradient(#e3dccf,#d8cfbd);transform:rotate(-10deg);border-radius:24px;opacity:.9}
+.map{position:relative;height:300px;margin:0 16px;border-radius:22px;overflow:hidden;background:#f4ece1;box-shadow:inset 0 0 0 1px rgba(160,95,0,.06)}
+.basemap{position:absolute;inset:0;width:100%;height:100%;z-index:0}
 .route{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible}
-.route path{fill:none;stroke:var(--orange);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;opacity:.6;transition:stroke-dashoffset 2.2s cubic-bezier(.4,.0,.2,1)}
-.pin{position:absolute;width:24px;height:24px;border-radius:50% 50% 50% 0;display:grid;place-items:center;transition:all .45s cubic-bezier(.2,.9,.3,1.4);transform:rotate(-45deg) scale(.62);background:#fff;box-shadow:0 2px 5px rgba(46,38,34,.12);opacity:.55;z-index:2}
-.pin.on{background:var(--orange);box-shadow:0 5px 12px rgba(160,95,0,.4);opacity:1;transform:rotate(-45deg) scale(1)}
+.route path{fill:none;stroke-linecap:round;stroke-linejoin:round;transition:stroke-dashoffset 3.5s linear}
+.route .casing{stroke:#fff;stroke-width:7;opacity:.95}
+.route .walk{stroke:var(--orange);stroke-width:3.2;opacity:.92}
+.pin{position:absolute;width:24px;height:24px;border-radius:50% 50% 50% 0;display:grid;place-items:center;transition:all .45s cubic-bezier(.2,.9,.3,1.4);transform:translate(-50%,-50%) rotate(-45deg) scale(.62);background:#fff;box-shadow:0 2px 5px rgba(46,38,34,.12);opacity:.55;z-index:2}
+.pin.on{background:var(--orange);box-shadow:0 5px 12px rgba(160,95,0,.4);opacity:1;transform:translate(-50%,-50%) rotate(-45deg) scale(1)}
 .pin svg{width:10px;height:10px;transform:rotate(45deg);opacity:0;transition:opacity .3s}
 .pin.on svg{opacity:1}
 .pin.cur::before{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--orange);opacity:.45;z-index:-1;animation:ping 1.7s cubic-bezier(.2,.6,.4,1) infinite}
+.pin-label{position:absolute;z-index:3;font-size:10.5px;font-weight:700;color:var(--ink);background:rgba(255,255,255,.9);border-radius:999px;padding:2px 7px;white-space:nowrap;opacity:.4;pointer-events:none;line-height:1.3}
+.pin-label.on{opacity:1}
 @keyframes ping{0%{transform:scale(1);opacity:.45}80%,100%{transform:scale(2.7);opacity:0}}
 @media (prefers-reduced-motion:reduce){.pin.cur::before{animation:none;opacity:0}}
 .phone-card{margin:14px 16px 18px;background:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 4px 14px rgba(46,38,34,.04)}
@@ -147,8 +179,8 @@ h1,h2,h3{margin:0}
 .phone-card-top .count{font-weight:700;font-size:13.5px;color:var(--orange);font-variant-numeric:tabular-nums}
 .track{height:8px;background:#efe6d8;border-radius:9px;overflow:hidden}
 .track i{display:block;height:100%;width:0;background:var(--orange);border-radius:9px;transition:width .9s cubic-bezier(.3,.9,.3,1)}
-.badge-float{position:absolute;z-index:3;right:24px;top:118px;background:#fff;border-radius:16px;padding:11px 14px;box-shadow:0 12px 30px rgba(46,38,34,.2);display:flex;align-items:center;gap:10px;opacity:0;transform:scale(.4) translateY(10px)}
-.badge-float.show{opacity:1;animation:pop .55s cubic-bezier(.34,1.4,.64,1) both}
+.badge-float{display:none;margin:12px 16px 0;background:#fff;border-radius:16px;padding:10px 12px;box-shadow:0 8px 22px rgba(46,38,34,.08);align-items:center;gap:10px}
+.badge-float.show{display:flex;animation:pop .55s cubic-bezier(.34,1.4,.64,1) both}
 .badge-float .ic{width:40px;height:40px;border-radius:13px;background:var(--purple);display:grid;place-items:center;flex:none;color:#fff}
 .badge-float small{display:block;font-size:9px;color:var(--text-light)}
 .badge-float b{font-size:13px;font-weight:700;color:var(--ink)}
@@ -315,7 +347,7 @@ h1,h2,h3{margin:0}
   .signup input{min-width:0}
   .signup button{flex:1}
   .stat b{font-size:1.7rem}
-  .badge-float{right:8px;padding:9px 11px}
+  .badge-float{padding:9px 11px}
 }
 </style>
 </head>
@@ -332,7 +364,8 @@ h1,h2,h3{margin:0}
       <a href="#parcours" class="ulink">Les parcours</a>
       <a href="#faq" class="ulink">FAQ</a>
     </nav>
-    <a href="#waitlist" class="nav-cta press">Rejoindre la liste</a>
+    <a href="#telecharger" class="nav-cta press only-other">Télécharger</a>
+    <a href="#telecharger" class="nav-cta press only-ios">Télécharger l'app</a>
   </div>
 </header>
 
@@ -344,17 +377,19 @@ h1,h2,h3{margin:0}
     <div class="hero-grid">
       <div>
         <span class="over hero-eyebrow">
-          <span class="star" aria-hidden="true">✦</span>Café de spécialité · Paris · Mi-octobre 2026
+          <span class="star" aria-hidden="true">✦</span>Café de spécialité · Paris · C'est ouvert
         </span>
         <h1 class="serif">Le café de Paris,<br>à explorer comme<br><span class="italic" style="color:var(--orange)">un jeu.</span><span class="spark" style="display:inline-block;font-size:.4em;color:var(--sage);transform:translate(8px,-1.1em)">✦</span></h1>
         <p class="hero-p">Gottu te guide de café en café à travers des parcours curatés. Tu valides chaque visite, ta carte se colore, tu collectionnes. C'est l'ami connaisseur qui connaît toutes les bonnes adresses, et te les fait découvrir une par une.</p>
-        <div class="form-state" data-form>
-          <form class="signup" data-signup novalidate>
-            <input type="email" name="email" placeholder="ton@email.com" aria-label="Adresse email" required>
-            <button type="submit" class="press">Je m'inscris</button>
-          </form>
-          <p class="signup-note"><span aria-hidden="true">✓</span>Accès 24h avant tout le monde · zéro spam</p>
-          <div class="signup-done"><span class="tick" aria-hidden="true">✓</span>C'est noté. On te prévient au lancement.</div>
+        <div class="download store-row">
+          <a class="play-btn press" href="https://play.google.com/store/apps/details?id=com.gottu.app" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="#4285F4" d="M1.5 2.2c-.3.3-.5.8-.5 1.4v16.8c0 .6.2 1.1.5 1.4l.1.1 9.4-9.4v-.2L1.6 2.1l-.1.1z"/><path fill="#34A853" d="M16.4 14.6l-3.2-3.2-9.6 9.5c.4.4 1 .5 1.6.1l11.2-6.4z"/><path fill="#FBBC04" d="M20.2 10.8l-3.8-2.2-3.2 3.2 3.2 3.2 3.8-2.2c.8-.5.8-1.5 0-2z"/><path fill="#EA4335" d="M13.2 11.8 3.6 2.3c.2-.2.6-.3.9-.3.4 0 .7.1 1 .3l10.9 6.3-3.2 3.2z"/></svg>
+            <span class="play-copy"><small>Disponible sur</small><strong>Google Play</strong></span>
+          </a>
+          <span class="play-btn store-soon">
+            <span class="sad" aria-hidden="true">😢</span>
+            <span class="play-copy"><small>Bientôt sur</small><strong>iPhone</strong></span>
+          </span>
         </div>
       </div>
 
@@ -362,7 +397,7 @@ h1,h2,h3{margin:0}
         <span class="spark" style="top:24px;left:14px;font-size:22px;color:var(--orange)">✦</span>
         <span class="spark" style="bottom:60px;right:6px;font-size:15px;color:var(--purple);animation-delay:1s">✦</span>
         <img src="img/logo-mascot-dark.png" alt="" aria-hidden="true" class="hero-mascot floaty" style="animation:floaty 6s ease-in-out infinite">
-        <div class="phone" role="img" aria-label="Aperçu de l'app Gottu : une carte de Paris dont les cafés visités se colorent au fil du parcours.">
+        <div class="phone" role="img" aria-label="Aperçu de l'app Gottu : le parcours Saint Ambroise, cinq cafés dans le 11e.">
           <span class="btn btn-power" aria-hidden="true"></span>
           <span class="btn btn-vu" aria-hidden="true"></span>
           <span class="btn btn-vd" aria-hidden="true"></span>
@@ -377,31 +412,61 @@ h1,h2,h3{margin:0}
               </span>
             </div>
             <div class="phone-head">
-              <span><span class="serif">Le Marais</span><span class="sub">Parcours en cours</span></span>
-              <span class="pill">Amateur</span>
+              <span><span class="serif">Saint Ambroise</span><span class="sub">Oberkampf → Chemin Vert</span></span>
             </div>
             <div class="map" id="map" aria-hidden="true">
-              <div class="river"></div>
-              <div class="park" style="left:6%;top:8%;width:26%;height:22%"></div>
-              <div class="park" style="right:7%;bottom:9%;width:22%;height:24%"></div>
-              <div class="road" style="left:0;right:0;top:30%;height:5px"></div>
-              <div class="road" style="left:0;right:0;top:66%;height:5px"></div>
-              <div class="road" style="top:0;bottom:0;left:38%;width:5px"></div>
-              <div class="road" style="top:0;bottom:0;left:72%;width:5px"></div>
-              <svg class="route" id="route" preserveAspectRatio="none" aria-hidden="true"><path id="routepath" d=""/></svg>
+              <svg class="basemap" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <rect width="100" height="100" fill="#f4ece1"/>
+                <path d="M86-4C78 16 92 36 80 54C72 70 88 86 78 106" fill="none" stroke="#c5d8df" stroke-width="7" stroke-linecap="round"/>
+                <path d="M86-4C78 16 92 36 80 54C72 70 88 86 78 106" fill="none" stroke="#e7f2f4" stroke-width="2.5" stroke-linecap="round"/>
+                <g fill="#e6d7c4">
+                  <rect x="2" y="2" width="16" height="11" rx="1.6"/>
+                  <rect x="30" y="2" width="22" height="11" rx="1.6"/>
+                  <rect x="68" y="2" width="12" height="11" rx="1.6"/>
+                  <rect x="2" y="23" width="16" height="18" rx="1.6"/>
+                  <rect x="30" y="23" width="22" height="8" rx="1.4"/>
+                  <rect x="68" y="23" width="10" height="8" rx="1.4"/>
+                  <rect x="2" y="42" width="14" height="16" rx="1.6"/>
+                  <rect x="34" y="40" width="12" height="9" rx="1.4"/>
+                  <rect x="52" y="36" width="12" height="10" rx="1.4"/>
+                  <rect x="2" y="68" width="16" height="10" rx="1.6"/>
+                  <rect x="52" y="72" width="16" height="16" rx="1.6"/>
+                  <rect x="78" y="76" width="18" height="20" rx="1.6"/>
+                  <rect x="2" y="88" width="16" height="9" rx="1.4"/>
+                  <rect x="42" y="88" width="22" height="9" rx="1.4"/>
+                </g>
+                <g fill="#dccbb6">
+                  <rect x="80" y="40" width="16" height="14" rx="1.4"/>
+                  <rect x="20" y="88" width="16" height="9" rx="1.2"/>
+                  <rect x="68" y="58" width="8" height="10" rx="1.2"/>
+                </g>
+                <rect x="20" y="42" width="11" height="12" rx="2" fill="#d3e4d4"/>
+                <g fill="none" stroke="#fbf7f1" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M0 18H100" stroke-width="3.1"/>
+                  <path d="M24 0V100" stroke-width="2.2"/>
+                  <path d="M62 0V100" stroke-width="2.3"/>
+                  <path d="M0 52H100" stroke-width="2.2"/>
+                  <path d="M0 66H100" stroke-width="2"/>
+                  <path d="M46 40V100" stroke-width="1.8"/>
+                  <path d="M0 82H100" stroke-width="2.6"/>
+                  <path d="M24 18H62V34" stroke-width="3.8"/>
+                  <path d="M62 34 74 52 46 66 28 82" stroke-width="3.8"/>
+                </g>
+              </svg>
+              <svg class="route" id="route" preserveAspectRatio="none" aria-hidden="true"><path id="routecasing" class="casing" d=""/><path id="routepath" class="walk" d=""/></svg>
+            </div>
+            <div class="badge-float" id="badge">
+              <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5L7 22l5-3 5 3-1.5-9.5"/></svg></div>
+              <div><small class="over">Badge débloqué</small><b>Premier parcours</b></div>
             </div>
             <div class="phone-card">
               <div class="phone-card-top">
-                <span class="label">Parcours du Marais</span>
-                <span class="count" id="pcount">0/10</span>
+                <span class="label" id="plabel">À pied</span>
+                <span class="count" id="pcount">0/5</span>
               </div>
               <div class="track"><i id="ptrack"></i></div>
             </div>
             <span class="gloss" aria-hidden="true"></span>
-          </div>
-          <div class="badge-float" id="badge">
-            <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5L7 22l5-3 5 3-1.5-9.5"/></svg></div>
-            <div><small class="over">Badge débloqué</small><b>Explorateur du Marais</b></div>
           </div>
         </div>
       </div>
@@ -418,10 +483,10 @@ h1,h2,h3{margin:0}
   <div class="wrap stats-inner">
     <div class="over" style="color:var(--orange-deep)">Là où la curiosité rencontre le café</div>
     <div class="stats-row">
-      <div class="stat"><b class="serif">10</b><span>cafés fondateurs</span></div>
-      <div class="stat"><b class="serif">1<sup style="font-size:.5em">er</sup></b><span>parcours en octobre</span></div>
-      <div class="stat"><b class="serif">0 €</b><span>au lancement</span></div>
-      <div class="stat"><b class="serif">Paris</b><span>puis ville par ville</span></div>
+      <div class="stat"><b class="serif">5</b><span>cafés dans le 11e</span></div>
+      <div class="stat"><b class="serif">1</b><span>parcours ouvert</span></div>
+      <div class="stat"><b class="serif">0 €</b><span>pour explorer</span></div>
+      <div class="stat"><b class="serif">5 nov.</b><span>dernier jour</span></div>
     </div>
   </div>
 </div>
@@ -469,7 +534,7 @@ h1,h2,h3{margin:0}
       <div class="step">
         <div class="step-num" style="background:var(--peach)"><span style="color:var(--orange-deep)">1</span></div>
         <h3>Choisis un parcours</h3>
-        <p>Dix cafés triés sur le volet autour d'un quartier. Tu pars quand tu veux, dans l'ordre que tu veux.</p>
+        <p>Cinq cafés triés sur le volet, d'Oberkampf au Chemin Vert. Tu pars quand tu veux, dans l'ordre que tu veux.</p>
       </div>
       <div class="step">
         <div class="step-num" style="background:var(--mint)"><span style="color:var(--sage-deep)">2</span></div>
@@ -479,12 +544,12 @@ h1,h2,h3{margin:0}
       <div class="step">
         <div class="step-num" style="background:var(--yellow)"><span style="color:var(--ink)">3</span></div>
         <h3>Valide ta visite</h3>
-        <p>Le barista affiche un QR code, tu le scannes dans l'app. Une seconde, et la visite est enregistrée.</p>
+        <p>Au comptoir, un QR Gottu. Tu le scannes avec ton téléphone, et la visite est enregistrée.</p>
       </div>
       <div class="step">
         <div class="step-num" style="background:var(--lavender)"><span style="color:var(--purple-deep)">4</span></div>
         <h3>Collectionne &amp; progresse</h3>
-        <p>Ta carte se colore, un badge tombe, ton niveau monte. Et ta carte Wallet se met à jour toute seule.</p>
+        <p>Ta carte se colore, un badge tombe, ton niveau monte. Tout reste dans l'app.</p>
       </div>
     </div>
   </div>
@@ -515,12 +580,12 @@ h1,h2,h3{margin:0}
           <div class="ic" style="background:var(--lavender)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 3 6-7"/><path d="M3 21h18"/></svg></div>
           <div>
             <h3>Les niveaux</h3>
-            <p>Tu montes lentement, visite après visite. Une vraie progression, pas un compteur qui s'emballe.</p>
+            <p>Quatorze niveaux, visite après visite. Tu commences Eau Tiède. Tu vises Légende du Grain.</p>
             <div class="chips">
-              <span class="chip">Curieux</span>
-              <span class="chip active">Amateur</span>
-              <span class="chip">Connaisseur</span>
-              <span class="chip">Expert</span>
+              <span class="chip active">Eau Tiède</span>
+              <span class="chip">Espresso</span>
+              <span class="chip">Cappuccino</span>
+              <span class="chip">Légende du Grain</span>
             </div>
           </div>
         </div>
@@ -530,13 +595,13 @@ h1,h2,h3{margin:0}
           <div class="blob-c" aria-hidden="true"></div>
           <div class="cc-head">
             <img class="cc-logo" src="img/logo-lockup-light.png" alt="Gottu" style="height:20px;width:auto;display:block">
-            <span class="cc-pill">Amateur</span>
+            <span class="cc-pill">Eau Tiède</span>
           </div>
           <div class="cc-body">
             <div>
               <span class="over">Cafés visités</span>
-              <div class="cc-num serif">23 <small>/ Paris</small></div>
-              <span class="over">Toujours à jour, dans ton Wallet</span>
+              <div class="cc-num serif">5 <small>/ 11e</small></div>
+              <span class="over">Ta progression, dans l'app</span>
             </div>
             <div class="qr" aria-hidden="true"></div>
           </div>
@@ -552,12 +617,12 @@ h1,h2,h3{margin:0}
     <div class="parcours-card">
       <div class="parcours-left">
         <div class="over tag">Le premier parcours</div>
-        <h2 class="serif">Dix cafés. Un quartier.<br><span class="italic" style="color:var(--orange)">Octobre.</span></h2>
-        <p>On ouvre avec un quartier dense, choisi pour la qualité de ses adresses. Dix cafés fondateurs, un parcours à compléter, puis un nouveau parcours chaque mois.</p>
+        <h2 class="serif">Cinq cafés. Le 11<sup style="font-size:.5em">e</sup>.<br><span class="italic" style="color:var(--orange)">Saint Ambroise.</span></h2>
+        <p>Cinq adresses à pied, d'Oberkampf au Chemin Vert : L'Orée, Bagarre, Le Pazari, Automne et Polygone. Le parcours est ouvert, à boucler jusqu'au 5 novembre.</p>
         <div class="mini-stats">
-          <div><b class="serif">10</b><span>cafés fondateurs</span></div>
-          <div><b class="serif">1</b><span>quartier pour commencer</span></div>
-          <div><b class="serif">+1</b><span>parcours / mois</span></div>
+          <div><b class="serif">5</b><span>cafés</span></div>
+          <div><b class="serif">11<sup style="font-size:.5em">e</sup></b><span>pour commencer</span></div>
+          <div><b class="serif">5 nov.</b><span>dernier jour</span></div>
         </div>
       </div>
       <div class="parcours-art" aria-hidden="true">
@@ -566,14 +631,14 @@ h1,h2,h3{margin:0}
         <div class="ring" style="width:330px;height:330px;border-color:rgba(246,241,234,.08)"></div>
         <span class="spark" style="top:60px;left:60px;font-size:18px;color:var(--orange)">✦</span>
         <img src="img/logo-mascot-light.png" alt="" class="floaty" style="width:88px;position:relative;z-index:2;margin-bottom:14px;animation:floaty 6s ease-in-out infinite">
-        <div class="big">Octobre<span>2026</span></div>
+        <div class="big">Ouvert<span style="letter-spacing:.04em">jusqu'au 5 novembre</span></div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- WAITLIST BAND -->
-<section id="waitlist" style="padding:0 0 100px">
+<section id="telecharger" style="padding:0 0 100px">
   <div class="wrap">
     <div class="band">
       <div class="blob1" aria-hidden="true"></div>
@@ -582,15 +647,33 @@ h1,h2,h3{margin:0}
       <span class="spark" style="bottom:50px;right:16%;font-size:15px;color:var(--purple);animation-delay:.7s">✦</span>
       <div class="band-inner">
         <img class="bigstar floaty" src="img/logo-mascot-dark.png" alt="" aria-hidden="true" style="animation:floaty 5s ease-in-out infinite">
-        <h2 class="serif">Sois là dès <span class="italic" style="color:var(--orange-deeper)">le premier café.</span></h2>
-        <p>Inscris-toi à la liste d'attente : tu reçois ton accès 24h avant l'ouverture publique, et tu fais partie des tout premiers à explorer le parcours.</p>
-        <div class="form-state" data-form>
-          <form class="signup" data-signup novalidate>
-            <input type="email" name="email" placeholder="ton@email.com" aria-label="Adresse email" required>
-            <button type="submit" class="press">Rejoindre la liste</button>
-          </form>
-          <p class="signup-note">On te prévient au lancement, mi-octobre. C'est tout.</p>
-          <div class="signup-done"><span class="tick" aria-hidden="true">✓</span>Bienvenue dans le premier cercle. À très vite !</div>
+        <div class="only-other">
+          <h2 class="serif">Le premier café <span class="italic" style="color:var(--orange-deeper)">t'attend.</span></h2>
+          <p>L'app est sur Google Play. Télécharge-la et commence Saint Ambroise.</p>
+          <div class="store-row">
+            <a class="play-btn press" href="https://play.google.com/store/apps/details?id=com.gottu.app" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="#4285F4" d="M1.5 2.2c-.3.3-.5.8-.5 1.4v16.8c0 .6.2 1.1.5 1.4l.1.1 9.4-9.4v-.2L1.6 2.1l-.1.1z"/><path fill="#34A853" d="M16.4 14.6l-3.2-3.2-9.6 9.5c.4.4 1 .5 1.6.1l11.2-6.4z"/><path fill="#FBBC04" d="M20.2 10.8l-3.8-2.2-3.2 3.2 3.2 3.2 3.8-2.2c.8-.5.8-1.5 0-2z"/><path fill="#EA4335" d="M13.2 11.8 3.6 2.3c.2-.2.6-.3.9-.3.4 0 .7.1 1 .3l10.9 6.3-3.2 3.2z"/></svg>
+              <span class="play-copy"><small>Disponible sur</small><strong>Google Play</strong></span>
+            </a>
+            <span class="play-btn store-soon">
+              <span class="sad" aria-hidden="true">😢</span>
+              <span class="play-copy"><small>Bientôt sur</small><strong>iPhone</strong></span>
+            </span>
+          </div>
+        </div>
+        <div class="only-ios">
+          <h2 class="serif">Pas encore <span class="italic" style="color:var(--orange-deeper)">sur iPhone.</span></h2>
+          <p class="ios-msg">😢 On revient vers toi dès que l'app est validée.</p>
+          <div class="store-row">
+            <a class="play-btn press" href="https://play.google.com/store/apps/details?id=com.gottu.app" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="#4285F4" d="M1.5 2.2c-.3.3-.5.8-.5 1.4v16.8c0 .6.2 1.1.5 1.4l.1.1 9.4-9.4v-.2L1.6 2.1l-.1.1z"/><path fill="#34A853" d="M16.4 14.6l-3.2-3.2-9.6 9.5c.4.4 1 .5 1.6.1l11.2-6.4z"/><path fill="#FBBC04" d="M20.2 10.8l-3.8-2.2-3.2 3.2 3.2 3.2 3.8-2.2c.8-.5.8-1.5 0-2z"/><path fill="#EA4335" d="M13.2 11.8 3.6 2.3c.2-.2.6-.3.9-.3.4 0 .7.1 1 .3l10.9 6.3-3.2 3.2z"/></svg>
+              <span class="play-copy"><small>Disponible sur</small><strong>Google Play</strong></span>
+            </a>
+            <span class="play-btn store-soon">
+              <span class="sad" aria-hidden="true">😢</span>
+              <span class="play-copy"><small>Bientôt sur</small><strong>iPhone</strong></span>
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -603,8 +686,8 @@ h1,h2,h3{margin:0}
     <div class="b2b">
       <div>
         <div class="over tag">Vous êtes un café ?</div>
-        <h3 class="serif">Rejoignez les cafés fondateurs de Gottu.</h3>
-        <p>Une nouvelle vitrine, des clients qualifiés qui poussent la porte pour vous découvrir, et une place dans le tout premier parcours parisien. Les places fondatrices sont limitées.</p>
+        <h3 class="serif">Rejoignez les prochains cafés Gottu.</h3>
+        <p>Une nouvelle vitrine, et des clients qui poussent la porte pour vous découvrir. Saint Ambroise est lancé. Les prochains cafés, on les choisit avec vous.</p>
       </div>
       <a href="mailto:contact@gottu.io?subject=Devenir%20un%20caf%C3%A9%20partenaire%20Gottu" class="b2b-btn press">Devenir un café partenaire</a>
     </div>
@@ -625,15 +708,15 @@ h1,h2,h3{margin:0}
       </details>
       <details>
         <summary>Faut-il télécharger une app ?<span class="plus" aria-hidden="true">+</span></summary>
-        <p>Oui, l'app Gottu, sur iOS et Android. Elle arrive mi-octobre. Inscris-toi à la liste d'attente pour être prévenu dès qu'elle est dispo.</p>
+        <p>Oui. Sur Android, elle est sur Google Play. Sur iPhone, 😢 on revient vers toi dès que l'app est validée.</p>
       </details>
       <details>
         <summary>Comment je valide une visite ?<span class="plus" aria-hidden="true">+</span></summary>
-        <p>Sur place, le barista affiche un QR code temporaire. Tu le scannes dans l'app, et la visite est enregistrée instantanément. Pas de carte physique à porter, pas de tampon à chercher.</p>
+        <p>Sur place, tu scannes le QR Gottu du comptoir. La visite s'enregistre tout de suite. Pas de carte physique à porter, pas de tampon à chercher.</p>
       </details>
       <details>
         <summary>C'est quoi exactement, un parcours ?<span class="plus" aria-hidden="true">+</span></summary>
-        <p>Une sélection curatée de cafés autour d'un quartier ou d'un thème, à compléter à ton rythme. Tu choisis l'ordre, tu pars quand tu veux. À la complétion, tu débloques un badge.</p>
+        <p>Une sélection curatée de cafés, à compléter à ton rythme. Le premier s'appelle Saint Ambroise : cinq cafés dans le 11e, d'Oberkampf au Chemin Vert, jusqu'au 5 novembre. Tu choisis l'ordre. À la fin, tu débloques un badge.</p>
       </details>
       <details>
         <summary>Et mes données ?<span class="plus" aria-hidden="true">+</span></summary>
@@ -641,7 +724,7 @@ h1,h2,h3{margin:0}
       </details>
       <details>
         <summary>C'est dispo partout en France ?<span class="plus" aria-hidden="true">+</span></summary>
-        <p>On commence à Paris, avec un premier parcours. L'idée est ensuite de dérouler ville par ville. Si tu veux Gottu dans ta ville, dis-le nous.</p>
+        <p>On commence à Paris, avec Saint Ambroise dans le 11e. L'idée est ensuite de dérouler ville par ville. Si tu veux Gottu dans ta ville, dis-le nous.</p>
       </details>
     </div>
   </div>
@@ -669,7 +752,7 @@ h1,h2,h3{margin:0}
           <div class="over">Plus</div>
           <a href="#cafes" class="ulink">Vous êtes un café ?</a>
           <a href="#faq" class="ulink">FAQ</a>
-          <a href="#waitlist" class="ulink">Liste d'attente</a>
+          <a href="#telecharger" class="ulink">Télécharger l'app</a>
         </div>
         <div class="footer-col">
           <div class="over">Contact</div>
@@ -686,8 +769,6 @@ h1,h2,h3{margin:0}
 </footer>
 
 <script>
-const WEB3FORMS_KEY = '6f834764-0c17-4213-8dff-d7d097f11dae';
-
 const nav = document.getElementById('nav');
 const onScroll = () => nav.classList.toggle('stuck', window.scrollY > 8);
 window.addEventListener('scroll', onScroll, {passive:true});
@@ -698,45 +779,46 @@ const words = ['Curiosité','Roast','Rituel','Découverte','Quartier','Spéciali
 const group = words.map(w => `<span class="grp"><span class="w serif">${w}</span><span class="s" aria-hidden="true">✦</span></span>`).join('');
 document.getElementById('marquee').innerHTML = group + group;
 
-// waitlist forms
-document.querySelectorAll('[data-signup]').forEach(form => {
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const input = form.querySelector('input[type=email]');
-    if (!input || !input.value || !input.checkValidity()) { input && input.reportValidity && input.reportValidity(); return; }
-    const wrap = form.closest('[data-form]');
-    const data = new FormData();
-    data.append('access_key', WEB3FORMS_KEY);
-    data.append('email', input.value);
-    data.append('subject', 'Nouvelle inscription liste d\'attente Gottu');
-    fetch('https://api.web3forms.com/submit', {method:'POST', body:data}).catch(()=>{});
-    wrap.classList.add('done');
-  });
-});
-
 // animated map: pins light up, progress + badge
 (function(){
   const map = document.getElementById('map');
   const countEl = document.getElementById('pcount');
+  const labelEl = document.getElementById('plabel');
   const track = document.getElementById('ptrack');
   const badge = document.getElementById('badge');
   const routePath = document.getElementById('routepath');
-  // serpentine order so the route reads as one continuous walk
-  const pos = [
-    {l:16,t:20},{l:40,t:13},{l:63,t:22},{l:82,t:38},
-    {l:72,t:60},{l:52,t:50},{l:25,t:46},
-    {l:31,t:72},{l:55,t:78},{l:84,t:72}
+  const routeCase = document.getElementById('routecasing');
+  const stops = [
+    {l:24,t:18,name:"L'Orée",side:'right'},
+    {l:62,t:34,name:'Bagarre',side:'left'},
+    {l:74,t:52,name:'Le Pazari',side:'left'},
+    {l:46,t:66,name:'Automne',side:'right'},
+    {l:28,t:82,name:'Polygone',side:'right'}
   ];
+  const waypoints = [[24,18],[62,18],[62,34],[74,52],[46,66],[28,82]];
   const check = '<svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2 5 8.5 9.5 3.5"/></svg>';
-  const pins = pos.map(p => {
+  const pins = [];
+  const labels = [];
+  stops.forEach(p => {
     const el = document.createElement('span');
     el.className = 'pin';
     el.style.left = p.l + '%'; el.style.top = p.t + '%';
     el.innerHTML = check;
+    const label = document.createElement('span');
+    label.className = 'pin-label';
+    label.textContent = p.name;
+    label.style.top = 'calc(' + p.t + '% - 11px)';
+    if (p.side === 'left') {
+      label.style.right = 'calc(' + (100 - p.l) + '% + 14px)';
+    } else {
+      label.style.left = 'calc(' + p.l + '% + 14px)';
+    }
     map.appendChild(el);
-    return el;
+    map.appendChild(label);
+    pins.push(el);
+    labels.push(label);
   });
-  const total = pos.length;
+  const total = stops.length;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // build the route through the pin tips (in the map's pixel space)
@@ -744,10 +826,14 @@ document.querySelectorAll('[data-signup]').forEach(form => {
     const w = map.clientWidth, h = map.clientHeight;
     if (!w || !h) return null;
     document.getElementById('route').setAttribute('viewBox', '0 0 ' + w + ' ' + h);
-    const pts = pins.map(el => [el.offsetLeft + el.offsetWidth/2, el.offsetTop + el.offsetHeight/2]);
-    routePath.setAttribute('d', 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L'));
+    const pts = waypoints.map(p => [(p[0] / 100) * w, (p[1] / 100) * h]);
+    const d = 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
+    routeCase.setAttribute('d', d);
+    routePath.setAttribute('d', d);
     const len = routePath.getTotalLength();
+    routeCase.style.strokeDasharray = len;
     routePath.style.strokeDasharray = len;
+    routeCase.style.strokeDashoffset = reduce ? 0 : len;
     routePath.style.strokeDashoffset = reduce ? 0 : len;
     return len;
   };
@@ -756,13 +842,16 @@ document.querySelectorAll('[data-signup]').forEach(form => {
   const update = () => {
     countEl.textContent = lit + '/' + total;
     track.style.width = (lit/total*100) + '%';
+    if (lit > 0) labelEl.textContent = stops[lit - 1].name;
+    labels.forEach((el, i) => el.classList.toggle('on', i < lit));
     if (lit >= total) badge.classList.add('show');
   };
   const run = () => {
     buildRoute();
     if (reduce) { lit = total; pins.forEach(p=>p.classList.add('on')); update(); return; }
-    void routePath.getBoundingClientRect(); // flush so the dash transition runs
-    routePath.style.strokeDashoffset = 0; // draws over the full sequence
+    void routePath.getBoundingClientRect();
+    routeCase.style.strokeDashoffset = 0;
+    routePath.style.strokeDashoffset = 0;
     const t = setInterval(() => {
       pins.forEach(p => p.classList.remove('cur'));
       if (lit >= total) { clearInterval(t); return; }
@@ -770,7 +859,7 @@ document.querySelectorAll('[data-signup]').forEach(form => {
       if (lit + 1 < total) pins[lit + 1].classList.add('cur');
       lit++;
       update();
-    }, 240);
+    }, 700);
   };
   window.addEventListener('resize', () => { if (lit >= total) buildRoute(); });
   if ('IntersectionObserver' in window) {

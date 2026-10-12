@@ -382,8 +382,21 @@ function fillBadges(root, badges) {
   }
 }
 
+function isIos() {
+  const ua = navigator.userAgent || '';
+  return /iPad|iPhone|iPod/.test(ua)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
 function fillStores(root) {
   const row = root.querySelector('[data-stores]');
+  const note = root.querySelector('[data-ios-note]');
+  if (isIos()) {
+    row.hidden = true;
+    if (note) note.hidden = false;
+    return;
+  }
+  if (note) note.hidden = true;
   const links = [
     [root.querySelector('[data-store="apple"]'), storeUrl(config.appStoreUrl)],
     [root.querySelector('[data-store="play"]'), storeUrl(config.playStoreUrl)],
@@ -401,6 +414,38 @@ function fillStores(root) {
   }
   row.hidden = visible === 0;
   row.classList.toggle('is-single', visible === 1);
+}
+
+function wholeCount(value) {
+  const count = Number(value);
+  if (!Number.isFinite(count) || count < 1) return null;
+  return Math.floor(count);
+}
+
+/** Same words as the app's visitPassageLabel. A repeat scan never reads as a first visit. */
+function visitPassageLabel({ visitCount, isFirstVisit, alreadyCounted }) {
+  const count = wholeCount(visitCount);
+  if (alreadyCounted) {
+    if (count != null && count >= 2) return `DÉJÀ VENU · ${count}e VISITE`;
+    return 'DÉJÀ VENU';
+  }
+  if (isFirstVisit === true) return 'PREMIÈRE VISITE';
+  if (count === 1 && isFirstVisit !== false) return 'PREMIÈRE VISITE';
+  if (count != null && count >= 2) return `${count}e VISITE`;
+  if (isFirstVisit === false) return 'DÉJÀ VENU';
+  return null;
+}
+
+function paintVisitStatus(root, label) {
+  const node = root.querySelector('[data-visit-status]');
+  if (!node) return;
+  if (!label) {
+    node.hidden = true;
+    node.textContent = '';
+    return;
+  }
+  node.hidden = false;
+  node.textContent = label;
 }
 
 function paintOutcome(root, { grains, badges, parcours, provider, email }) {
@@ -621,14 +666,26 @@ async function claimVisit(provider) {
         provider,
         email,
       };
+      const passage = visitPassageLabel({
+        visitCount: result.data?.visit_count,
+        isFirstVisit:
+          result.data?.is_first_visit === true
+            ? true
+            : result.data?.is_first_visit === false
+              ? false
+              : null,
+        alreadyCounted: result.code !== 'OK',
+      });
       if (result.code === 'OK') {
         const grains = result.data?.grains_awarded;
         const grainsNode = paintOutcome(screens.done, { ...outcome, grains });
+        paintVisitStatus(screens.done, passage);
         show('done');
         if (grainsNode) animateCount(grainsNode, grains);
         burst(screens.done.querySelector('[data-confetti]'));
       } else {
         paintOutcome(screens.already, outcome);
+        paintVisitStatus(screens.already, passage);
         show('already');
       }
       return;

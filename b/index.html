@@ -452,6 +452,20 @@ img{max-width:100%;height:auto}
 .success-title{width:100%;font-size:clamp(36px,12vw,46px);text-align:center;margin-top:10px}
 .success-title span{display:block;animation:wPop 500ms cubic-bezier(.34,1.56,.64,1) both}
 .success-title span + span{animation-delay:120ms}
+.visit-status{
+  margin-top:14px;
+  background:var(--peach);
+  color:#000;
+  border:var(--line);
+  border-radius:10px;
+  font-family:Fredoka,'Helvetica Neue',sans-serif;
+  font-weight:600;
+  font-stretch:90%;
+  font-size:20px;
+  line-height:1.05;
+  padding:8px 16px 7px;
+  animation:wPop 600ms .35s cubic-bezier(.34,1.56,.64,1) both;
+}
 .grains{
   display:flex;align-items:center;gap:10px;margin-top:12px;
   padding:8px 18px;border-radius:999px;background:var(--peach);color:#000;
@@ -520,6 +534,11 @@ img{max-width:100%;height:auto}
 .store-apple{background:#fff;color:#000}
 .store-play{background:#000;color:#fff}
 .stores.is-single .store{height:56px;border-radius:999px;background:var(--peach);color:#000}
+.ios-note{
+  width:100%;margin-top:16px;padding:14px 16px;border-radius:16px;
+  background:var(--peach);color:#000;font-weight:600;font-size:16px;line-height:1.35;
+  text-align:center;animation:wUp 500ms .85s both;
+}
 
 @keyframes wUp{0%{transform:translateY(16px);opacity:0}100%{transform:none;opacity:1}}
 @keyframes wPop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.08)}100%{transform:none;opacity:1}}
@@ -728,6 +747,7 @@ img{max-width:100%;height:auto}
       <img class="success-mascot" src="assets/mascot-white.png" alt="">
       <div class="stamp" data-cafe-up></div>
       <h1 class="display success-title"><span>VISITE</span><span>ENREGISTRÉE</span></h1>
+      <p class="visit-status" data-visit-status hidden></p>
       <div class="grains" data-grains hidden>
         <img src="assets/icon-badge.png" alt="">
         +<span data-grains-n>0</span> GRAINS
@@ -747,6 +767,7 @@ img{max-width:100%;height:auto}
         <p class="method-line" data-method></p>
       </div>
       <div class="spacer"></div>
+      <p class="ios-note" data-ios-note hidden>😢 On revient vers toi dès que l'app est validée.</p>
       <div class="stores" data-stores hidden>
         <a class="store store-apple" data-store="apple" hidden target="_blank" rel="noopener noreferrer"><span class="store-kicker">Télécharger sur</span><span class="store-name">App Store</span></a>
         <a class="store store-play" data-store="play" hidden target="_blank" rel="noopener noreferrer"><span class="store-kicker">Disponible sur</span><span class="store-name">Google Play</span></a>
@@ -769,6 +790,7 @@ img{max-width:100%;height:auto}
       <img class="success-mascot" src="assets/mascot-white.png" alt="">
       <div class="stamp" data-cafe-up></div>
       <h1 class="display success-title">DÉJÀ BADGÉ ICI</h1>
+      <p class="visit-status" data-visit-status hidden></p>
       <div class="parcours" data-parcours hidden>
         <div class="kicker">PARCOURS</div>
         <div data-parcours-list></div>
@@ -783,6 +805,7 @@ img{max-width:100%;height:auto}
         <p class="method-line" data-method></p>
       </div>
       <div class="spacer"></div>
+      <p class="ios-note" data-ios-note hidden>😢 On revient vers toi dès que l'app est validée.</p>
       <div class="stores" data-stores hidden>
         <a class="store store-apple" data-store="apple" hidden target="_blank" rel="noopener noreferrer"><span class="store-kicker">Télécharger sur</span><span class="store-name">App Store</span></a>
         <a class="store store-play" data-store="play" hidden target="_blank" rel="noopener noreferrer"><span class="store-kicker">Disponible sur</span><span class="store-name">Google Play</span></a>
