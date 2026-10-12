@@ -5,6 +5,10 @@ const PRIVACY_VERSION = '2026-10';
 const PROVIDER_KEY = 'gottu.claim.provider';
 const CONSENT_KEY = 'gottu.claim.consent';
 const VERIFY_HOLD_MS = 700;
+// Android reports approximate location at 2000 m. Below that, a fix can still
+// land inside the 300 m web radius, so only the coarse band skips the claim.
+const COARSE_ACCURACY_M = 1000;
+const POSITION_WAIT_MS = 12000;
 
 const STORE_CODES = new Set(['OK', 'RECENTLY_VISITED', 'ALREADY_VISITED']);
 
@@ -58,6 +62,7 @@ const whyLead = document.querySelector('#why-lead');
 const geoTitle = document.querySelector('#geo-title');
 const farTitle = document.querySelector('#far-title');
 const farText = document.querySelector('#far-text');
+const farRetry = document.querySelector('#far-retry');
 const blockedMessage = document.querySelector('#blocked-message');
 const blockedRetry = document.querySelector('#blocked-retry');
 const digitCells = [...codeGrid.querySelectorAll('.digit')];
@@ -67,6 +72,8 @@ let cafeAddress = '';
 let pendingEmail = '';
 let busy = false;
 let claiming = false;
+let farMode = 'far';
+let coarseAsks = 0;
 let supabase = null;
 
 function wait(ms) {
@@ -125,11 +132,24 @@ function showBlocked(message, retry) {
   show('blocked');
 }
 
-function showFar(denied) {
-  farTitle.textContent = denied ? 'POSITION REQUISE' : 'TROP LOIN DU CAFÉ';
-  farText.textContent = denied
-    ? `Sans ta position, on ne peut pas confirmer que tu es chez ${cafeName}. Autorise-la dans les réglages du navigateur.`
-    : `Tu n'es pas assez près de ${cafeName}. Rapproche-toi à moins de 300 m et réessaie.`;
+function showFar(mode) {
+  farMode = mode;
+  if (mode === 'denied') {
+    farTitle.textContent = 'POSITION REQUISE';
+    farText.textContent = `Sans ta position, on ne peut pas confirmer que tu es chez ${cafeName}. Autorise-la dans les réglages du navigateur.`;
+    farRetry.textContent = 'Réessayer';
+  } else if (mode === 'coarse') {
+    coarseAsks += 1;
+    farTitle.textContent = 'POSITION APPROXIMATIVE';
+    farText.textContent = coarseAsks > 1
+      ? 'La position est toujours approximative. Dans Chrome, ouvre les réglages du site, puis Localisation, et active la position exacte.'
+      : `Le navigateur n'a partagé qu'une zone d'environ 2 km. Pour confirmer que tu es chez ${cafeName}, autorise la position exacte.`;
+    farRetry.textContent = coarseAsks > 1 ? 'Réessayer' : 'Autoriser la position exacte';
+  } else {
+    farTitle.textContent = 'TROP LOIN DU CAFÉ';
+    farText.textContent = `Tu n'es pas assez près de ${cafeName}. Rapproche-toi à moins de 300 m et réessaie.`;
+    farRetry.textContent = 'Réessayer';
+  }
   show('far');
 }
 
@@ -442,17 +462,62 @@ async function recordConsent(client, userId) {
   throw error;
 }
 
+function isCoarseAccuracy(accuracy) {
+  return Number.isFinite(accuracy) && accuracy >= COARSE_ACCURACY_M;
+}
+
 function readPosition() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
       reject(new Error('unsupported'));
       return;
     }
-    navigator.geolocation.getCurrentPosition(resolve, reject, {
-      enableHighAccuracy: true,
-      timeout: 12000,
-      maximumAge: 0,
-    });
+
+    let settled = false;
+    let best = null;
+    let watchId = 0;
+    let timer = 0;
+
+    const finish = (value, failed) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+      if (failed) reject(value);
+      else resolve(value);
+    };
+
+    timer = setTimeout(() => {
+      if (best) finish(best, false);
+      else finish(new Error('timeout'), true);
+    }, POSITION_WAIT_MS);
+
+    // accuracyMode asks Chrome for the precise-location upgrade prompt when
+    // the site only has an approximate grant. Other browsers ignore it.
+    watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const accuracy = position.coords.accuracy;
+        const bestAccuracy = best?.coords.accuracy;
+        if (
+          !best ||
+          (Number.isFinite(accuracy) &&
+            (!Number.isFinite(bestAccuracy) || accuracy < bestAccuracy))
+        ) {
+          best = position;
+        }
+        if (!isCoarseAccuracy(accuracy)) finish(position, false);
+      },
+      (error) => {
+        if (best) finish(best, false);
+        else finish(error, true);
+      },
+      {
+        enableHighAccuracy: true,
+        accuracyMode: 'precise',
+        timeout: POSITION_WAIT_MS,
+        maximumAge: 0,
+      },
+    );
   });
 }
 
@@ -509,7 +574,12 @@ async function claimVisit(provider) {
     try {
       position = await readPosition();
     } catch {
-      showFar(true);
+      showFar('denied');
+      return;
+    }
+
+    if (isCoarseAccuracy(position.coords.accuracy)) {
+      showFar('coarse');
       return;
     }
 
@@ -565,7 +635,7 @@ async function claimVisit(provider) {
     }
 
     if (result.code === 'TOO_FAR') {
-      showFar(false);
+      showFar('far');
       return;
     }
 
@@ -771,7 +841,12 @@ function bind() {
     const provider = sessionStorage.getItem(PROVIDER_KEY) || 'email';
     void claimVisit(provider);
   });
-  document.querySelector('#far-retry').addEventListener('click', () => {
+  farRetry.addEventListener('click', () => {
+    if (farMode === 'coarse') {
+      const provider = sessionStorage.getItem(PROVIDER_KEY) || 'email';
+      void claimVisit(provider);
+      return;
+    }
     show('geo');
   });
 }
