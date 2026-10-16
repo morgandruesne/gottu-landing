@@ -21,16 +21,15 @@
           "App-Key": "A-EU-6490241678"
         },
         credentials: "omit",
-        keepalive: true,
         body: JSON.stringify({
           timestamp: new Date().toISOString(),
           sessionId: gottuSession,
           eventName: name,
           systemProps: {
-            locale: navigator.language || "fr",
+            locale: (navigator.language || "fr").slice(0, 10),
             isDebug: false,
             appVersion: "",
-            sdkVersion: "gottu-web@1"
+            sdkVersion: "aptabase-web@0.5.0"
           },
           props: props || {}
         })

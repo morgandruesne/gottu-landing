@@ -8,9 +8,12 @@ import {
 
 const APTABASE_APP_KEY = 'A-EU-6490241678';
 const aptabaseSession = `${Math.floor(Date.now() / 1000)}${String(Math.floor(Math.random() * 1e8)).padStart(8, '0')}`;
-let welcomeOpenTracked = false;
 
 function trackClaim(name, props) {
+  if (typeof window.gottuTrack === 'function') {
+    window.gottuTrack(name, props);
+    return;
+  }
   try {
     fetch('https://eu.aptabase.com/api/v0/event', {
       method: 'POST',
@@ -19,16 +22,15 @@ function trackClaim(name, props) {
         'App-Key': APTABASE_APP_KEY,
       },
       credentials: 'omit',
-      keepalive: true,
       body: JSON.stringify({
         timestamp: new Date().toISOString(),
         sessionId: aptabaseSession,
         eventName: name,
         systemProps: {
-          locale: navigator.language || 'fr',
+          locale: (navigator.language || 'fr').slice(0, 10),
           isDebug: false,
           appVersion: '',
-          sdkVersion: 'gottu-web@1',
+          sdkVersion: 'aptabase-web@0.5.0',
         },
         props: props || {},
       }),
@@ -36,12 +38,6 @@ function trackClaim(name, props) {
   } catch {
     // Analytics must never break the claim.
   }
-}
-
-function trackWelcomeOpen() {
-  if (welcomeOpenTracked) return;
-  welcomeOpenTracked = true;
-  trackClaim('claim_welcome', { path: location.pathname || '/b' });
 }
 
 const CGU_VERSION = '2026-10';
@@ -158,7 +154,6 @@ function show(step) {
   locating.hidden = true;
   locating.classList.remove('run');
   window.scrollTo(0, 0);
-  if (step === 'welcome') trackWelcomeOpen();
 }
 
 function showLocating() {

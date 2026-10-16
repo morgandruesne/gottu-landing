@@ -834,6 +834,50 @@ img{max-width:100%;height:auto}
 </div>
 
 <script src="./config.js"></script>
-<script type="module" src="./claim.js"></script>
+<script>
+(function () {
+  var sent = false;
+  var session = String(Math.floor(Date.now() / 1000)) + String(Math.floor(Math.random() * 1e8)).padStart(8, "0");
+  function send(name, props) {
+    try {
+      fetch("https://eu.aptabase.com/api/v0/event", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "App-Key": "A-EU-6490241678"
+        },
+        credentials: "omit",
+        body: JSON.stringify({
+          timestamp: new Date().toISOString(),
+          sessionId: session,
+          eventName: name,
+          systemProps: {
+            locale: (navigator.language || "fr").slice(0, 10),
+            isDebug: false,
+            appVersion: "",
+            sdkVersion: "aptabase-web@0.5.0"
+          },
+          props: props || {}
+        })
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  window.gottuTrack = send;
+  function watchWelcome() {
+    var welcome = document.querySelector('[data-screen="welcome"]');
+    if (!welcome) return;
+    function opened() {
+      if (sent || welcome.hidden) return;
+      sent = true;
+      send("claim_welcome", { path: location.pathname || "/b" });
+    }
+    opened();
+    new MutationObserver(opened).observe(welcome, { attributes: true, attributeFilter: ["hidden"] });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", watchWelcome);
+  else watchWelcome();
+})();
+</script>
+<script type="module" src="./claim.js?v=3"></script>
 </body>
 </html>
