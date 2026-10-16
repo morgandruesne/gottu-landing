@@ -519,26 +519,17 @@ img{max-width:100%;height:auto}
 }
 .method .quiet{color:#ccc5b9}
 .method-line{margin:0;font-size:16px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
-.stores{
-  width:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px;
-  margin-top:16px;animation:wUp 500ms .85s both;
+.success [data-download]{margin-top:16px;animation:wUp 500ms .85s both}
+.soon{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:24px}
+.soon-backdrop{position:absolute;inset:0;border:0;padding:0;background:rgba(0,0,0,.55);cursor:pointer}
+.soon-card{
+  position:relative;background:#fff;color:#000;border:var(--line);border-radius:24px;
+  padding:28px 22px;max-width:22rem;width:100%;text-align:center;
+  display:flex;flex-direction:column;gap:14px;align-items:stretch;
+  box-shadow:6px 6px 0 var(--coffee);
 }
-.stores.is-single{grid-template-columns:1fr}
-.store{
-  height:46px;border:2.5px solid #fff;border-radius:14px;
-  text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  line-height:1.05;
-}
-.store-kicker{font-size:10px}
-.store-name{font-size:17px;font-weight:700}
-.store-apple{background:#fff;color:#000}
-.store-play{background:#000;color:#fff}
-.stores.is-single .store{height:56px;border-radius:999px;background:var(--peach);color:#000}
-.ios-note{
-  width:100%;margin-top:16px;padding:14px 16px;border-radius:16px;
-  background:var(--peach);color:#000;font-weight:600;font-size:16px;line-height:1.35;
-  text-align:center;animation:wUp 500ms .85s both;
-}
+.soon-card h2{font-size:clamp(28px,8vw,36px)}
+.soon-card .lead{color:var(--muted)}
 
 @keyframes wUp{0%{transform:translateY(16px);opacity:0}100%{transform:none;opacity:1}}
 @keyframes wPop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.08)}100%{transform:none;opacity:1}}
@@ -767,11 +758,7 @@ img{max-width:100%;height:auto}
         <p class="method-line" data-method></p>
       </div>
       <div class="spacer"></div>
-      <p class="ios-note" data-ios-note hidden>😢 On revient vers toi dès que l'app est validée.</p>
-      <div class="stores" data-stores hidden>
-        <a class="store store-apple" data-store="apple" hidden target="_blank" rel="noopener noreferrer"><span class="store-kicker">Télécharger sur</span><span class="store-name">App Store</span></a>
-        <a class="store store-play" data-store="play" hidden target="_blank" rel="noopener noreferrer"><span class="store-kicker">Disponible sur</span><span class="store-name">Google Play</span></a>
-      </div>
+      <a class="pill peach" data-download hidden target="_blank" rel="noopener noreferrer">Télécharger l'app</a>
     </div>
   </div>
 </section>
@@ -805,11 +792,7 @@ img{max-width:100%;height:auto}
         <p class="method-line" data-method></p>
       </div>
       <div class="spacer"></div>
-      <p class="ios-note" data-ios-note hidden>😢 On revient vers toi dès que l'app est validée.</p>
-      <div class="stores" data-stores hidden>
-        <a class="store store-apple" data-store="apple" hidden target="_blank" rel="noopener noreferrer"><span class="store-kicker">Télécharger sur</span><span class="store-name">App Store</span></a>
-        <a class="store store-play" data-store="play" hidden target="_blank" rel="noopener noreferrer"><span class="store-kicker">Disponible sur</span><span class="store-name">Google Play</span></a>
-      </div>
+      <a class="pill peach" data-download hidden target="_blank" rel="noopener noreferrer">Télécharger l'app</a>
     </div>
   </div>
 </section>
@@ -839,6 +822,16 @@ img{max-width:100%;height:auto}
     </div>
   </div>
 </section>
+
+<div class="soon" id="soon" hidden>
+  <button type="button" class="soon-backdrop" data-soon-close tabindex="-1" aria-label="Fermer"></button>
+  <div class="soon-card" role="dialog" aria-modal="true" aria-labelledby="soon-title">
+    <p class="kicker">IPHONE</p>
+    <h2 id="soon-title" class="display">L'app arrive bientôt.</h2>
+    <p class="lead">Pas encore sur l'App Store. On revient vers toi dès qu'elle est validée.</p>
+    <button type="button" class="pill dark" data-soon-close data-soon-focus>OK</button>
+  </div>
+</div>
 
 <script src="./config.js"></script>
 <script type="module" src="./claim.js"></script>

@@ -1,13 +1,43 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.108.2';
+import {
+  classifyWebClaimFix,
+  coarseFollowUpCopy,
+  haversineMeters,
+  webTooFarMode,
+} from './claim-location.js';
+
+const APTABASE_APP_KEY = 'A-EU-6490241678';
+let aptabaseReady = false;
+let welcomeOpened = false;
+let welcomeOpenTracked = false;
+let trackClaim = function () {};
+
+function trackWelcomeOpen() {
+  welcomeOpened = true;
+  if (!aptabaseReady || welcomeOpenTracked) return;
+  welcomeOpenTracked = true;
+  trackClaim('page_view', {
+    path: location.pathname || '/b',
+    screen: 'welcome',
+  });
+}
+
+import('https://cdn.jsdelivr.net/npm/@aptabase/web@0.5.0/+esm')
+  .then(function (aptabase) {
+    aptabase.init(APTABASE_APP_KEY);
+    trackClaim = function (name, props) {
+      try { aptabase.trackEvent(name, props); } catch { /* analytics must never break the claim */ }
+    };
+    aptabaseReady = true;
+    if (welcomeOpened) trackWelcomeOpen();
+  })
+  .catch(function () {});
 
 const CGU_VERSION = '2026-10';
 const PRIVACY_VERSION = '2026-10';
 const PROVIDER_KEY = 'gottu.claim.provider';
 const CONSENT_KEY = 'gottu.claim.consent';
 const VERIFY_HOLD_MS = 700;
-// Android reports approximate location at 2000 m. Below that, a fix can still
-// land inside the 300 m web radius, so only the coarse band skips the claim.
-const COARSE_ACCURACY_M = 1000;
 const POSITION_WAIT_MS = 12000;
 
 const STORE_CODES = new Set(['OK', 'RECENTLY_VISITED', 'ALREADY_VISITED']);
@@ -69,6 +99,8 @@ const digitCells = [...codeGrid.querySelectorAll('.digit')];
 
 let cafeName = '';
 let cafeAddress = '';
+let cafeLat = null;
+let cafeLng = null;
 let pendingEmail = '';
 let busy = false;
 let claiming = false;
@@ -115,6 +147,7 @@ function show(step) {
   locating.hidden = true;
   locating.classList.remove('run');
   window.scrollTo(0, 0);
+  if (step === 'welcome') trackWelcomeOpen();
 }
 
 function showLocating() {
@@ -142,9 +175,13 @@ function showFar(mode) {
     coarseAsks += 1;
     farTitle.textContent = 'POSITION APPROXIMATIVE';
     farText.textContent = coarseAsks > 1
-      ? 'La position est toujours approximative. Dans Chrome, ouvre les réglages du site, puis Localisation, et active la position exacte.'
+      ? coarseFollowUpCopy(navigator.userAgent)
       : `Le navigateur n'a partagé qu'une zone d'environ 2 km. Pour confirmer que tu es chez ${cafeName}, autorise la position exacte.`;
     farRetry.textContent = coarseAsks > 1 ? 'Réessayer' : 'Autoriser la position exacte';
+  } else if (mode === 'weak') {
+    farTitle.textContent = 'SIGNAL GPS FAIBLE';
+    farText.textContent = "Place-toi dehors ou près d'une fenêtre pour améliorer la réception, puis réessaie.";
+    farRetry.textContent = 'Réessayer';
   } else {
     farTitle.textContent = 'TROP LOIN DU CAFÉ';
     farText.textContent = `Tu n'es pas assez près de ${cafeName}. Rapproche-toi à moins de 300 m et réessaie.`;
@@ -389,31 +426,63 @@ function isIos() {
 }
 
 function fillStores(root) {
-  const row = root.querySelector('[data-stores]');
-  const note = root.querySelector('[data-ios-note]');
-  if (isIos()) {
-    row.hidden = true;
-    if (note) note.hidden = false;
+  const link = root.querySelector('[data-download]');
+  if (!link) return;
+  const play = storeUrl(config.playStoreUrl);
+  if (!isIos() && !play) {
+    link.hidden = true;
+    link.removeAttribute('href');
     return;
   }
-  if (note) note.hidden = true;
-  const links = [
-    [root.querySelector('[data-store="apple"]'), storeUrl(config.appStoreUrl)],
-    [root.querySelector('[data-store="play"]'), storeUrl(config.playStoreUrl)],
-  ];
-  let visible = 0;
-  for (const [link, href] of links) {
-    if (!href) {
-      link.hidden = true;
-      link.removeAttribute('href');
-      continue;
-    }
-    link.href = href;
-    link.hidden = false;
-    visible += 1;
+  if (play) link.href = play;
+  else link.removeAttribute('href');
+  link.hidden = false;
+}
+
+function bindDownloadPrompt() {
+  const soon = document.getElementById('soon');
+  let soonLast = null;
+
+  function openSoon(from) {
+    if (!soon) return;
+    soonLast = from || null;
+    soon.hidden = false;
+    const focus = soon.querySelector('[data-soon-focus]');
+    if (focus) focus.focus();
   }
-  row.hidden = visible === 0;
-  row.classList.toggle('is-single', visible === 1);
+
+  function closeSoon() {
+    if (!soon || soon.hidden) return;
+    soon.hidden = true;
+    if (soonLast && soonLast.focus) soonLast.focus();
+  }
+
+  document.addEventListener('click', function (event) {
+    const el = event.target;
+    if (!el || !el.closest) return;
+    if (el.closest('[data-soon-close]')) {
+      closeSoon();
+      return;
+    }
+    const link = el.closest('[data-download]');
+    if (!link) return;
+    const screen = link.closest('[data-screen]');
+    const props = {
+      placement: 'claim',
+      screen: screen ? screen.getAttribute('data-screen') || 'claim' : 'claim',
+    };
+    if (isIos()) {
+      event.preventDefault();
+      trackClaim('store_click', Object.assign({ store: 'ios_soon' }, props));
+      openSoon(link);
+      return;
+    }
+    trackClaim('store_click', Object.assign({ store: 'google_play' }, props));
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') closeSoon();
+  });
 }
 
 function wholeCount(value) {
@@ -507,8 +576,12 @@ async function recordConsent(client, userId) {
   throw error;
 }
 
-function isCoarseAccuracy(accuracy) {
-  return Number.isFinite(accuracy) && accuracy >= COARSE_ACCURACY_M;
+function cafeDistance(position) {
+  if (!Number.isFinite(cafeLat) || !Number.isFinite(cafeLng)) return null;
+  return haversineMeters(
+    { latitude: position.coords.latitude, longitude: position.coords.longitude },
+    { latitude: cafeLat, longitude: cafeLng },
+  );
 }
 
 function readPosition() {
@@ -550,7 +623,11 @@ function readPosition() {
         ) {
           best = position;
         }
-        if (!isCoarseAccuracy(accuracy)) finish(position, false);
+        const decision = classifyWebClaimFix({
+          accuracyMeters: accuracy,
+          distanceMeters: cafeDistance(position),
+        });
+        if (decision === 'send' || decision === 'far') finish(position, false);
       },
       (error) => {
         if (best) finish(best, false);
@@ -623,8 +700,12 @@ async function claimVisit(provider) {
       return;
     }
 
-    if (isCoarseAccuracy(position.coords.accuracy)) {
-      showFar('coarse');
+    const decision = classifyWebClaimFix({
+      accuracyMeters: position.coords.accuracy,
+      distanceMeters: cafeDistance(position),
+    });
+    if (decision === 'coarse' || decision === 'weak' || decision === 'far') {
+      showFar(decision);
       return;
     }
 
@@ -692,7 +773,7 @@ async function claimVisit(provider) {
     }
 
     if (result.code === 'TOO_FAR') {
-      showFar('far');
+      showFar(webTooFarMode(position.coords.accuracy));
       return;
     }
 
@@ -899,7 +980,7 @@ function bind() {
     void claimVisit(provider);
   });
   farRetry.addEventListener('click', () => {
-    if (farMode === 'coarse') {
+    if (farMode === 'coarse' || farMode === 'weak') {
       const provider = sessionStorage.getItem(PROVIDER_KEY) || 'email';
       void claimVisit(provider);
       return;
@@ -937,6 +1018,10 @@ async function start() {
   cafeName = name.trim();
   const address = preview.data?.address;
   cafeAddress = typeof address === 'string' ? address.trim() : '';
+  const latitude = Number(preview.data?.latitude);
+  const longitude = Number(preview.data?.longitude);
+  cafeLat = Number.isFinite(latitude) ? latitude : null;
+  cafeLng = Number.isFinite(longitude) ? longitude : null;
   applyCafe();
 
   const { data: sessionData } = await supabase.auth.getSession();
@@ -952,6 +1037,7 @@ async function start() {
 drawQr();
 armAppLinks();
 bind();
+bindDownloadPrompt();
 renderDigits('');
 start().catch(() => {
   showBlocked(COPY.generic, () => {

@@ -10,6 +10,60 @@
   if (ios) document.documentElement.dataset.os = 'ios';
 })();
 </script>
+<script type="module">
+  import { init, trackEvent } from "https://cdn.jsdelivr.net/npm/@aptabase/web@0.5.0/+esm";
+  init("A-EU-6490241678");
+  window.gottuTrack = function (name, props) {
+    try { trackEvent(name, props); } catch (e) { /* analytics must never break the page */ }
+  };
+  try {
+    window.gottuTrack("page_view", { path: location.pathname || "/" });
+  } catch (e) { /* analytics must never break the page */ }
+  var isIos = document.documentElement.dataset.os === "ios";
+  var soon = document.getElementById("soon");
+  var soonLast = null;
+
+  function openSoon(from) {
+    if (!soon) return;
+    soonLast = from || null;
+    soon.hidden = false;
+    var focus = soon.querySelector("[data-soon-focus]");
+    if (focus) focus.focus();
+  }
+
+  function closeSoon() {
+    if (!soon || soon.hidden) return;
+    soon.hidden = true;
+    if (soonLast && soonLast.focus) soonLast.focus();
+  }
+
+  document.addEventListener("click", function (event) {
+    try {
+      var el = event.target;
+      if (!el || !el.closest) return;
+      if (el.closest("[data-soon-close]")) {
+        closeSoon();
+        return;
+      }
+      var link = el.closest("a.js-download");
+      if (!link) return;
+      var placement = link.getAttribute("data-placement") || "hero";
+      if (isIos) {
+        event.preventDefault();
+        window.gottuTrack("store_click", { store: "ios_soon", placement: placement });
+        openSoon(link);
+        return;
+      }
+      if ((link.getAttribute("href") || "").indexOf("play.google.com") !== -1) {
+        window.gottuTrack("store_click", { store: "google_play", placement: placement });
+      }
+    } catch (e) { /* analytics must never break the page */ }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") closeSoon();
+  });
+</script>
 <title>Gottu : le café de Paris, à explorer comme un jeu</title>
 <meta name="description" content="Gottu est ouvert à Paris. Le premier parcours, Saint Ambroise, relie cinq cafés du 11e. Tu valides chaque visite, ta carte se colore, tu collectionnes.">
 <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
@@ -128,13 +182,18 @@ html[data-os="ios"] a.nav-cta.only-ios{display:inline-block}
 .play-btn small{display:block;font-size:10px;font-weight:500;letter-spacing:.04em;opacity:.75;line-height:1.15;text-transform:uppercase}
 .play-btn strong{display:block;font-size:16px;font-weight:700;line-height:1.15}
 .band .play-btn{box-shadow:none}
-.store-soon{cursor:default}
-.store-soon .sad{font-size:22px;line-height:1;width:26px;text-align:center}
 .ios-msg{
   margin:0;font-weight:600;font-size:1.08rem;line-height:1.45;color:var(--ink);
   background:#fff;border-radius:15px;padding:.95em 1.2em;max-width:36ch;
 }
 .band p.ios-msg{margin-left:auto;margin-right:auto;background:rgba(255,255,255,.94);color:var(--ink);font-weight:600}
+.soon{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:24px}
+.soon[hidden]{display:none}
+.soon-backdrop{position:absolute;inset:0;border:0;padding:0;background:rgba(14,11,10,.46);cursor:pointer}
+.soon-card{position:relative;background:#fff;border-radius:24px;padding:32px 28px;max-width:22rem;width:100%;text-align:center;box-shadow:0 24px 60px rgba(14,11,10,.24)}
+.soon-card h2{font-size:1.8rem;margin:8px 0 12px;color:var(--ink)}
+.soon-card p{color:var(--text-mid);margin:0 0 22px;font-size:1.02rem;line-height:1.5}
+.soon-ok{border:0;background:var(--ink);color:#fff;font-family:inherit;font-size:15px;font-weight:600;padding:12px 28px;border-radius:14px}
 
 /* phone mockup */
 .heroart{position:relative;display:flex;justify-content:center}
@@ -364,8 +423,7 @@ html[data-os="ios"] a.nav-cta.only-ios{display:inline-block}
       <a href="#parcours" class="ulink">Les parcours</a>
       <a href="#faq" class="ulink">FAQ</a>
     </nav>
-    <a href="#telecharger" class="nav-cta press only-other">Télécharger</a>
-    <a href="#telecharger" class="nav-cta press only-ios">Télécharger l'app</a>
+    <a href="#telecharger" class="nav-cta press js-download" data-placement="nav">Télécharger l'app</a>
   </div>
 </header>
 
@@ -382,14 +440,10 @@ html[data-os="ios"] a.nav-cta.only-ios{display:inline-block}
         <h1 class="serif">Le café de Paris,<br>à explorer comme<br><span class="italic" style="color:var(--orange)">un jeu.</span><span class="spark" style="display:inline-block;font-size:.4em;color:var(--sage);transform:translate(8px,-1.1em)">✦</span></h1>
         <p class="hero-p">Gottu te guide de café en café à travers des parcours curatés. Tu valides chaque visite, ta carte se colore, tu collectionnes. C'est l'ami connaisseur qui connaît toutes les bonnes adresses, et te les fait découvrir une par une.</p>
         <div class="download store-row">
-          <a class="play-btn press" href="https://play.google.com/store/apps/details?id=com.gottu.app" target="_blank" rel="noopener noreferrer">
-            <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="#4285F4" d="M1.5 2.2c-.3.3-.5.8-.5 1.4v16.8c0 .6.2 1.1.5 1.4l.1.1 9.4-9.4v-.2L1.6 2.1l-.1.1z"/><path fill="#34A853" d="M16.4 14.6l-3.2-3.2-9.6 9.5c.4.4 1 .5 1.6.1l11.2-6.4z"/><path fill="#FBBC04" d="M20.2 10.8l-3.8-2.2-3.2 3.2 3.2 3.2 3.8-2.2c.8-.5.8-1.5 0-2z"/><path fill="#EA4335" d="M13.2 11.8 3.6 2.3c.2-.2.6-.3.9-.3.4 0 .7.1 1 .3l10.9 6.3-3.2 3.2z"/></svg>
-            <span class="play-copy"><small>Disponible sur</small><strong>Google Play</strong></span>
+          <a class="play-btn press js-download" data-placement="hero" href="https://play.google.com/store/apps/details?id=com.gottu.app" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>
+            <span class="play-copy"><strong>Télécharger l'app</strong></span>
           </a>
-          <span class="play-btn store-soon">
-            <span class="sad" aria-hidden="true">😢</span>
-            <span class="play-copy"><small>Bientôt sur</small><strong>iPhone</strong></span>
-          </span>
         </div>
       </div>
 
@@ -651,28 +705,20 @@ html[data-os="ios"] a.nav-cta.only-ios{display:inline-block}
           <h2 class="serif">Le premier café <span class="italic" style="color:var(--orange-deeper)">t'attend.</span></h2>
           <p>L'app est sur Google Play. Télécharge-la et commence Saint Ambroise.</p>
           <div class="store-row">
-            <a class="play-btn press" href="https://play.google.com/store/apps/details?id=com.gottu.app" target="_blank" rel="noopener noreferrer">
-              <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="#4285F4" d="M1.5 2.2c-.3.3-.5.8-.5 1.4v16.8c0 .6.2 1.1.5 1.4l.1.1 9.4-9.4v-.2L1.6 2.1l-.1.1z"/><path fill="#34A853" d="M16.4 14.6l-3.2-3.2-9.6 9.5c.4.4 1 .5 1.6.1l11.2-6.4z"/><path fill="#FBBC04" d="M20.2 10.8l-3.8-2.2-3.2 3.2 3.2 3.2 3.8-2.2c.8-.5.8-1.5 0-2z"/><path fill="#EA4335" d="M13.2 11.8 3.6 2.3c.2-.2.6-.3.9-.3.4 0 .7.1 1 .3l10.9 6.3-3.2 3.2z"/></svg>
-              <span class="play-copy"><small>Disponible sur</small><strong>Google Play</strong></span>
+            <a class="play-btn press js-download" data-placement="telecharger" href="https://play.google.com/store/apps/details?id=com.gottu.app" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>
+              <span class="play-copy"><strong>Télécharger l'app</strong></span>
             </a>
-            <span class="play-btn store-soon">
-              <span class="sad" aria-hidden="true">😢</span>
-              <span class="play-copy"><small>Bientôt sur</small><strong>iPhone</strong></span>
-            </span>
           </div>
         </div>
         <div class="only-ios">
           <h2 class="serif">Pas encore <span class="italic" style="color:var(--orange-deeper)">sur iPhone.</span></h2>
-          <p class="ios-msg">😢 On revient vers toi dès que l'app est validée.</p>
+          <p class="ios-msg">L'app arrive bientôt. On revient vers toi dès qu'elle est validée.</p>
           <div class="store-row">
-            <a class="play-btn press" href="https://play.google.com/store/apps/details?id=com.gottu.app" target="_blank" rel="noopener noreferrer">
-              <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="#4285F4" d="M1.5 2.2c-.3.3-.5.8-.5 1.4v16.8c0 .6.2 1.1.5 1.4l.1.1 9.4-9.4v-.2L1.6 2.1l-.1.1z"/><path fill="#34A853" d="M16.4 14.6l-3.2-3.2-9.6 9.5c.4.4 1 .5 1.6.1l11.2-6.4z"/><path fill="#FBBC04" d="M20.2 10.8l-3.8-2.2-3.2 3.2 3.2 3.2 3.8-2.2c.8-.5.8-1.5 0-2z"/><path fill="#EA4335" d="M13.2 11.8 3.6 2.3c.2-.2.6-.3.9-.3.4 0 .7.1 1 .3l10.9 6.3-3.2 3.2z"/></svg>
-              <span class="play-copy"><small>Disponible sur</small><strong>Google Play</strong></span>
+            <a class="play-btn press js-download" data-placement="telecharger" href="https://play.google.com/store/apps/details?id=com.gottu.app" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>
+              <span class="play-copy"><strong>Télécharger l'app</strong></span>
             </a>
-            <span class="play-btn store-soon">
-              <span class="sad" aria-hidden="true">😢</span>
-              <span class="play-copy"><small>Bientôt sur</small><strong>iPhone</strong></span>
-            </span>
           </div>
         </div>
       </div>
@@ -870,6 +916,16 @@ document.getElementById('marquee').innerHTML = group + group;
   } else { run(); }
 })();
 </script>
+
+<div class="soon" id="soon" hidden>
+  <button type="button" class="soon-backdrop" data-soon-close tabindex="-1" aria-label="Fermer"></button>
+  <div class="soon-card" role="dialog" aria-modal="true" aria-labelledby="soon-title">
+    <p class="over">iPhone</p>
+    <h2 id="soon-title" class="serif">L'app arrive bientôt.</h2>
+    <p>Pas encore sur l'App Store. On revient vers toi dès qu'elle est validée.</p>
+    <button type="button" class="soon-ok press" data-soon-close data-soon-focus>OK</button>
+  </div>
+</div>
 
 </body>
 </html>
