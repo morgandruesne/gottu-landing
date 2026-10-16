@@ -11,10 +11,31 @@
 })();
 </script>
 <script type="module">
-  import { init, trackEvent } from "https://cdn.jsdelivr.net/npm/@aptabase/web@0.5.0/+esm";
-  init("A-EU-6490241678");
+  var gottuSession = String(Math.floor(Date.now() / 1000)) + String(Math.floor(Math.random() * 1e8)).padStart(8, "0");
   window.gottuTrack = function (name, props) {
-    try { trackEvent(name, props); } catch (e) { /* analytics must never break the page */ }
+    try {
+      fetch("https://eu.aptabase.com/api/v0/event", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "App-Key": "A-EU-6490241678"
+        },
+        credentials: "omit",
+        keepalive: true,
+        body: JSON.stringify({
+          timestamp: new Date().toISOString(),
+          sessionId: gottuSession,
+          eventName: name,
+          systemProps: {
+            locale: navigator.language || "fr",
+            isDebug: false,
+            appVersion: "",
+            sdkVersion: "gottu-web@1"
+          },
+          props: props || {}
+        })
+      }).catch(function () {});
+    } catch (e) { /* analytics must never break the page */ }
   };
   try {
     window.gottuTrack("page_view", { path: location.pathname || "/" });

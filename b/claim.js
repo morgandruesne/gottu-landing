@@ -7,31 +7,42 @@ import {
 } from './claim-location.js';
 
 const APTABASE_APP_KEY = 'A-EU-6490241678';
-let aptabaseReady = false;
-let welcomeOpened = false;
+const aptabaseSession = `${Math.floor(Date.now() / 1000)}${String(Math.floor(Math.random() * 1e8)).padStart(8, '0')}`;
 let welcomeOpenTracked = false;
-let trackClaim = function () {};
 
-function trackWelcomeOpen() {
-  welcomeOpened = true;
-  if (!aptabaseReady || welcomeOpenTracked) return;
-  welcomeOpenTracked = true;
-  trackClaim('page_view', {
-    path: location.pathname || '/b',
-    screen: 'welcome',
-  });
+function trackClaim(name, props) {
+  try {
+    fetch('https://eu.aptabase.com/api/v0/event', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'App-Key': APTABASE_APP_KEY,
+      },
+      credentials: 'omit',
+      keepalive: true,
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        sessionId: aptabaseSession,
+        eventName: name,
+        systemProps: {
+          locale: navigator.language || 'fr',
+          isDebug: false,
+          appVersion: '',
+          sdkVersion: 'gottu-web@1',
+        },
+        props: props || {},
+      }),
+    }).catch(() => {});
+  } catch {
+    // Analytics must never break the claim.
+  }
 }
 
-import('https://cdn.jsdelivr.net/npm/@aptabase/web@0.5.0/+esm')
-  .then(function (aptabase) {
-    aptabase.init(APTABASE_APP_KEY);
-    trackClaim = function (name, props) {
-      try { aptabase.trackEvent(name, props); } catch { /* analytics must never break the claim */ }
-    };
-    aptabaseReady = true;
-    if (welcomeOpened) trackWelcomeOpen();
-  })
-  .catch(function () {});
+function trackWelcomeOpen() {
+  if (welcomeOpenTracked) return;
+  welcomeOpenTracked = true;
+  trackClaim('claim_welcome', { path: location.pathname || '/b' });
+}
 
 const CGU_VERSION = '2026-10';
 const PRIVACY_VERSION = '2026-10';
