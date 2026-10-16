@@ -869,7 +869,10 @@ img{max-width:100%;height:auto}
     function opened() {
       if (sent || welcome.hidden) return;
       sent = true;
-      send("claim_welcome", { path: location.pathname || "/b" });
+      var cafe = (welcome.getAttribute("data-cafe") || "").trim().slice(0, 180);
+      var props = { path: location.pathname || "/b" };
+      if (cafe) props.cafe = cafe;
+      send("claim_welcome", props);
     }
     opened();
     new MutationObserver(opened).observe(welcome, { attributes: true, attributeFilter: ["hidden"] });
@@ -878,6 +881,6 @@ img{max-width:100%;height:auto}
   else watchWelcome();
 })();
 </script>
-<script type="module" src="./claim.js?v=3"></script>
+<script type="module" src="./claim.js?v=4"></script>
 </body>
 </html>

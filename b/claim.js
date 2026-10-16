@@ -198,6 +198,8 @@ function showFar(mode) {
 
 function applyCafe() {
   const cafeUp = upper(cafeName);
+  const welcome = document.querySelector('[data-screen="welcome"]');
+  if (welcome) welcome.dataset.cafe = cafeName;
   document.querySelectorAll('[data-cafe-up]').forEach((node) => {
     node.textContent = cafeUp;
   });
@@ -477,6 +479,7 @@ function bindDownloadPrompt() {
       placement: 'claim',
       screen: screen ? screen.getAttribute('data-screen') || 'claim' : 'claim',
     };
+    if (cafeName) props.cafe = cafeName.slice(0, 180);
     if (isIos()) {
       event.preventDefault();
       trackClaim('store_click', Object.assign({ store: 'ios_soon' }, props));
