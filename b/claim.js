@@ -437,14 +437,20 @@ function fillStores(root) {
   const link = root.querySelector('[data-download]');
   if (!link) return;
   const play = storeUrl(config.playStoreUrl);
-  if (!isIos() && !play) {
-    link.hidden = true;
+  const apple = storeUrl(config.appStoreUrl);
+  const url = isIos() ? apple : play;
+  if (url) {
+    link.href = url;
+    link.hidden = false;
+    return;
+  }
+  if (isIos()) {
+    link.hidden = false;
     link.removeAttribute('href');
     return;
   }
-  if (play) link.href = play;
-  else link.removeAttribute('href');
-  link.hidden = false;
+  link.hidden = true;
+  link.removeAttribute('href');
 }
 
 function bindDownloadPrompt() {
@@ -480,13 +486,15 @@ function bindDownloadPrompt() {
       screen: screen ? screen.getAttribute('data-screen') || 'claim' : 'claim',
     };
     if (cafeName) props.cafe = cafeName.slice(0, 180);
-    if (isIos()) {
+    const href = link.getAttribute('href') || '';
+    if (isIos() && href.indexOf('apps.apple.com') === -1) {
       event.preventDefault();
       trackClaim('store_click', Object.assign({ store: 'ios_soon' }, props));
       openSoon(link);
       return;
     }
-    trackClaim('store_click', Object.assign({ store: 'google_play' }, props));
+    const store = href.indexOf('apps.apple.com') !== -1 ? 'app_store' : 'google_play';
+    trackClaim('store_click', Object.assign({ store: store }, props));
   });
 
   document.addEventListener('keydown', function (event) {
