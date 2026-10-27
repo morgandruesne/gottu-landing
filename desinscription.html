@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Se désinscrire - Gottu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f6f1ea;
+  --ink:#2e2622;
+  --orange:#ec8a55;
+  --orange-deep:#c47a3d;
+  --text-mid:#6b5d54;
+  --text-light:#a29386;
+  --line:#ece3d6;
+  --peach:#ffe1cf;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+.serif{font-family:'Newsreader',Georgia,serif;font-weight:300;letter-spacing:-.015em;line-height:1.05}
+
+.logo{display:inline-flex;align-items:center}
+.logo img{display:block;width:auto;height:28px}
+
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(246,241,234,.85);backdrop-filter:saturate(150%) blur(12px);border-bottom:1px solid var(--line)}
+.nav-inner{max-width:1160px;margin:0 auto;padding:0 28px;height:70px;display:flex;align-items:center}
+
+.page-wrap{max-width:760px;margin:0 auto;padding:130px 28px 100px}
+.page-tag{display:inline-flex;align-items:center;gap:7px;background:var(--peach);color:var(--orange-deep);padding:6px 14px;border-radius:100px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.15em;margin-bottom:20px}
+.page-tag::before{content:"✦";font-size:11px}
+.page-title{font-size:clamp(36px,5vw,56px);margin-bottom:28px}
+
+.lead{font-size:16px;line-height:1.7;color:var(--text-mid);margin-bottom:28px;max-width:36em}
+
+.unsub-form{display:flex;flex-direction:column;align-items:flex-start;gap:12px;max-width:460px}
+.unsub-form label{font-size:13px;font-weight:600;color:var(--ink)}
+.unsub-form input[type="email"]{width:100%;font-family:inherit;font-size:16px;padding:0 16px;height:52px;border:1px solid var(--line);border-radius:14px;background:#fff;color:var(--ink);outline:none}
+.unsub-form input[type="email"]:focus{border-color:var(--orange)}
+.unsub-form button{border:0;background:var(--orange);color:#fff;font-family:inherit;font-size:15px;font-weight:600;padding:0 22px;height:52px;border-radius:14px;cursor:pointer}
+.unsub-form button:hover{background:var(--orange-deep)}
+
+.confirm{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 24px;max-width:460px}
+.confirm p{font-size:16px;line-height:1.6;color:var(--ink);font-weight:600}
+
+.footer{background:var(--ink);color:var(--paper);padding:40px 28px}
+.footer-inner{max-width:1160px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-left{display:flex;align-items:center;gap:16px}
+.footer-tagline{font-size:13px;color:rgba(246,241,234,.5);font-style:italic;font-family:'Newsreader',serif}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{font-size:13px;color:rgba(246,241,234,.6);transition:color .2s}
+.footer-links a:hover{color:var(--paper)}
+
+@media(max-width:900px){
+  .footer-inner{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <img src="img/logo-lockup-dark.png" alt="Gottu">
+    </a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="page-tag">E-mail</div>
+  <h1 class="page-title serif">Se désinscrire</h1>
+
+  <div id="unsub-ask">
+    <p class="lead">Indiquez l’adresse e-mail qui a reçu le message GOTTU.</p>
+    <form class="unsub-form" action="https://api.web3forms.com/submit" method="POST">
+      <input type="hidden" name="access_key" value="6f834764-0c17-4213-8dff-d7d097f11dae">
+      <input type="hidden" name="subject" value="Désinscription newsletter GOTTU">
+      <input type="hidden" name="redirect" value="https://gottu.io/desinscription.html?ok=1">
+      <label for="email">Adresse e-mail</label>
+      <input type="email" id="email" name="email" required autocomplete="email" inputmode="email" placeholder="vous@exemple.fr">
+      <button type="submit">Se désinscrire</button>
+    </form>
+  </div>
+
+  <div id="unsub-done" class="confirm" hidden>
+    <p>Votre demande a été reçue.</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <a href="index.html" class="logo"><img src="img/logo-lockup-light.png" alt="Gottu"></a>
+      <span class="footer-tagline">Là où la curiosité rencontre le café.</span>
+    </div>
+    <div class="footer-links">
+      <a href="mentions-legales.html">Mentions légales</a>
+      <a href="cgu.html">CGU</a>
+      <a href="confidentialite.html">Confidentialité</a>
+      <a href="suppression-compte.html">Supprimer le compte</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  if (new URLSearchParams(window.location.search).get("ok") !== "1") return;
+  var ask = document.getElementById("unsub-ask");
+  var done = document.getElementById("unsub-done");
+  if (ask) ask.hidden = true;
+  if (done) done.hidden = false;
+})();
+</script>
+
+</body>
+</html>
